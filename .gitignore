@@ -1,0 +1,59 @@
+# Python compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Dependency directories
+.pip_cache/
+pip-wheel-metadata/
+dist/
+build/
+*.egg-info/
+*.egg
+
+# FastAPI/Pydantic specific
+*.log
+*.cache
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+nosetests.xml
+junit-reports/
+
+# IDE/Editor files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite3
+
+# Miscellaneous
+*.bak
+*.swp
+*~

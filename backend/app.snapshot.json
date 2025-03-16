@@ -1,0 +1,207 @@
+{
+	"snapshot": {
+		"id": "snap-20250311",
+		"created_at": "2025-03-11T12:00:00Z",
+		"powered_by": "FastApi backend and HTMX",
+		"backend_version": "TODO - need to add more?"
+	},
+	"app": {
+		"name": "MyApp",
+		"environment": "prod",
+		"url": "https://myapp.com",
+		"status": "UP",
+		"health": "healthy",
+		"version": {
+			"number": "1.2.3",
+			"timestamp": "2025-03-10T10:00:00Z"
+		},
+		"deployment": {
+			"current_timestamp": "2025-03-10T10:00:00Z",
+			"deployment_cicd_exec_id": "?",
+			"history": { 
+				"TODO - add sub def here": ""
+			}
+		},
+		"dns": {
+			"A": "192.168.1.1",
+			"details_url": ""
+		},
+		"certificate": {
+			"registrar": "AWS",
+			"url": "https://aws.com/1",
+			"expires": "2026-03-11T12:00:00Z",
+			"name": "myapp.com"
+		}
+	},
+	"source": {
+		"git_repo_url": "https://codecommit.aws.com/org/repo",
+		"status": "active",
+		"latest_commits": [
+			{
+				"id": "abc123",
+				"message": "Fix bug",
+				"timestamp": "2025-03-10T09:00:00Z",
+				"branch": "main"
+			}
+		]
+	},
+	"aws": {
+		"account_id": "123456789012",
+		"region": "us-east-1",
+		"vpc_id": "vpc-12345678",
+		"services": [
+			"ec2",
+			"s3"
+		]
+	},
+	"cost": {
+		"currency": "USD",
+		"current_monthly_total": 150.75,
+		"past_months": [
+			{
+				"month": "2025-02-01",
+				"total": 140.50
+			}
+		],
+		"projected": [
+			{
+				"month": "2025-04-01",
+				"total": 160.00
+			}
+		]
+	},
+	"docs": [
+		{
+			"name": "Architecture Diagram",
+			"url": "https://s3.amazonaws.com/docs/arch.pdf",
+			"type": "architecture",
+			"last_updated": "2025-03-01T12:00:00Z"
+		}
+	],
+	"jira": {
+		"url": "https://myapp.atlassian.net",
+		"tickets": {
+			"open": 5,
+			"latest": [
+				{
+					"id": "JIRA-123",
+					"title": "Fix login bug",
+					"description": "Users can’t log in",
+					"status": "open",
+					"created": "2025-03-10T08:00:00Z"
+				}
+			]
+		}
+	},
+	"servicenow": {
+		"open": 3,
+		"overdue": 1,
+		"latest": [
+			{
+				"id": "INC001",
+				"title": "Server down",
+				"description": "Prod server offline",
+				"created": "2025-03-09T14:00:00Z",
+				"impact": "high",
+				"approvers": [
+					"user1@myapp.com"
+				],		
+				"parent_id": null
+			}
+		]
+	},
+	"logs": {
+		"http": {
+			"cloudwatch_url": "...",
+			"total": 1500,
+			"more_available": true,
+			"recent": [
+				{
+					"timestamp": "2025-03-11T11:55:00Z",
+					"output": "GET /api 200 OK",
+					"severity": "info"
+				}
+			]
+		}
+	},
+	"metrics": {
+		"uptime": {
+			"percentage": 99.95,
+			"last_downtime": "2025-03-01T03:00:00Z"
+		},
+		"requests": {
+			"total": 15000,
+			"rate_per_second": 10.5,
+			"errors": {
+				"count": 50,
+				"rate": 0.33
+			}
+		},
+		"latency": {
+			"avg_ms": 120,
+			"p95_ms": 250,
+			"p99_ms": 400
+		},
+		"resource_usage": {
+			"cpu_percent": 65.5,
+			"memory_mb": 2048,
+			"disk_gb": 15.3
+		}
+	},
+	"security": {
+		"vulnerabilities": {
+			"open": 3,
+			"critical": 1,
+			"latest": [
+				{
+					"id": "CVE-2025-1234",
+					"severity": "critical",
+					"description": "Buffer overflow in libX",
+					"reported": "2025-03-05T12:00:00Z"
+				}
+			]
+		},
+		"iam": {
+			"overprivileged_roles": 2,
+			"last_audit": "2025-02-01T12:00:00Z"
+		},
+		"compliance": {
+			"status": "partial",
+			"standards": [
+				"SOC2",
+				"ISO27001"
+			],
+			"last_audit": "2025-01-15T12:00:00Z"
+		}
+	},
+	"alerts": {
+		"active": 2,
+		"latest": [
+			{
+				"id": "ALERT-001",
+				"title": "High latency detected",
+				"severity": "warning",
+				"triggered": "2025-03-11T11:30:00Z",
+				"status": "open"
+			}
+		]
+	},
+	"traffic": {
+		"active_users": 120,
+		"sessions": {
+			"total": 5000,
+			"avg_duration_sec": 300
+		},
+		"geo_distribution": {
+			"US": 60,
+			"EU": 30,
+			"Other": 10
+		}
+	},
+	"backup": {
+		"last_backup": "2025-03-11T02:00:00Z",
+		"status": "successful",
+		"size_gb": 5.2,
+		"retention_days": 30
+	}
+}
