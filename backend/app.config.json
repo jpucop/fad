@@ -1,66 +1,15 @@
 {
-  "app_name": "fis-archive",
-  "app_desc": "FIS Archive",
-  "app_owner": "jkirton@ucop.edu",
-	"app_host": "aws",
-	"app_host_deploy_profile": "cicd-fargate-rds",	
-  "app_host_environments": [{
-		"name": "dev",
-		"git_branch": "dev",
-		"cicd_name": "fis-archive-dev"
-	}],
-	"project": {
-		"project_name": "fis-archive",
-    "git_repo_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/sptWeb",
-    "authors": [{
-      "name": "JP",
-      "email": "jkirton@ucop.edu"
-    }]
-  },
-  "ucop": {
-    "group": "FinApps",
-    "buisness_owners": [{
-      "name": "JP",
-      "email": "jkirton@ucop.edu"
-    }]
-  },
-  "docs": {
-    "confluence": [ {
-      "name": "UCOP Confluence - Wage CDK",
-      "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/Wage+CDK"
-    } ],
-    "box": [ {
-      "name": "UCOP Box - Wage",
-      "url": "https://ucop.box.com/s/l5mwmh2gzzrdoktgl2ag73w8zo6lgdqt"
-    }]
-  },
+  "name": "finapps-aggregate-dashboard",
+  "short_name": "FAD",
+  "version": "1.0",
+  "description": "All in one info for ucop's financial apps group and apps status and metrics and docs and tickets and request logs and all of it.",
+  "authors": [
+   "jkirton@ucop.edu" 
+  ],
+  "git_repo_url": "",
+  "": "",
   "aws": {
     "account_id": "",
-    "region": "",
-    "codecommit_project_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/sptWeb",
-    "cicd": {
-      "arn": "",
-      "last_deployment_timestamp": "",
-      "pipeline_status": ""
-    },
-    "route53": {
-      "hostedZone": ""
-    },
-    "certificatemgr": {
-      "tls_http_arn": ""
-    },
-		"rds": [{
-			"rds_arn": "",
-			"rds_name": ""
-		}],
-		"s3": {
-      "referenced_bucket_arns": [ "" ]
-    },
-    "cloudwatch_log_groups": [
-      {
-        "name": "",
-        "url": ""
-      }
-    ]
+    "region": "us-west-2"
   }
 }

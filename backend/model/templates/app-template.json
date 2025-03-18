@@ -1,0 +1,49 @@
+{
+  "app_business_name": "REMS",
+  "app_project_name": "sptWeb",
+  "project_git_repo_url": "https://aws.codecommit.com/sptWeb",
+  "inception_date": "1/1/1999",
+  "docs": [
+    {
+      "name": "",
+      "type": "architecture",
+      "desc": "",
+      "url": "https://s3.amazonaws.com/docs/arch.pdf"
+    }
+  ],
+  "jira": {
+    "name": "Additional business refs/docs/yada",
+    "desc": "",
+    "url": "https://myapp.atlassian.net"
+  },
+  "servicenow": {
+    "classifications": [{
+      "type": "",
+      "name": "",
+      "value": ""
+    }]
+  },
+  "business": [
+    {
+      "name": "Additional business refs/docs/yada",
+      "desc": "",
+      "url": ""
+    }
+  ],
+  "aws": {
+    "account_id": "",
+    "region": ""
+  },
+  "environments": [
+    {
+      "name": "DEV|QA|PROD",
+      "host": "AWS|SDSC|other",
+      "profile": "cicd-fargate-rds|cicd-lambda|cicd-fargate|other",
+      "git_branch_name": "dev",
+      "cicd": {
+        "pipeline_name": "app-dev-cicd",
+        "pipeline_id": ""
+      }
+    }
+  ]
+}

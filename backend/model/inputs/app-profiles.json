@@ -1,0 +1,6 @@
+{
+  "app_profiles": [{
+    "name": "aws-cicd-fargate-rds",
+    "description": ""
+  }]
+}

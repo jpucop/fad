@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the virtual environment directory name
-VENV_DIR=".venv"
+VENV_DIR="venv"
 
 # Check if requirements.txt exists
 if [[ ! -f "requirements.txt" ]]; then
