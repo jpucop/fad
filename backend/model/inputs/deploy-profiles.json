@@ -1,0 +1,16 @@
+{
+  "app_profiles": [
+    {
+      "name": "aws-cicd-fargate",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server"
+    },
+    {
+      "name": "aws-cicd-fargate-rds",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s)"
+    },
+    {
+      "name": "aws-cicd-lambda",
+      "description": "TODO"
+    }
+  ]
+}

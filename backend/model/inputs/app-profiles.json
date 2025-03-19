@@ -1,6 +1,20 @@
 {
-  "app_profiles": [{
-    "name": "aws-cicd-fargate-rds",
-    "description": ""
-  }]
+  "app_profiles": [
+    {
+      "name": "jboss-java17",
+      "description": ""
+    },
+    {
+      "name": "jboss-java17-sso",
+      "description": ""
+    },
+    {
+      "name": "tomcat-java17",
+      "description": ""
+    },
+    {
+      "name": "tomcat-java17-sso",
+      "description": ""
+    }
+  ]
 }
