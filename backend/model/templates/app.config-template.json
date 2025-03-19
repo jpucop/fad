@@ -1,0 +1,33 @@
+{
+  "app_name": "fis-archive",
+  "app_desc": "FIS Archive",
+  "app_business_owner": "Hema",
+  "app_business_group": "FinApps",
+  "deploy_profile": "aws-cicd-fargate-rds (from deploy-profiles.json)",
+  "app_profile": "jboss-java17-sso (from app-profiles.json)",
+  "environments": [
+    {
+      "name": "dev",
+      "app_host": "aws",
+      "git_branch": "dev",
+      "deploy_pipeline_name": "fis-archive-dev",
+      "deploy_pipeline_refid": "?",
+      "aws": {
+        "account_id": "",
+        "region": ""
+      }
+    }
+  ],
+  "source": {
+    "project_name": "fis-archive",
+    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/sptWeb"
+  },
+  "docs": [
+    {
+      "name": "UCOP Confluence - Wage CDK",
+      "type": "Confluence|JIRA|Business|Other",
+      "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/Wage+CDK",
+      "description": ""
+    }
+  ]
+}

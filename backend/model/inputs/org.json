@@ -1,0 +1,13 @@
+{
+  "org_name": "UCOP",
+  "org_group_name": "UCOP Financial Applications Group",
+  "short_name": "FinApps",
+  "lead": "bossman",
+  "members": [
+    {
+      "name": "Jon Kirton",
+      "email": "jkirton@ucop.edu",
+      "title": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "finapps-aggregate-dashboard",
+  "short_name": "FAD",
+  "version": "1.0",
+  "description": "All in one info for ucop's financial apps group and apps status and metrics and docs and tickets and request logs and all of it.",
+  "authors": [
+   "jkirton@ucop.edu" 
+  ],
+  "git_repo_url": "",
+  "": "",
+  "aws": {
+    "account_id": "",
+    "region": "us-west-2"
+  }
+}
