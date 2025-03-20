@@ -2,19 +2,19 @@
   "app_profiles": [
     {
       "name": "jboss-java17",
-      "description": ""
+      "description": "JBoss EAP 8 app server with Java 17 project"
     },
     {
       "name": "jboss-java17-sso",
-      "description": ""
+      "description": "JBoss EAP 8 app server with Java 17 project with SSO Login"
     },
     {
       "name": "tomcat-java17",
-      "description": ""
+      "description": "Tomcat app server with Java 17 web app"
     },
     {
       "name": "tomcat-java17-sso",
-      "description": ""
+      "description": "Tomcat app server with Java 17 web app with SSO Login"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "app_profiles": [
+  "deploy_profiles": [
     {
       "name": "aws-cicd-fargate",
       "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server"
