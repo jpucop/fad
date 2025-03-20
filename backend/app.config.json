@@ -1,13 +1,12 @@
 {
-  "name": "finapps-aggregate-dashboard",
-  "short_name": "FAD",
+  "name": "finapps-dashboard",
+  "short_name": "fad",
   "version": "1.0",
-  "description": "All in one info for ucop's financial apps group and apps status and metrics and docs and tickets and request logs and all of it.",
-  "authors": [
-   "jkirton@ucop.edu" 
-  ],
-  "git_repo_url": "",
-  "": "",
+  "description": "All in one dashboard for information on managed apps and real time metrics and more.",
+  "source": {
+    "project_name": "finapps-dashboard",
+    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/sptWeb"
+  },
   "aws": {
     "account_id": "",
     "region": "us-west-2"
