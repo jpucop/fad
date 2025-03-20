@@ -1,13 +1,25 @@
 {
   "org_name": "UCOP",
-  "org_group_name": "UCOP Financial Applications Group",
+  "org_group_name": "Financial Applications",
   "short_name": "FinApps",
-  "lead": "bossman",
+  "lead": {
+    "name": "Stan",
+    "email": "tsquare@bleep.edu",
+    "title": "devr",
+    "bio": "TODO"
+  },
   "members": [
     {
-      "name": "Jon Kirton",
-      "email": "jkirton@ucop.edu",
-      "title": ""
+      "name": "Stan",
+      "email": "tsquare@bleep.edu",
+      "title": "devr",
+      "bio": "TODO"
+    },
+    {
+      "name": "Stan",
+      "email": "tsquare@bleep.edu",
+      "title": "junior",
+      "bio": "TODO"
     }
   ]
 }

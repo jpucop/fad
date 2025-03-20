@@ -10,7 +10,7 @@
     },
     {
       "name": "aws-cicd-lambda",
-      "description": "TODO"
+      "description": "AWS hosted, CICD deployments, Lambda functions only"
     }
   ]
 }
