@@ -18,7 +18,6 @@
   {
     "app_name": "rems",
     "app_desc": "REMS baby",
-    "deploy_profile": "aws-cicd-fargate-rds",
     "source": {
       "project_name": "sptWeb",
       "git_origin_url": "https://aws.codecommit.com/sptWeb"

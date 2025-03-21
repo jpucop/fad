@@ -1,7 +1,6 @@
 {
   "app_name": "",
   "app_desc": "",
-  "app_profile": "",
   "environments": [],
   "source": {
     "project_name": "{source.project_name}",

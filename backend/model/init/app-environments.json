@@ -9,7 +9,7 @@
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
         "deploy_pipeline_name": "{app_name}-{env}",
-        "deploy_config": {
+        "aws": {
           "aws_account_id": "",
           "aws_region": "us-west-2"
         }
@@ -21,7 +21,7 @@
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
         "deploy_pipeline_name": "{app_name}-{env}",
-        "deploy_config": {
+        "aws": {
           "aws_account_id": "",
           "aws_region": "us-west-2"
         }
@@ -33,7 +33,7 @@
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
         "deploy_pipeline_name": "{app_name}-{env}",
-        "deploy_config": {
+        "aws": {
           "aws_account_id": "",
           "aws_region": "us-west-2"
         }
