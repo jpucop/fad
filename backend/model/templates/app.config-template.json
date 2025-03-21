@@ -2,29 +2,10 @@
   "app_name": "",
   "app_desc": "",
   "app_profile": "",
-  "environments": [
-    {
-      "env": "dev",
-      "app_host": "aws",
-      "git_branch": "dev",
-      "deploy_pipeline_name": "{app_name}-{env}",
-      "deploy_profile": "",
-      "deploy_config": {
-        "aws_account_id": "",
-        "aws_region": ""
-      }
-    }
-  ],
+  "environments": [],
   "source": {
     "project_name": "{source.project_name}",
     "git_origin_url": ""
   },
-  "docs": [
-    {
-      "name": "",
-      "type": "",
-      "url": "",
-      "description": ""
-    }
-  ]
+  "docs": []
 }

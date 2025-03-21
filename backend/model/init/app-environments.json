@@ -1,11 +1,10 @@
 [
   {
     "app_name": "",
-    "app_desc": "",
-    "project_name": "",
     "environments": [
       {
         "env": "dev",
+        "host": "aws",
         "git_branch": "{env}",
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
@@ -17,6 +16,7 @@
       },
       {
         "env": "qa",
+        "host": "aws",
         "git_branch": "{env}",
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
@@ -28,6 +28,7 @@
       },
       {
         "env": "prod",
+        "host": "aws",
         "git_branch": "main",
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
