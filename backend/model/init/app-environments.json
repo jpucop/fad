@@ -1,0 +1,42 @@
+[
+  {
+    "app_name": "",
+    "app_desc": "",
+    "project_name": "",
+    "environments": [
+      {
+        "env": "dev",
+        "git_branch": "{env}",
+        "app_profile": "tomcat-java",
+        "deploy_profile": "aws-cicd-fargate",
+        "deploy_pipeline_name": "{app_name}-{env}",
+        "deploy_config": {
+          "aws_account_id": "",
+          "aws_region": "us-west-2"
+        }
+      },
+      {
+        "env": "qa",
+        "git_branch": "{env}",
+        "app_profile": "tomcat-java",
+        "deploy_profile": "aws-cicd-fargate",
+        "deploy_pipeline_name": "{app_name}-{env}",
+        "deploy_config": {
+          "aws_account_id": "",
+          "aws_region": "us-west-2"
+        }
+      },
+      {
+        "env": "prod",
+        "git_branch": "main",
+        "app_profile": "tomcat-java",
+        "deploy_profile": "aws-cicd-fargate",
+        "deploy_pipeline_name": "{app_name}-{env}",
+        "deploy_config": {
+          "aws_account_id": "",
+          "aws_region": "us-west-2"
+        }
+      }
+    ]
+  }
+]

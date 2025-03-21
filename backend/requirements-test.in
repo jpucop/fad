@@ -1,4 +1,0 @@
--c requirements.txt  # Ensures test deps don’t override main deps
-pytest
-httpx
-pytest-asyncio

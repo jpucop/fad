@@ -1,6 +1,0 @@
-fastapi
-uvicorn[standard]
-pydantic
-botocore
-boto3
-Jinja2

@@ -1,0 +1,27 @@
+{
+  "org_name": "UCOP",
+  "group": {
+    "name": "Financial Applications",
+    "short_name": "FinApps",
+    "lead": {
+      "name": "Stan",
+      "email": "tsquare@bleep.edu",
+      "title": "devr",
+      "bio": "TODO"
+    },
+    "members": [
+      {
+        "name": "Stan",
+        "email": "tsquare@bleep.edu",
+        "title": "devr",
+        "bio": "TODO"
+      },
+      {
+        "name": "Len",
+        "email": "aate@bleep.edu",
+        "title": "snr",
+        "bio": "TODO"
+      }
+    ]
+  }
+}

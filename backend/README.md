@@ -33,7 +33,7 @@ Financial Applications UCOP group aggregate dashboard widget.
 
 ## Features
 
-TODO
+tree -I "venv|.git|.gitignore|.gitmodules"
 
 ## re-generate requirements.txt and requirements-test.txt
 

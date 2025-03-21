@@ -1,0 +1,41 @@
+[
+  {
+    "app_name": "ayso",
+    "app_desc": "At Your Service Online",
+    "source": {
+      "project_name": "aysWeb",
+      "git_origin_url": "https://aws.codecommit.com/aysWeb"
+    },
+    "docs": [
+      {
+        "name": "Wikis",
+        "type": "confluence",
+        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/aysWeb",
+        "description": "Confluence docs for AYSO"
+      }
+    ]
+  },
+  {
+    "app_name": "rems",
+    "app_desc": "REMS baby",
+    "deploy_profile": "aws-cicd-fargate-rds",
+    "source": {
+      "project_name": "sptWeb",
+      "git_origin_url": "https://aws.codecommit.com/sptWeb"
+    },
+    "docs": [
+      {
+        "name": "JIRA Docs",
+        "type": "jira",
+        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/rems",
+        "description": ""
+      },
+      {
+        "name": "REMS FinApps wiki (confluence)",
+        "type": "confluence",
+        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/rems",
+        "description": ""
+      }
+    ]  
+  }
+]

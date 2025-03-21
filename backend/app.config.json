@@ -1,14 +1,8 @@
 {
-  "name": "finapps-dashboard",
-  "short_name": "fad",
   "version": "1.0",
-  "description": "All in one dashboard for information on managed apps and real time metrics and more.",
-  "source": {
-    "project_name": "finapps-dashboard",
-    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/sptWeb"
-  },
-  "aws": {
-    "account_id": "",
-    "region": "us-west-2"
+  "args": {
+    "": "",
+    "model_dir": "model/gen", 
+    "model_timestamp": "{{ model_timestamp }}"
   }
 }
