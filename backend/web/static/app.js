@@ -1,24 +1,39 @@
-<script>
-    let ecsMetrics = window.ecsData.series[0].pointlist.map(([time, value]) => ({
-        time: new Date(time * 1000).toLocaleTimeString(),
-        value
-    }));
-    
-    let labels = ecsMetrics.map(item => item.time);
-    let data = ecsMetrics.map(item => item.value);
-
-    onMount(() => {
-        new Chart(document.getElementById("ecsChart"), {
-            type: "line",
-            data: {
-                labels,
-                datasets: [{
-                    label: "Running Tasks",
-                    data,
-                    borderColor: "blue",
-                    fill: false
-                }]
-            }
-        });
-    });
-</script>
+function treeNav() {
+  return {
+      nodes: [
+          {
+              title: "Dashboard",
+              path: "/",
+              children: [],
+              expanded: false
+          },
+          {
+              title: "Config",
+              path: "/config",
+              children: [],
+              expanded: false
+          },
+          {
+              title: "Apps",
+              path: "/apps",
+              children: [
+                  { title: "ayso", path: "/configs/ayso" },
+                  { title: "rems", path: "/configs/rems" }
+              ],
+              expanded: false
+          }
+      ],
+      initTree() {
+          // Initialize tree state
+      },
+      toggleNode(node) {
+          node.expanded = !node.expanded;
+      },
+      navigate(path) {
+          window.location.href = path;
+      },
+      isCurrent(path) {
+          return window.location.pathname === path;
+      }
+  };
+}
