@@ -4,7 +4,15 @@
   "environments": [],
   "source": {
     "project_name": "{source.project_name}",
-    "git_origin_url": ""
+    "git_origin_url": "https://aws.codecommit.com/{aws_region}/{project_name}",
+    "aws_account_id": "finapps-dev",
+    "aws_region": "us-west-2"
   },
-  "docs": []
+  "docs": [
+    {
+      "name": "FinApps Group Docs",
+      "url": "https://ucop.edu/finapps/wiki/",
+      "type": "Confluence"
+    }
+  ]  
 }
