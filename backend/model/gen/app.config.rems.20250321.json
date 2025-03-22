@@ -1,0 +1,63 @@
+{
+  "app_name": "rems",
+  "app_desc": "REMS baby",
+  "environments": [
+    {
+      "env": "dev",
+      "host": "aws",
+      "git_branch": "dev",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "rems-dev",
+      "aws": {
+        "aws_account_id": "",
+        "aws_region": "us-west-2"
+      }
+    },
+    {
+      "env": "qa",
+      "host": "aws",
+      "git_branch": "qa",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "rems-qa",
+      "aws": {
+        "aws_account_id": "",
+        "aws_region": "us-west-2"
+      }
+    },
+    {
+      "env": "prod",
+      "host": "aws",
+      "git_branch": "main",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "rems-prod",
+      "aws": {
+        "aws_account_id": "",
+        "aws_region": "us-west-2"
+      }
+    }
+  ],
+  "source": {
+    "project_name": "sptWeb",
+    "git_origin_url": "https://aws.codecommit.com/sptWeb",
+    "aws_account_id": "finapps-dev",
+    "aws_region": "us-west-2"
+  },
+  "docs": [
+    {
+      "name": "JIRA Docs",
+      "type": "jira",
+      "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/rems",
+      "description": ""
+    },
+    {
+      "name": "REMS FinApps wiki (confluence)",
+      "type": "confluence",
+      "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/rems",
+      "description": ""
+    }
+  ],
+  "app_profile": "tomcat-java"
+}
