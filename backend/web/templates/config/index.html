@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinApps Apps Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/custom.css">
+</head>
 
 <head>
   <title>FAD Apps</title>
 </head>
 
 <body>
-  <h1>{{ org.name }} Apps</h1> <!-- Uses org.name, which is "Financial Applications" -->
+  <h1>{{ org.name }} Apps</h1>
   <ul>
     {% for app in apps %}
     <li>{{ app.app_name }} - {{ app.app_desc }}</li>
