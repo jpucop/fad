@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
-echo("starting localhost fastapi server..")
-fastapi dev backend/app/main.py
+cd ~/dev/fad/backend
+echo("running from <project_root>/backend/")
 
+echo("starting localhost fastapi server..")
+# fastapi dev backend/app/main.py
+uvicorn main:app --reload

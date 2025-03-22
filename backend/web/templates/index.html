@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,48 +9,51 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="/static/custom.css">
 </head>
+
 <body>
   <div class="layout">
-  <aside class="nav-tree" x-data="treeNav()" x-init="initTree">
-    <h3>Site Navigation</h3>
-    <ul class="tree">
-    <template x-for="(node, index) in nodes" :key="node.path">
-      <li>
-      <span @click="toggleNode(node)" class="toggle" :class="{ 'expanded': node.expanded }">
-        <i class="fas" :class="node.expanded ? 'fa-minus' : 'fa-plus'" x-show="node.children.length"></i>
-        <i class="fas fa-file" x-show="!node.children.length"></i>
-      </span>
-      <a @click="navigate(node.path)" :class="{ 'active': isCurrent(node.path) }" x-text="node.title"></a>
-      <ul x-show="node.expanded" x-transition>
-        <template x-for="child in node.children" :key="child.path">
-        <li>
-          <span class="toggle"><i class="fas fa-file"></i></span>
-          <a @click="navigate(child.path)" :class="{ 'active': isCurrent(child.path) }" x-text="child.title"></a>
-        </li>
+    <aside class="nav-tree" x-data="treeNav()" x-init="initTree">
+      <h3>Site Navigation</h3>
+      <ul class="tree">
+        <template x-for="(node, index) in nodes" :key="node.path">
+          <li>
+            <span @click="toggleNode(node)" class="toggle" :class="{ 'expanded': node.expanded }">
+              <i class="fas" :class="node.expanded ? 'fa-minus' : 'fa-plus'" x-show="node.children.length"></i>
+              <i class="fas fa-file" x-show="!node.children.length"></i>
+            </span>
+            <a @click="navigate(node.path)" :class="{ 'active': isCurrent(node.path) }" x-text="node.title"></a>
+            <ul x-show="node.expanded" x-transition>
+              <template x-for="child in node.children" :key="child.path">
+                <li>
+                  <span class="toggle"><i class="fas fa-file"></i></span>
+                  <a @click="navigate(child.path)" :class="{ 'active': isCurrent(child.path) }"
+                    x-text="child.title"></a>
+                </li>
+              </template>
+            </ul>
+          </li>
         </template>
       </ul>
-      </li>
-    </template>
-    </ul>
-  </aside>
-  <div class="main-container">
-    <header>
-    <h1>Financial Applications Dashboard</h1>
-    <nav>
-      <a @click="navigate('/stats')">Stats</a>
-      <a @click="navigate('/logs')">Logs</a>
-      <a @click="navigate('/services')">Services</a>
-    </nav>
-    </header>
-    <main id="main-content">
-    {% include 'dashboard.html' %}
-    </main>
-    <footer>
-    <p>Advanced Logic - Dashboard</p>
-    </footer>
-  </div>
+    </aside>
+    <div class="main-container">
+      <header>
+        <h1>Financial Applications Dashboard</h1>
+        <nav>
+          <a @click="navigate('/stats')">Stats</a>
+          <a @click="navigate('/logs')">Logs</a>
+          <a @click="navigate('/services')">Services</a>
+        </nav>
+      </header>
+      <main id="main-content">
+        {% include 'dashboard.html' %}
+      </main>
+      <footer>
+        <p>Advanced Logic - Dashboard</p>
+      </footer>
+    </div>
   </div>
   <script src="/static/alpine.min.js" defer></script>
   <script src="/static/app.js"></script>
 </body>
+
 </html>

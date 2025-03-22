@@ -2,7 +2,7 @@
   "version": "1.0",
   "args": {
     "": "",
-    "model_dir": "model/gen", 
+    "model_dir": "model/gen",
     "model_timestamp": "{{ model_timestamp }}"
   }
 }

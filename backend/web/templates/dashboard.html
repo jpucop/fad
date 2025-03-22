@@ -1,30 +1,30 @@
 <section>
   <h2>Applications</h2>
   {% for app in apps %}
-    <article>
-      <h3>{{ app.app_name }} - {{ app.app_desc }}</h3>
-      <p><strong>Project:</strong> {{ app.source.project_name }}</p>
-      <p><strong>Git:</strong> <a href="{{ app.source.git_origin_url }}">{{ app.source.git_origin_url }}</a></p>
-      <details>
-        <summary>Environments</summary>
-        <ul>
-          {% for env in app.environments %}
-            <li>
-              <strong>{{ env.env }}</strong>: 
-              {{ env.app_profile.description }} on {{ env.deploy_profile.description }} 
-              (Region: {{ env.aws.aws_region }})
-            </li>
-          {% endfor %}
-        </ul>
-      </details>
-      <details>
-        <summary>Documentation</summary>
-        <ul>
-          {% for doc in app.docs %}
-            <li><a href="{{ doc.url }}">{{ doc.name }} ({{ doc.type }})</a></li>
-          {% endfor %}
-        </ul>
-      </details>
-    </article>
+  <article>
+    <h3>{{ app.app_name }} - {{ app.app_desc }}</h3>
+    <p><strong>Project:</strong> {{ app.source.project_name }}</p>
+    <p><strong>Git:</strong> <a href="{{ app.source.git_origin_url }}">{{ app.source.git_origin_url }}</a></p>
+    <details>
+      <summary>Environments</summary>
+      <ul>
+        {% for env in app.environments %}
+        <li>
+          <strong>{{ env.env }}</strong>:
+          {{ env.app_profile.description }} on {{ env.deploy_profile.description }}
+          (Region: {{ env.aws.aws_region }})
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    <details>
+      <summary>Documentation</summary>
+      <ul>
+        {% for doc in app.docs %}
+        <li><a href="{{ doc.url }}">{{ doc.name }} ({{ doc.type }})</a></li>
+        {% endfor %}
+      </ul>
+    </details>
+  </article>
   {% endfor %}
 </section>

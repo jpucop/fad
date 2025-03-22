@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>FAD Apps</title>
+  <title>FAD Apps</title>
 </head>
+
 <body>
-    <h1>{{ org.name }} Apps</h1>  <!-- Uses org.name, which is "Financial Applications" -->
-    <ul>
+  <h1>{{ org.name }} Apps</h1> <!-- Uses org.name, which is "Financial Applications" -->
+  <ul>
     {% for app in apps %}
-        <li>{{ app.app_name }} - {{ app.app_desc }}</li>
+    <li>{{ app.app_name }} - {{ app.app_desc }}</li>
     {% endfor %}
-    </ul>
+  </ul>
 </body>
+
 </html>
