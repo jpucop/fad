@@ -1,7 +1,7 @@
 {
   "app_name": "",
+  "app_config_version": "1",
   "app_desc": "",
-  "environments": [],
   "source": {
     "project_name": "{source.project_name}",
     "git_origin_url": "https://aws.codecommit.com/{aws_region}/{project_name}",
@@ -14,5 +14,6 @@
       "url": "https://ucop.edu/finapps/wiki/",
       "type": "Confluence"
     }
-  ]  
+  ],
+  "environments": []
 }
