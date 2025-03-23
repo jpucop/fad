@@ -1,6 +1,6 @@
 {
+  "version": "1",
   "app_name": "",
-  "app_config_version": "1",
   "app_desc": "",
   "source": {
     "project_name": "{source.project_name}",
