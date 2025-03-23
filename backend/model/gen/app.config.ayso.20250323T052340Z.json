@@ -30,9 +30,10 @@
       "deploy_profile": "aws-cicd-fargate",
       "deploy_pipeline_name": "ayso-dev",
       "aws": {
-        "aws_account_id": "123456789012",
-        "aws_region": "us-west-2"
-      }
+        "account_id": "123456789012",
+        "region": "us-west-2"
+      },
+      "env": "dev"
     },
     {
       "host": "aws",
@@ -41,9 +42,10 @@
       "deploy_profile": "aws-cicd-fargate",
       "deploy_pipeline_name": "ayso-qa",
       "aws": {
-        "aws_account_id": "123456789012",
-        "aws_region": "us-west-2"
-      }
+        "account_id": "123456789012",
+        "region": "us-west-2"
+      },
+      "env": "qa"
     },
     {
       "host": "aws",
@@ -52,9 +54,10 @@
       "deploy_profile": "aws-cicd-fargate",
       "deploy_pipeline_name": "ayso-prod",
       "aws": {
-        "aws_account_id": "123456789012",
-        "aws_region": "us-west-2"
-      }
+        "account_id": "123456789012",
+        "region": "us-west-2"
+      },
+      "env": "prod"
     }
   ]
 }

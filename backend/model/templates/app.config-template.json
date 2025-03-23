@@ -15,5 +15,18 @@
   "servicenow": {
     "url": "{servicenow_base_url}/{app_name}"
   },
-  "environments": []
+  "environments": [
+    {
+      "env": "{env}",
+      "host": "aws",
+      "git_branch": "{env}",
+      "app_profile": "{app_profile}",
+      "deploy_profile": "{deploy_profile}",
+      "deploy_pipeline_name": "{app_name}-{env}",
+      "aws": {
+        "account_id": "{aws_account_id}",
+        "region": "{aws_region}"
+      }
+    }
+  ]
 }

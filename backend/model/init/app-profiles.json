@@ -6,8 +6,8 @@
     },
     {
       "name": "jboss-java-sso",
-      "description": "{jboss_java.name} with SSO login"
-    },
+      "description": "JBoss EAP app server with Java EE war file app bundle with SSO login"
+    },    
     {
       "name": "tomcat-java",
       "description": "Tomcat app server with Java 17 web app"

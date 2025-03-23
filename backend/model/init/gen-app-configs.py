@@ -47,8 +47,8 @@ def generate_app_configs():
 
   default_env = env_data["default_environment"]
   env_overrides = env_data.get("overrides", {})
-  aws_region = default_env["aws"]["aws_region"]  # Use from default env
-  env_list = ["dev", "qa", "prod"]  # Could be made configurable via env_data
+  aws_region = default_env["aws"]["aws_region"]
+  env_list = ["dev", "qa", "prod"]  # Could be configurable via env_data
 
   timestamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")  # e.g., "20250323T120000Z"
 
@@ -86,12 +86,16 @@ def generate_app_configs():
       if deploy_profile not in deploy_profiles:
         raise ValueError(f"Invalid deploy_profile '{deploy_profile}' for app '{app_name}'")
       env_config["deploy_profile"] = deploy_profile
+      env_config["env"] = env_name  # Explicitly set the env name
       replacements = {
         "app_name": app_name,
         "env": env_name,
         "aws_account_id": org_data["group"].get("aws_account_id", "")
       }
       env_config = replace_placeholders(env_config, replacements)
+      # Align with snapshot field names
+      env_config["aws"]["account_id"] = env_config["aws"].pop("aws_account_id")
+      env_config["aws"]["region"] = env_config["aws"].pop("aws_region")
       config["environments"].append(env_config)
 
     # Add org-related fields
