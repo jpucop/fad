@@ -1,0 +1,60 @@
+{
+  "app_name": "ayso",
+  "app_desc": "At Your Service Online",
+  "app_profile": "tomcat-java",
+  "source": {
+    "project_name": "aysWeb",
+    "git_origin_url": "https://aws.codecommit.com/aysWeb",
+    "aws_account_id": "123456789012",
+    "aws_region": "us-west-2"
+  },
+  "docs": [
+    {
+      "name": "Wikis",
+      "type": "confluence",
+      "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/pages/48138543/aysWeb",
+      "description": "Confluence docs for AYSO"
+    }
+  ],
+  "jira": {
+    "url": "https://ucopedu.atlassian.net/projects/ayso"
+  },
+  "servicenow": {
+    "url": "https://ucop.service-now.com/ayso"
+  },
+  "environments": [
+    {
+      "host": "aws",
+      "git_branch": "dev",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "ayso-dev",
+      "aws": {
+        "aws_account_id": "123456789012",
+        "aws_region": "us-west-2"
+      }
+    },
+    {
+      "host": "aws",
+      "git_branch": "qa",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "ayso-qa",
+      "aws": {
+        "aws_account_id": "123456789012",
+        "aws_region": "us-west-2"
+      }
+    },
+    {
+      "host": "aws",
+      "git_branch": "main",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "ayso-prod",
+      "aws": {
+        "aws_account_id": "123456789012",
+        "aws_region": "us-west-2"
+      }
+    }
+  ]
+}

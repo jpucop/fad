@@ -1,6 +1,5 @@
 {
   "default_environment": {
-    "env": "dev",
     "host": "aws",
     "git_branch": "{env}",
     "app_profile": "tomcat-java",

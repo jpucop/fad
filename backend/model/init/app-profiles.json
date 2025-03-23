@@ -2,28 +2,23 @@
   "app_profiles": [
     {
       "name": "jboss-java",
-      "description": "JBoss EAP app server with Java 17 project",
-      "dependency_manager": "maven|gradle|python"
+      "description": "JBoss EAP app server with Java EE war file app bundle."
     },
     {
       "name": "jboss-java-sso",
-      "description": "JBoss EAP app server with Java 17 project with SSO Login",
-      "dependency_manager": "maven|gradle|python"
+      "description": "{jboss_java.name} with SSO login"
     },
     {
       "name": "tomcat-java",
-      "description": "Tomcat app server with Java 17 web app",
-      "dependency_manager": "maven|gradle|python"
+      "description": "Tomcat app server with Java 17 web app"
     },
     {
       "name": "tomcat-java-sso",
-      "description": "Tomcat app server with Java 17 web app with SSO Login",
-      "dependency_manager": "maven|gradle|python"
+      "description": "Tomcat app server with Java 17 web app with SSO Login"
     },
     {
       "name": "flask-sso",
-      "description": "Tomcat app server with Java 17 web app with SSO Login",
-      "dependency_manager": "maven|gradle|python"
+      "description": "Tomcat app server with Java 17 web app with SSO Login"
     }
   ]
 }

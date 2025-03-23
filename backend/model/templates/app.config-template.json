@@ -6,22 +6,14 @@
     "project_name": "{source.project_name}",
     "git_origin_url": "",
     "aws_account_id": "{aws_account_id}",
-    "aws_region": "us-west-2"
+    "aws_region": "{aws_region}"
   },
-  "docs": [
-    {
-      "name": "",
-      "url": "",
-      "description": ""
-    }
-  ],
+  "docs": [],
   "jira": {
-    "url": "",
-    "app_ref_name": ""
+    "url": "{jira_base_url}/projects/{app_name}"
   },
   "servicenow": {
-    "url": "",
-    "app_ref_name": ""
+    "url": "{servicenow_base_url}/{app_name}"
   },
   "environments": []
 }

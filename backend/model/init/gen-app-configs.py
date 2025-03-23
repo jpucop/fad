@@ -8,8 +8,8 @@ GEN_DIR = os.path.join(BASE_DIR, "../gen")
 TEMPLATE_PATH = os.path.join(BASE_DIR, "../templates/app.config-template.json")
 APPS_PATH = os.path.join(BASE_DIR, "apps.json")
 ENV_PATH = os.path.join(BASE_DIR, "app-environments.json")
-APP_PROFILES_PATH = os.path.join(BASE_DIR, "app-profile-defs.json")
-DEPLOY_PROFILES_PATH = os.path.join(BASE_DIR, "deploy-profile-defs.json")
+APP_PROFILES_PATH = os.path.join(BASE_DIR, "app-profiles.json")
+DEPLOY_PROFILES_PATH = os.path.join(BASE_DIR, "deploy-profiles.json")
 ORG_PATH = os.path.join(BASE_DIR, "org.json")
 
 # Ensure gen directory exists
@@ -47,8 +47,10 @@ def generate_app_configs():
 
   default_env = env_data["default_environment"]
   env_overrides = env_data.get("overrides", {})
+  aws_region = default_env["aws"]["aws_region"]  # Use from default env
+  env_list = ["dev", "qa", "prod"]  # Could be made configurable via env_data
 
-  timestamp = datetime.now().isoformat()  # e.g., "2025-03-23T12:00:00Z"
+  timestamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")  # e.g., "20250323T120000Z"
 
   for app in apps_data:
     app_name = app["app_name"]
@@ -60,7 +62,7 @@ def generate_app_configs():
       raise ValueError(f"Invalid app_profile '{app_profile}' for app '{app_name}'")
 
     # Create config from template
-    config = template.copy()
+    config = json.loads(json.dumps(template))  # Deep copy
     config["app_name"] = app_name
     config["app_desc"] = app.get("app_desc", "")
     config["app_profile"] = app_profile
@@ -69,7 +71,7 @@ def generate_app_configs():
       {
         "source.project_name": project_name,
         "aws_account_id": org_data["group"].get("aws_account_id", ""),
-        "aws_region": "us-west-2"  # Could be parameterized
+        "aws_region": aws_region
       }
     )
     config["source"]["git_origin_url"] = app["source"]["git_origin_url"]
@@ -77,8 +79,8 @@ def generate_app_configs():
 
     # Populate environments
     config["environments"] = []
-    for env_name in ["dev", "qa", "prod"]:  # Hardcoded for simplicity; could be configurable
-      env_config = default_env.copy()
+    for env_name in env_list:
+      env_config = json.loads(json.dumps(default_env))  # Deep copy
       env_config.update(env_overrides.get(env_name, {}))
       deploy_profile = app.get("deploy_profile", env_config["deploy_profile"])
       if deploy_profile not in deploy_profiles:
@@ -93,11 +95,14 @@ def generate_app_configs():
       config["environments"].append(env_config)
 
     # Add org-related fields
-    config["jira"]["url"] = replace_placeholders(
-      config["jira"]["url"],
+    config["jira"] = replace_placeholders(
+      config["jira"],
       {"jira_base_url": org_data["group"]["jira_base_url"], "app_name": app_name}
     )
-    config["servicenow"]["url"] = f"{org_data['group']['servicenow_base_url']}/{app_name}"
+    config["servicenow"] = replace_placeholders(
+      config["servicenow"],
+      {"servicenow_base_url": org_data["group"]["servicenow_base_url"], "app_name": app_name}
+    )
 
     # Write output
     output_file = os.path.join(GEN_DIR, f"app.config.{app_name}.{timestamp}.json")
