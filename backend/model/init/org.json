@@ -3,25 +3,8 @@
   "group": {
     "name": "Financial Applications",
     "short_name": "FinApps",
-    "lead": {
-      "name": "Stan",
-      "email": "tsquare@bleep.edu",
-      "title": "devr",
-      "bio": "TODO"
-    },
-    "members": [
-      {
-        "name": "Stan",
-        "email": "tsquare@bleep.edu",
-        "title": "devr",
-        "bio": "TODO"
-      },
-      {
-        "name": "Len",
-        "email": "aate@bleep.edu",
-        "title": "snr",
-        "bio": "TODO"
-      }
-    ]
+    "aws_account_id": "123456789012",
+    "jira_base_url": "https://ucopedu.atlassian.net",
+    "servicenow_base_url": "https://ucop.service-now.com"
   }
 }
