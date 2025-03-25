@@ -1,0 +1,45 @@
+.
+├── Dockerfile
+├── README.md
+├── app
+│   ├── config.py
+│   ├── main.py
+│   └── models.py
+├── app.config.json
+├── fetchers
+│   ├── aws_info_fetcher.py
+│   └── aws_pipeline_app_fetcher.py
+├── local.bat
+├── local.sh
+├── model
+│   ├── app.config-ayso.json
+│   ├── app.config-rems.json
+│   ├── app_deploy_profiles.json
+│   ├── app_profiles.json
+│   ├── aws.json
+│   ├── gen.py
+│   ├── org.json
+│   └── templates
+│       ├── app.config-template.json
+│       └── app.snapshot-template.json
+├── ptree.txt
+├── requirements.txt
+├── resetenv.bat
+├── resetenv.sh
+├── source-venv.sh
+└── web
+    ├── static
+    │   ├── alpine.min.js
+    │   ├── app.js
+    │   ├── custom.css
+    │   ├── favicon.ico
+    │   └── simple.min.css
+    └── templates
+        ├── app-tile-grid.html
+        ├── app-tile.html
+        ├── config
+        │   └── index.html
+        ├── dashboard.html
+        └── index.html
+
+9 directories, 34 files

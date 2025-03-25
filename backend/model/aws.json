@@ -1,0 +1,28 @@
+{
+  "accounts": [
+    {
+      "name": "finapps-dev",
+      "account_id": "999",
+      "region": "us-west-2",
+      "desc": "Base FinApps AWS account holding project source repositoryies and all DEV and QA environments."
+    },
+    {
+      "name": "finapps-prod",
+      "account_id": "777",
+      "region": "us-west-2",
+      "desc": "Production FinApps AWS account."
+    },
+    {
+      "name": "fis-dev",
+      "account_id": "111",
+      "region": "us-west-2",
+      "desc": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+    },
+    {
+      "name": "fis-prod",
+      "account_id": "555",
+      "region": "us-west-2",
+      "desc": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+    }
+  ]
+}

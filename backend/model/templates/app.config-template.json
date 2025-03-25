@@ -1,31 +1,32 @@
 {
+  "version": "1",
   "app_name": "",
   "app_desc": "",
-  "app_profile": "{app_profile}",
+  "app_profile": "{app_profiles[].name}",
   "source": {
-    "project_name": "{source.project_name}",
+    "project_name": "",
     "git_origin_url": "",
-    "aws_account_id": "{aws_account_id}",
-    "aws_region": "{aws_region}"
+    "aws": {
+      "account_name": ""
+    }
   },
-  "docs": [],
-  "jira": {
-    "url": "{jira_base_url}/projects/{app_name}"
-  },
-  "servicenow": {
-    "url": "{servicenow_base_url}/{app_name}"
-  },
+  "docs": [
+    {
+      "name": "",
+      "desc": "",
+      "url": ""
+    }
+  ],
   "environments": [
     {
-      "env": "{env}",
+      "name": "dev|qa|prod",
       "host": "aws",
-      "git_branch": "{env}",
-      "app_profile": "{app_profile}",
-      "deploy_profile": "{deploy_profile}",
-      "deploy_pipeline_name": "{app_name}-{env}",
+      "git_branch": "{name}",
+      "app_profile": "{app_profiles[].name}",
+      "deploy_profile": "{deploy_profiles[].name}",
+      "deploy_pipeline_name": "pipeline-{app_name}-{env}",
       "aws": {
-        "account_id": "{aws_account_id}",
-        "region": "{aws_region}"
+        "account_name": "{aws.accounts[].name}"
       }
     }
   ]

@@ -1,6 +1,8 @@
 {
-  "app_snapshot_id": "app-snap-{app_name}-{app.env}-{unique_suffix}",
-  "app_snapshot_timestamp": "2025-03-11T12:00:00Z",
+  "app_snapshot": {
+    "id": "app-snap-{app_name}-{app.env}-{unique_suffix}",
+    "timestamp": "2025-03-11T12:00:00Z"  
+  },
   "app": {
     "name": "{app_name}",
     "desc": "{app_desc}",
@@ -18,7 +20,7 @@
         "git_branch": "{env}",
         "app_profile": "tomcat-java",
         "deploy_profile": "aws-cicd-fargate",
-        "deploy_pipeline_name": "{app_name}-{env}",
+        "deploy_pipeline_name": "pipeline-{app_name}-{env}",
         "deployment": {
           "timestamp": "2025-03-10T10:00:00Z",
           "deploy_pipeline_execution_id": "?"
@@ -34,8 +36,9 @@
           "name": "myapp.com"
         },
         "aws": {
-          "account_id": "123456789012",
-          "region": "us-east-1"
+          "account_name": "",
+          "account_id": "",
+          "region": ""
         },
         "cost": {
           "currency": "USD",
@@ -115,6 +118,9 @@
     ],
     "source": {
       "git_origin": "https://codecommit.aws.com/org/repo",
+      "aws": {
+        "account_name": ""
+      },
       "latest_commits": [
         {
           "id": "abc123",

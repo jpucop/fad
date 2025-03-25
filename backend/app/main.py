@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 import json
 from pathlib import Path
 import re
-from app.models import AppConfig, Profile
+from app.models import AppConfig
 
 app = FastAPI()
 
@@ -14,8 +14,6 @@ STATIC_DIR = BASE_DIR / "web/static"
 TEMPLATES_DIR = BASE_DIR / "web/templates"
 ORG_CONFIG = BASE_DIR / "model/init/org.json"
 GEN_DIR = BASE_DIR / "model/gen"
-PROFILE_DEFS = BASE_DIR / "model/init/app-profile-defs.json"
-DEPLOY_DEFS = BASE_DIR / "model/init/deploy-profile-defs.json"
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -24,18 +22,6 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 # Load org and profile data
 with ORG_CONFIG.open() as f:
     ORG_DATA = json.load(f)
-with PROFILE_DEFS.open() as f:
-    APP_PROFILES = {p["name"]: p for p in json.load(f)["app_profiles"]}
-with DEPLOY_DEFS.open() as f:
-    DEPLOY_PROFILES = {p["name"]: p for p in json.load(f)["deploy_profiles"]}
-
-def enrich_config(config: AppConfig) -> dict:
-    """Enrich the config with full profile details."""
-    config_dict = config.dict()
-    for env in config_dict["environments"]:
-        env["app_profile"] = APP_PROFILES.get(env["app_profile"], {"name": env["app_profile"]})
-        env["deploy_profile"] = DEPLOY_PROFILES.get(env["deploy_profile"], {"name": env["deploy_profile"]})
-    return config_dict
 
 def load_app_config(filename: str) -> AppConfig:
     """Load and validate an app config file."""

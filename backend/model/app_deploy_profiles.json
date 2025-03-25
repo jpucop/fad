@@ -9,6 +9,14 @@
       "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s)"
     },
     {
+      "name": "aws-cicd-fargate-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server and SSO login"
+    },
+    {
+      "name": "aws-cicd-fargate-rds-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s) and SSO login"
+    },
+    {
       "name": "aws-cicd-lambda",
       "description": "AWS hosted, CICD deployments, Lambda functions only"
     }

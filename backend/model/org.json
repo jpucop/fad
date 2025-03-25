@@ -3,7 +3,6 @@
   "group": {
     "name": "Financial Applications",
     "short_name": "FinApps",
-    "aws_account_id": "123456789012",
     "jira_base_url": "https://ucopedu.atlassian.net",
     "servicenow_base_url": "https://ucop.service-now.com"
   }
