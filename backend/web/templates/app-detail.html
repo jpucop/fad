@@ -1,0 +1,116 @@
+<!-- app/templates/app-detail.html -->
+<div class="app-detail" x-data="{ tab: 'overview' }">
+  <h2><i class="fas fa-cube"></i> {{ config.app_name }} - {{ config.app_desc }}</h2>
+  
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button @click="tab = 'overview'" :class="{ 'active': tab === 'overview' }">Overview</button>
+    <button @click="tab = 'environments'" :class="{ 'active': tab === 'environments' }">Environments</button>
+    <button @click="tab = 'source'" :class="{ 'active': tab === 'source' }">Source</button>
+    <button @click="tab = 'docs'" :class="{ 'active': tab === 'docs' }">Docs</button>
+    <button @click="tab = 'metrics'" :class="{ 'active': tab === 'metrics' }">Metrics</button>
+    <button @click="tab = 'security'" :class="{ 'active': tab === 'security' }">Security</button>
+    <button @click="tab = 'logs'" :class="{ 'active': tab === 'logs' }">Logs</button>
+    <button @click="tab = 'tickets'" :class="{ 'active': tab === 'tickets' }">Tickets</button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <div x-show="tab === 'overview'" x-transition>
+      <p>Snapshot ID: {{ snapshot.app_snapshot_id }}</p>
+      <p>Last Updated: {{ snapshot.app_snapshot_timestamp }}</p>
+      <p>Environments: {{ snapshot.app.environments|length }}</p>
+    </div>
+    
+    <div x-show="tab === 'environments'" x-transition>
+      {% for env in snapshot.app.environments %}
+        <div class="env-section">
+          <h4>{{ env.env }} ({{ env.status }})</h4>
+          <p><i class="fas fa-heartbeat"></i> Health: {{ env.health }}</p>
+          <p><i class="fas fa-link"></i> URL: <a href="{{ env.url }}">{{ env.url }}</a></p>
+          <p><i class="fas fa-code-branch"></i> Branch: {{ env.git_branch }}</p>
+          <p><i class="fas fa-rocket"></i> Pipeline: {{ env.deploy_pipeline_name }}</p>
+          <p><i class="fas fa-clock"></i> Last Deploy: {{ env.deployment.timestamp }}</p>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div x-show="tab === 'source'" x-transition>
+      <p><i class="fas fa-code"></i> Git: <a href="{{ snapshot.app.source.git_origin }}">{{ snapshot.app.source.git_origin }}</a></p>
+      <h4>Latest Commits</h4>
+      <ul>
+        {% for commit in snapshot.app.source.latest_commits %}
+          <li>{{ commit.timestamp }} - {{ commit.message }} ({{ commit.id }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+    
+    <div x-show="tab = 'docs'" x-transition>
+      <ul>
+        {% for doc in snapshot.app.docs %}
+          <li><i class="fas fa-file-alt"></i> <a href="{{ doc.url }}">{{ doc.name }} ({{ doc.type }})</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    
+    <div x-show="tab === 'metrics'" x-transition>
+      {% for env in snapshot.app.environments %}
+        <div class="env-section">
+          <h4>{{ env.env }}</h4>
+          <p><i class="fas fa-clock"></i> Uptime: {{ env.metrics.uptime.percentage }}%</p>
+          <p><i class="fas fa-exchange-alt"></i> Requests: {{ env.metrics.requests.total }} ({{ env.metrics.requests.rate_per_second }}/s)</p>
+          <p><i class="fas fa-exclamation-circle"></i> Errors: {{ env.metrics.requests.errors.count }} ({{ env.metrics.requests.errors.rate }}%)</p>
+          <p><i class="fas fa-tachometer-alt"></i> Latency: Avg {{ env.metrics.latency.avg_ms }}ms, P95 {{ env.metrics.latency.p95_ms }}ms</p>
+          <p><i class="fas fa-microchip"></i> CPU: {{ env.metrics.resource_usage.cpu_percent }}%</p>
+          <p><i class="fas fa-memory"></i> Memory: {{ env.metrics.resource_usage.memory_mb }} MB</p>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div x-show="tab === 'security'" x-transition>
+      {% for env in snapshot.app.environments %}
+        <div class="env-section">
+          <h4>{{ env.env }}</h4>
+          <p><i class="fas fa-shield-alt"></i> Open Vulns: {{ env.security.vulnerabilities.open }}</p>
+          <p><i class="fas fa-exclamation-triangle"></i> Critical: {{ env.security.vulnerabilities.critical }}</p>
+          <ul>
+            {% for vuln in env.security.vulnerabilities.latest %}
+              <li>{{ vuln.severity }} - {{ vuln.description }} ({{ vuln.id }})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div x-show="tab === 'logs'" x-transition>
+      {% for env in snapshot.app.environments %}
+        <div class="env-section">
+          <h4>{{ env.env }} - HTTP Logs</h4>
+          <p><a href="{{ env.logs.http.cloudwatch_url }}">CloudWatch</a></p>
+          <ul>
+            {% for log in env.logs.http.recent %}
+              <li>{{ log.timestamp }} - {{ log.output }} ({{ log.severity }})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div x-show="tab === 'tickets'" x-transition>
+      <h4>Jira</h4>
+      <p><i class="fas fa-ticket-alt"></i> Open: {{ snapshot.app.jira.tickets.open }}</p>
+      <ul>
+        {% for ticket in snapshot.app.jira.tickets.latest %}
+          <li>{{ ticket.id }} - {{ ticket.title }} ({{ ticket.status }})</li>
+        {% endfor %}
+      </ul>
+      <h4>ServiceNow</h4>
+      <p><i class="fas fa-ticket-alt"></i> Open: {{ snapshot.app.servicenow.open }}, Overdue: {{ snapshot.app.servicenow.overdue }}</p>
+      <ul>
+        {% for ticket in snapshot.app.servicenow.tickets %}
+          <li>{{ ticket.id }} - {{ ticket.title }} ({{ ticket.impact }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,39 +1,30 @@
-function treeNav() {
-  return {
+// static/app.js
+document.addEventListener('alpine:init', () => {
+  Alpine.data('treeNav', () => ({
     nodes: [
       {
-        title: "Dashboard",
-        path: "/",
-        children: [],
-        expanded: false
-      },
-      {
-        title: "Config",
-        path: "/config",
-        children: [],
-        expanded: false
-      },
-      {
-        title: "Apps",
-        path: "/apps",
-        children: [
-          { title: "ayso", path: "/configs/ayso" },
-          { title: "rems", path: "/configs/rems" }
-        ],
-        expanded: false
+        title: 'Dashboard',
+        path: '/',
+        expanded: true,
+        children: []  // Populated dynamically below
       }
     ],
     initTree() {
-      // Initialize tree state
+      // Fetch app names from backend to populate nav
+      fetch('/configs')
+        .then(response => response.json())
+        .then(data => {
+          this.nodes[0].children = data.configs.map(config => ({
+            title: config.app_name,
+            path: `/app/${config.app_name}`
+          }));
+        });
     },
     toggleNode(node) {
       node.expanded = !node.expanded;
     },
-    navigate(path) {
-      window.location.href = path;
-    },
     isCurrent(path) {
       return window.location.pathname === path;
     }
-  };
-}
+  }));
+});

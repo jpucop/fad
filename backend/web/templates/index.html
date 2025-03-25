@@ -15,69 +15,50 @@
 
 <body>
   <div class="layout">
-
-    <header>
+    <!-- Persistent Header -->
+    <header class="fixed-header">
       <h1>Financial Applications Dashboard</h1>
       <nav>
-        <a @click="navigate('/admin')">Admin</a>
+        <a href="/admin" hx-boost="true">Admin</a>
       </nav>
     </header>
 
-    <div class="content-wrapper">
-      
-      <!-- nav-tree -->
-      <aside class="nav-tree" x-data="treeNav()" x-init="initTree">
-        <h3>Site Nav Tree</h3>
-        <ul class="tree">
-          <template x-for="(node, index) in nodes" :key="node.path">
-            <li>
-              <span @click="toggleNode(node)" class="toggle" :class="{ 'expanded': node.expanded }">
-                <i class="fas" :class="node.expanded ? 'fa-minus' : 'fa-plus'" x-show="node.children.length"></i>
-                <i class="fas fa-file" x-show="!node.children.length"></i>
-              </span>
-              <a @click="navigate(node.path)" :class="{ 'active': isCurrent(node.path) }" x-text="node.title"></a>
-              <ul x-show="node.expanded" x-transition>
-                <template x-for="child in node.children" :key="child.path">
-                  <li>
-                    <span class="toggle"><i class="fas fa-file"></i></span>
-                    <a @click="navigate(child.path)" :class="{ 'active': isCurrent(child.path) }"
-                      x-text="child.title"></a>
-                  </li>
-                </template>
-              </ul>
-            </li>
-          </template>
-        </ul>
-      </aside>
+    <!-- Persistent Left Nav Tree -->
+    <aside class="nav-tree" x-data="treeNav()" x-init="initTree">
+      <h3>Site Navigation</h3>
+      <ul class="tree">
+        <li>
+          <span @click="toggleNode(nodes[0])" class="toggle" :class="{ 'expanded': nodes[0].expanded }">
+            <i class="fas" :class="nodes[0].expanded ? 'fa-minus' : 'fa-plus'"></i>
+          </span>
+          <a href="/" hx-get="/" hx-target="#main-content" hx-swap="innerHTML"
+            :class="{ 'active': isCurrent('/') }">Dashboard</a>
+          <ul x-show="nodes[0].expanded" x-transition>
+            <template x-for="child in nodes[0].children" :key="child.path">
+              <li>
+                <span class="toggle"><i class="fas fa-file"></i></span>
+                <a href="{{ child.path }}" hx-get="{{ child.path }}" hx-target="#main-content" hx-swap="innerHTML"
+                  :class="{ 'active': isCurrent(child.path) }" x-text="child.title"></a>
+              </li>
+            </template>
+          </ul>
+        </li>
+      </ul>
+    </aside>
 
-      <!-- Main content area -->
-      <div class="main-container">
-        <main id="main-content">
-          
-          <!-- app tiles grid (TODO) -->
-          <h2>Applications</h2>
-          <div class="app-list">
-            
-            <div class="app-card">
-              <h3>ayso - At Your Service Online</h3>
-              <p>Project: {project_name}</p>
-              <p>Git: <a href="https://aws.codecommit.com/aysWeb">https://aws.codecommit.com/aysWeb</a></p>
-              <button>Environments</button>
-              <button>Documentation</button>
-            </div>
-
-          </div>
-        </main>
-      </div>
-    </div>
+    <!-- Main Content Area -->
+    <main id="main-content" class="main-content" hx-get="/app-tiles" hx-trigger="load" hx-swap="innerHTML">
+      <!-- Tiles or app details loaded here -->
+    </main>
 
     <!-- Footer -->
-    <footer>
+    <footer class="footer">
       <p>Advanced Logic - Dashboard</p>
     </footer>
   </div>
 
   <script src="/static/alpine.min.js" defer></script>
+  <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-..." crossorigin="anonymous"></script>
   <script src="/static/app.js"></script>
 </body>
 

@@ -1,4 +1,8 @@
-/* Custom CSS for layout adjustments */
+/* static/custom.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
 .layout {
   display: flex;
@@ -6,71 +10,145 @@
   min-height: 100vh;
 }
 
-header {
-  background-color: #1a1a1a;
-  color: white;
-  padding: 1rem;
-  text-align: center;
+/* Fixed Header */
+.fixed-header {
+  position: fixed;
+  top: 0;
   width: 100%;
-}
-
-header nav a {
-  margin: 0 1rem;
-  color: #f5f5f5;
-  text-decoration: none;
-}
-
-.content-wrapper {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
   display: flex;
-  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
 }
 
+/* Fixed Nav Tree */
 .nav-tree {
+  position: fixed;
+  top: 80px; /* Below header */
+  left: 0;
   width: 250px;
-  background-color: #2a2a2a;
+  height: calc(100vh - 80px - 60px); /* Header + Footer height */
+  background-color: #f4f4f4;
   padding: 1rem;
-  color: white;
-  border-right: 1px solid #444;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
 }
 
-.nav-tree h3 {
-  margin-bottom: 1rem;
+.tree {
+  list-style: none;
+  padding: 0;
 }
 
-.main-container {
+.tree li {
+  margin: 0.5rem 0;
+}
+
+.toggle {
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.tree a {
+  text-decoration: none;
+  color: #333;
+}
+
+.tree a.active {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Main Content */
+.main-content {
+  margin-top: 80px;
+  margin-left: 250px; /* Offset for nav */
+  padding: 2rem;
   flex: 1;
-  padding: 1rem;
-  background-color: #1a1a1a;
-  color: white;
 }
 
-.app-list {
-  display: flex;
-  flex-wrap: wrap;
+/* Tile Grid */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
 }
 
-.app-card {
-  background-color: #2a2a2a;
-  padding: 1rem;
+.app-tile {
+  background-color: #fff;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  width: 300px;
-  border: 1px solid #444;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-.app-card h3 {
-  margin: 0 0 0.5rem 0;
+.app-tile:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.app-card a {
-  color: #ffaa00;
-  text-decoration: none;
+.app-tile h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
 }
 
-footer {
-  background-color: #1a1a1a;
+.app-tile .metrics span {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.app-tile i {
+  margin-right: 0.5rem;
+}
+
+/* App Detail */
+.app-detail {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.tabs button.active {
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
+
+.tab-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.tab-content li {
+  margin: 0.5rem 0;
+}
+
+.tab-content i {
+  margin-right: 0.5rem;
+}
+
+/* Footer */
+.footer {
+  background-color: #333;
   color: white;
   text-align: center;
-  padding: 0.5rem;
-  width: 100%;
+  padding: 1rem;
 }
