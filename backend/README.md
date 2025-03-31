@@ -8,32 +8,21 @@ Financial Applications UCOP group aggregate dashboard widget.
 
 1. Navigate to the **backend** dir and make that the cwd for fastapi app startup.
 
-3. Create a python virtual environment
+2. Run the command line project script resetenv.sh|bat
 
-  ```sh
-  TODO
-  ```
+```sh
+resetenv.sh
+```
 
-2. Install dependencies:
-
-   ```sh
-   pip install -r requirements.txt
-   ```
-
-3. Run the app:
-
-   ```sh
-   fastapi dev app/main.py
-   ```
-   OR
-
-   ```sh
-   uvicorn main:app --reload
-   ```
+```bat
+resetenv.bat
+```
 
 ## Features
 
+```sh
 tree -I "venv|.git|.gitignore|.gitmodules"
+```
 
 ## re-generate requirements.txt and requirements-test.txt
 

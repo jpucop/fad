@@ -3,6 +3,7 @@
   "app_name": "",
   "app_desc": "",
   "app_profile": "{app_profiles[].name}",
+  "deploy_profile": "{app_deploy_profiles[].name}",
   "source": {
     "project_name": "",
     "git_origin_url": "",
@@ -23,7 +24,7 @@
       "host": "aws",
       "git_branch": "{name}",
       "app_profile": "{app_profiles[].name}",
-      "deploy_profile": "{deploy_profiles[].name}",
+      "deploy_profile": "{app_deploy_profiles[].name}",
       "deploy_pipeline_name": "pipeline-{app_name}-{env}",
       "aws": {
         "account_name": "{aws.accounts[].name}"

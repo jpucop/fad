@@ -62,10 +62,11 @@ typing-extensions==4.12.2
     #   pydantic-core
 urllib3==2.3.0
     # via botocore
-uvicorn[standard]==0.34.0
+#uvicorn[standard]==0.34.0
     # via -r requirements.in
-uvloop==0.21.0
+#uvloop==0.21.0
     # via uvicorn
+uvicorn==0.34.0  # Don't use [standard] to avoid uvloop
 watchfiles==1.0.4
     # via uvicorn
 websockets==15.0.1
