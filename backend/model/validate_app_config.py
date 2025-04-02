@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel, HttpUrl, Field, ValidationError
 from typing import List, Optional
 import json
@@ -12,10 +13,15 @@ class Document(BaseModel):
   url: HttpUrl
   description: Optional[str] = ""
 
+class EnvironmentName(str, Enum):
+    dev = "dev"
+    qa = "qa"
+    prod = "prod"
+
 class Environment(BaseModel):
-  name: str  # Should be "dev", "qa", or "prod"
-  host: str  # Expected "aws"
-  git_branch: str
+  name: EnvironmentName
+  host: str = Field(..., regex="^aws$")  # Ensures "aws" is the only valid value
+  git_branch = Field(..., min_length=1, max_length=50)
   app_profile: str
   deploy_profile: str
   deploy_pipeline_name: str
