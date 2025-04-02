@@ -1,172 +1,34 @@
 {
-  "app_snapshot": {
-    "id": "app-snap-{app_name}-{app.env}-{unique_suffix}",
-    "timestamp": "2025-03-11T12:00:00Z"  
-  },
-  "app": {
-    "name": "{app_name}",
-    "desc": "{app_desc}",
-    "environments": [
-      {
-        "env": "{env}",
-        "url": "",
-        "status": "up|down|unknown",
-        "health": "healthy|unhealthy",
-        "version": {
-          "number": "1.2.3",
-          "timestamp": "2025-03-10T10:00:00Z"
-        },
-        "host": "aws",
-        "git_branch": "{env}",
-        "app_profile": "tomcat-java",
-        "deploy_profile": "aws-cicd-fargate",
-        "deploy_pipeline_name": "pipeline-{app_name}-{env}",
-        "deployment": {
-          "timestamp": "2025-03-10T10:00:00Z",
-          "deploy_pipeline_execution_id": "?"
-        },
-        "dns": {
-          "A": "192.168.1.1",
-          "details_url": ""
-        },
-        "certificate": {
-          "registrar": "AWS",
-          "url": "https://aws.com/1",
-          "expires": "2026-03-11T12:00:00Z",
-          "name": "myapp.com"
-        },
-        "aws": {
-          "account_name": "",
-          "account_id": "",
-          "region": ""
-        },
-        "cost": {
-          "currency": "USD",
-          "current_monthly_total": 150.75
-        },
-        "logs": {
-          "http": {
-            "cloudwatch_url": "",
-            "recent": [
-              {
-                "timestamp": "2025-03-11T11:55:00Z",
-                "output": "GET /api 200 OK",
-                "severity": "info"
-              }
-            ]
-          },
-          "webapp": {
-            "cloudwatch_url": "...",
-            "recent": [
-              {
-                "timestamp": "2025-03-11T11:55:00Z",
-                "output": "GET /api 200 OK",
-                "severity": "info"
-              }
-            ]
-          },
-          "db": {
-            "cloudwatch_url": "...",
-            "recent": [
-              {
-                "timestamp": "2025-03-11T11:55:00Z",
-                "output": "GET /api 200 OK",
-                "severity": "info"
-              }
-            ]
-          }
-        },
-        "metrics": {
-          "uptime": {
-            "percentage": 99.95,
-            "last_downtime": "2025-03-01T03:00:00Z"
-          },
-          "requests": {
-            "total": 15000,
-            "rate_per_second": 10.5,
-            "errors": {
-              "count": 50,
-              "rate": 0.33
-            }
-          },
-          "latency": {
-            "avg_ms": 120,
-            "p95_ms": 250,
-            "p99_ms": 400
-          },
-          "resource_usage": {
-            "cpu_percent": 65.5,
-            "memory_mb": 2048,
-            "disk_gb": 15.3
-          }
-        },
-        "security": {
-          "vulnerabilities": {
-            "open": 3,
-            "critical": 1,
-            "latest": [
-              {
-                "id": "CVE-2025-1234",
-                "severity": "critical",
-                "description": "Buffer overflow in libX",
-                "reported": "2025-03-05T12:00:00Z"
-              }
-            ]
-          }
-        }
-      }
-    ],
-    "source": {
-      "git_origin": "https://codecommit.aws.com/org/repo",
-      "aws": {
-        "account_name": ""
-      },
-      "latest_commits": [
-        {
-          "id": "abc123",
-          "message": "Fix bug",
-          "timestamp": "2025-03-10T09:00:00Z",
-          "branch": "main"
-        }
-      ]
-    },
-    "docs": [
-      {
-        "name": "",
-        "url": "",
-        "type": ""
-      }
-    ],
-    "jira": {
-      "url": "https://myapp.atlassian.net",
-      "tickets": {
-        "open": 5,
-        "latest": [
-          {
-            "id": "JIRA-123",
-            "title": "Fix login bug",
-            "description": "Users can’t log in",
-            "status": "open",
-            "created": "2025-03-10T08:00:00Z"
-          }
-        ]
-      }
-    },
-    "servicenow": {
-      "open": 3,
-      "overdue": 1,
-      "tickets": [
-        {
-          "id": "INC001",
-          "title": "Server down",
-          "description": "Prod server offline",
-          "created": "2025-03-09T14:00:00Z",
-          "impact": "high",
-          "approvers": [
-            "user1@myapp.com"
-          ]
-        }
-      ]
+  "version": "1",
+  "app_name": "example",
+  "app_desc": "Example app",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate",
+  "source": {
+    "project_name": "exampleWeb",
+    "git_origin_url": "https://example.com/repo",
+    "aws": {
+      "account_name": "finapps-dev"
     }
-  }
+  },
+  "docs": [
+    {
+      "name": "Wiki",
+      "desc": "Example docs",
+      "url": "https://example.com/docs"
+    }
+  ],
+  "environments": [
+    {
+      "name": "dev",
+      "host": "aws",
+      "git_branch": "dev",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "pipeline-example-dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    }
+  ]
 }

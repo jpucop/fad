@@ -30,3 +30,14 @@ pip-compile requirements.in
 pip-compile requirements-test.in
 
 pip-sync
+
+## pydantic - generate models.py 
+
+Generate the pydantic types from the datamodel codegen tool of theirs using app.config-template.json and the other sourcing model files (mostly json file types).
+
+```sh
+datamodel-codegen --input ~/dev/fad/backend/model/app.config-template.json --input-file-type json --output ~/dev/fad/backend/app/models.py
+
+datamodel-codegen --input ~/dev/fad/backend/model/app_config_schema.json --input-file-type jsonschema --output ~/dev/fad/backend/app/models.py
+
+```

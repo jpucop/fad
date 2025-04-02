@@ -1,33 +1,33 @@
 {
   "version": "1",
-  "app_name": "",
-  "app_desc": "",
-  "app_profile": "{app_profiles[].name}",
-  "deploy_profile": "{app_deploy_profiles[].name}",
+  "app_name": "example",
+  "app_desc": "Example app",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate",
   "source": {
-    "project_name": "",
-    "git_origin_url": "",
+    "project_name": "exampleWeb",
+    "git_origin_url": "https://example.com/repo",
     "aws": {
-      "account_name": ""
+      "account_name": "finapps-dev"
     }
   },
   "docs": [
     {
-      "name": "",
-      "desc": "",
-      "url": ""
+      "name": "Wiki",
+      "desc": "Example docs",
+      "url": "https://example.com/docs"
     }
   ],
   "environments": [
     {
-      "name": "dev|qa|prod",
+      "name": "dev",
       "host": "aws",
-      "git_branch": "{name}",
-      "app_profile": "{app_profiles[].name}",
-      "deploy_profile": "{app_deploy_profiles[].name}",
-      "deploy_pipeline_name": "pipeline-{app_name}-{env}",
+      "git_branch": "dev",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "pipeline-example-dev",
       "aws": {
-        "account_name": "{aws.accounts[].name}"
+        "account_name": "finapps-dev"
       }
     }
   ]
