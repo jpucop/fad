@@ -1,0 +1,81 @@
+{
+  "name": "example",
+  "short_name": "either common used acronym (ususally this) or otherwise",
+  "long_name": "Ay Your Sercice Online",
+  "description": "Example app",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate",
+  "source": {
+    "project_name": "exampleWeb",
+    "git_origin_url": "https://example.com/repo",
+    "production_branch_name": "master|main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "docs": [
+    {
+      "name": "Wiki",
+      "description": "Example docs",
+      "url": "https://example.com/docs"
+    }
+  ],
+  "confluence": {
+    "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
+    "auth": {
+      "api_fetcher_name": "ucop-ad"
+    }
+  },
+  "box": {
+    "org_group_base_url": "https://ucop.app.box.com/",
+    "auth": {
+      "api_fetcher_name": "ucop-ad"
+    }
+  },
+  "jira": {
+    "app_url": "https://ucopedu.atlassian.net/jira/",
+    "project_name": "the JIRA project name",
+    "auth": {
+      "api_fetcher_name": "ucop-ad"
+    }
+  },
+  "service_now": {
+    "assignment_groups": [
+      "AYSO",
+      "Corporate Systems Gateway (CSG)"
+    ],
+    "auth": {
+      "api_fetcher_name": "ucop-ad"
+    }
+  },
+  "datadog": {
+    "app_ref_name": "the name datadog uses to identify this appliction",
+    "references": [
+      {
+        "name": "unique name to use as way to get credentials for making web app api ",
+        "type": "dashboard",
+        "title": "UI business-wise title to show in ui",
+        "url": "https://ucopedu.dd.appname.metrics-dashboard/"
+      }
+    ],
+    "auth": {
+      "api_fetcher_name": "ucop-ad"
+    }
+  },
+  "environments": [
+    {
+      "name": "dev",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "pipeline-example-dev",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev",
+        "services": [
+          "these are a , delim list of app specific runtime operational services (not code pipeline type meta stuff)"
+        ]
+      }
+    }
+  ]
+}

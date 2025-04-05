@@ -1,8 +1,0 @@
-{
-  "name": "FinApps UCOP Group Dashboard",
-  "desc": "Organization and group details and managed web app status and metrics",
-  "version": "1.0",
-  "input_args": {
-    "app_conifg_version": "1"
-  }
-}

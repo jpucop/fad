@@ -1,9 +1,145 @@
 {
-  "org_name": "UCOP",
-  "group": {
-    "name": "Financial Applications",
+  "org": {
+    "name": "UCOP",
     "short_name": "FinApps",
-    "jira_base_url": "https://ucopedu.atlassian.net",
-    "servicenow_base_url": "https://ucop.service-now.com"
+    "references": [
+      {
+        "name": "",
+        "title": "",
+        "description": "",
+        "url": ""
+      }
+    ],
+    "group": {
+      "name": "Financial Applications",
+      "short_name": "FinApps",
+      "aws": {
+        "defaults": {
+          "region": "us-west-2",
+          "account_name": "finapps-dev",
+          "cli_output_format": "json",
+          "tags": [
+            "ucop:group::FinApps",
+            "ucop:application::Dashboard",
+            "ucop:environment::dev",
+            "ucop:createdBy::jkirton@ucop.edu"
+          ]
+        },
+        "accounts": [
+          {
+            "name": "finapps-dev",
+            "account_id": "999",
+            "region": "us-west-2",
+            "description": "Base FinApps AWS account holding project source repositoryies and all DEV and QA environments."
+          },
+          {
+            "name": "finapps-prod",
+            "account_id": "777",
+            "region": "us-west-2",
+            "description": "Production FinApps AWS account."
+          },
+          {
+            "name": "fis-dev",
+            "account_id": "111",
+            "region": "us-west-2",
+            "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+          },
+          {
+            "name": "fis-prod",
+            "account_id": "555",
+            "region": "us-west-2",
+            "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+          }
+        ]
+      },
+      "confluence": {
+        "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
+        "auth": {
+          "api_credentials": "ad-ucop-eppn"
+        }
+      },
+      "box": {
+        "org_group_base_url": "https://ucop.app.box.com/",
+        "auth": {
+          "api_credentials": "ad-ucop-eppn"
+        }
+      },
+      "jira": {
+        "org_group_base_url": "https://ucopedu.atlassian.net/jira/",
+        "auth": {
+          "api_credentials": "ad-ucop-eppn"
+        }
+      },
+      "data_dog": {
+        "org_group_hompage_url": "https://dd.com/ucop/finapps/index.html",
+        "auth": {
+          "api_credentials": "ad-ucop-eppn"
+        }
+      },
+      "service_now": {
+        "org_group_base_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+        "assignment_groups": [
+          {
+            "name": "AYSO",
+            "description": ""
+          },
+          {
+            "name": "CAF AWS Support",
+            "description": ""
+          },
+          {
+            "name": "Corporate Systems Gateway (CSG)",
+            "description": ""
+          },
+          {
+            "name": "FDW Tech Support",
+            "description": ""
+          },
+          {
+            "name": "ITF Retrofit Team",
+            "description": ""
+          },
+          {
+            "name": "TM1 AWS Support",
+            "description": ""
+          },
+          {
+            "name": "FIS AWS Tech Support",
+            "description": ""
+          },
+          {
+            "name": "FINAPPS AWS Tech Support",
+            "description": ""
+          },
+          {
+            "name": "FIS Concur Support",
+            "description": ""
+          },
+          {
+            "name": "Endowment & Investment Accounting Svcs",
+            "description": ""
+          },
+          {
+            "name": "TCS Support",
+            "description": ""
+          },
+          {
+            "name": "Research Enterprise Management System (REMS)",
+            "description": ""
+          },
+          {
+            "name": "BUD Retrofit Team",
+            "description": ""
+          },
+          {
+            "name": "ACA Web Support",
+            "description": ""
+          }
+        ],
+        "auth": {
+          "api_credentials": "ad-ucop-eppn"
+        }
+      }
+    }
   }
 }

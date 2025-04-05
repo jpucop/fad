@@ -3,7 +3,6 @@ import argparse
 import os
 import json
 from pydantic import ValidationError
-from models import AppConfig
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
