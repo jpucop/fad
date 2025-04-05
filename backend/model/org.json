@@ -1,15 +1,6 @@
 {
   "org": {
     "name": "UCOP",
-    "short_name": "FinApps",
-    "references": [
-      {
-        "name": "",
-        "title": "",
-        "description": "",
-        "url": ""
-      }
-    ],
     "group": {
       "name": "Financial Applications",
       "short_name": "FinApps",
@@ -53,28 +44,16 @@
         ]
       },
       "confluence": {
-        "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
-        "auth": {
-          "api_credentials": "ad-ucop-eppn"
-        }
+        "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
       },
       "box": {
-        "org_group_base_url": "https://ucop.app.box.com/",
-        "auth": {
-          "api_credentials": "ad-ucop-eppn"
-        }
+        "org_group_base_url": "https://ucop.app.box.com/"
       },
       "jira": {
-        "org_group_base_url": "https://ucopedu.atlassian.net/jira/",
-        "auth": {
-          "api_credentials": "ad-ucop-eppn"
-        }
+        "org_group_base_url": "https://ucopedu.atlassian.net/jira/"
       },
       "data_dog": {
-        "org_group_hompage_url": "https://dd.com/ucop/finapps/index.html",
-        "auth": {
-          "api_credentials": "ad-ucop-eppn"
-        }
+        "org_group_homepage_url": "https://dd.com/ucop/finapps/index.html"
       },
       "service_now": {
         "org_group_base_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
@@ -135,10 +114,7 @@
             "name": "ACA Web Support",
             "description": ""
           }
-        ],
-        "auth": {
-          "api_credentials": "ad-ucop-eppn"
-        }
+        ]
       }
     }
   }

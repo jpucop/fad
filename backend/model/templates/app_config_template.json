@@ -13,54 +13,26 @@
       "account_name": "finapps-dev"
     }
   },
-  "docs": [
-    {
-      "name": "Wiki",
-      "description": "Example docs",
-      "url": "https://example.com/docs"
-    }
-  ],
   "confluence": {
-    "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
-    "auth": {
-      "api_fetcher_name": "ucop-ad"
-    }
+    "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
   },
   "box": {
-    "org_group_base_url": "https://ucop.app.box.com/",
-    "auth": {
-      "api_fetcher_name": "ucop-ad"
-    }
+    "org_group_base_url": "https://ucop.app.box.com/"
   },
   "jira": {
+    "org_group_base_url": "https://ucop.app.box.com/",
     "app_url": "https://ucopedu.atlassian.net/jira/",
-    "project_name": "the JIRA project name",
-    "auth": {
-      "api_fetcher_name": "ucop-ad"
-    }
+    "project_name": "the JIRA project name"
   },
   "service_now": {
+    "org_group_base_url": "https://ucop.app.box.com/",
     "assignment_groups": [
       "AYSO",
       "Corporate Systems Gateway (CSG)"
-    ],
-    "auth": {
-      "api_fetcher_name": "ucop-ad"
-    }
+    ]
   },
   "datadog": {
-    "app_ref_name": "the name datadog uses to identify this appliction",
-    "references": [
-      {
-        "name": "unique name to use as way to get credentials for making web app api ",
-        "type": "dashboard",
-        "title": "UI business-wise title to show in ui",
-        "url": "https://ucopedu.dd.appname.metrics-dashboard/"
-      }
-    ],
-    "auth": {
-      "api_fetcher_name": "ucop-ad"
-    }
+    "app_ref_name": "the name datadog uses to identify this appliction"
   },
   "environments": [
     {
