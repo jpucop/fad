@@ -1,7 +1,7 @@
 {
   "name": "example",
   "short_name": "either common used acronym (ususally this) or otherwise",
-  "long_name": "Ay Your Sercice Online",
+  "long_name": "At Your Sercice Online",
   "description": "Example app",
   "app_profile": "tomcat-java",
   "deploy_profile": "aws-cicd-fargate",
@@ -17,14 +17,15 @@
     "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
   },
   "box": {
-    "org_group_base_url": "https://ucop.app.box.com/"
+    "org_base_url": "https://ucop.app.box.com/"
   },
   "jira": {
-    "org_group_base_url": "https://ucop.app.box.com/",
-    "app_url": "https://ucopedu.atlassian.net/jira/",
-    "project_name": "the JIRA project name"
+    "org_base_url": "https://ucopedu.atlassian.net/jira/",
+    "project_keys": [
+      "project keys applicable to this app"
+    ]
   },
-  "service_now": {
+  "service_now": {  
     "org_group_base_url": "https://ucop.app.box.com/",
     "assignment_groups": [
       "AYSO",
