@@ -47,74 +47,76 @@
         "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
       },
       "box": {
-        "org_group_base_url": "https://ucop.app.box.com/"
+        "org_base_url": "https://ucop.app.box.com/"
       },
       "jira": {
-        "org_group_base_url": "https://ucopedu.atlassian.net/jira/"
+        "org_base_url": "https://ucopedu.atlassian.net/jira/"
       },
       "data_dog": {
-        "org_group_homepage_url": "https://dd.com/ucop/finapps/index.html"
+        "org_group_base_url": "https://dd.com/ucop/finapps/index.html"
       },
       "service_now": {
-        "org_group_base_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
-        "assignment_groups": [
-          {
-            "name": "AYSO",
-            "description": ""
-          },
-          {
-            "name": "CAF AWS Support",
-            "description": ""
-          },
-          {
-            "name": "Corporate Systems Gateway (CSG)",
-            "description": ""
-          },
-          {
-            "name": "FDW Tech Support",
-            "description": ""
-          },
-          {
-            "name": "ITF Retrofit Team",
-            "description": ""
-          },
-          {
-            "name": "TM1 AWS Support",
-            "description": ""
-          },
-          {
-            "name": "FIS AWS Tech Support",
-            "description": ""
-          },
-          {
-            "name": "FINAPPS AWS Tech Support",
-            "description": ""
-          },
-          {
-            "name": "FIS Concur Support",
-            "description": ""
-          },
-          {
-            "name": "Endowment & Investment Accounting Svcs",
-            "description": ""
-          },
-          {
-            "name": "TCS Support",
-            "description": ""
-          },
-          {
-            "name": "Research Enterprise Management System (REMS)",
-            "description": ""
-          },
-          {
-            "name": "BUD Retrofit Team",
-            "description": ""
-          },
-          {
-            "name": "ACA Web Support",
-            "description": ""
-          }
-        ]
+        "org_base_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+        "group": {
+          "assignment_groups": [
+            {
+              "name": "AYSO",
+              "description": ""
+            },
+            {
+              "name": "CAF AWS Support",
+              "description": ""
+            },
+            {
+              "name": "Corporate Systems Gateway (CSG)",
+              "description": ""
+            },
+            {
+              "name": "FDW Tech Support",
+              "description": ""
+            },
+            {
+              "name": "ITF Retrofit Team",
+              "description": ""
+            },
+            {
+              "name": "TM1 AWS Support",
+              "description": ""
+            },
+            {
+              "name": "FIS AWS Tech Support",
+              "description": ""
+            },
+            {
+              "name": "FINAPPS AWS Tech Support",
+              "description": ""
+            },
+            {
+              "name": "FIS Concur Support",
+              "description": ""
+            },
+            {
+              "name": "Endowment & Investment Accounting Svcs",
+              "description": ""
+            },
+            {
+              "name": "TCS Support",
+              "description": ""
+            },
+            {
+              "name": "Research Enterprise Management System (REMS)",
+              "description": ""
+            },
+            {
+              "name": "BUD Retrofit Team",
+              "description": ""
+            },
+            {
+              "name": "ACA Web Support",
+              "description": ""
+            }
+          ]
+        }
       }
     }
   }
