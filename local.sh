@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-cd ~/dev/fad/backend
+cd backend
 
 echo "starting localhost fastapi server.."
 # fastapi dev backend/app/main.py
