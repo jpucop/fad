@@ -1,0 +1,74 @@
+{
+  "name": "",
+  "short_name": "",
+  "long_name": "",
+  "description": "",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate",
+  "source": {
+    "project_name": "",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": ""
+    }
+  },
+  "confluence": {
+    "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
+    "links": [
+      {
+        "name": "",
+        "description": "",
+        "url": ""
+      }
+    ]
+  },
+  "box": {
+    "org_base_url": "https://ucop.app.box.com/",
+    "links": [
+      {
+        "name": "",
+        "description": "",
+        "url": ""
+      }
+    ]
+  },
+  "jira": {
+    "org_base_url": "https://ucopedu.atlassian.net/jira/",
+    "project_keys": [
+      ""
+    ]
+  },
+  "service_now": {  
+    "org_base_url": "https://ucop.app.box.com/",
+    "assignment_groups": [
+      ""
+    ]
+  },
+  "datadog": {
+    "app_ref_name": "",
+    "links": [
+      {
+        "name": "",
+        "description": "",
+        "url": ""
+      }
+    ]
+  },
+  "environments": [
+    {
+      "name": "dev",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate",
+      "deploy_pipeline_name": "",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "",
+        "services": [
+          ""
+        ]
+      }
+    }
+  ]
+}
