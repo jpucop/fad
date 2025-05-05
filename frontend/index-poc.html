@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>UCOP Dashboard</title>
+  <title>UCOP FinApps Dashboard</title>
+  <meta name="description" content="FinApps Apps Dashboard - Manage and Monitor Applications">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
 </head>
+
 <body class="bg-gray-100 text-gray-800 font-sans">
-  
+
   <!-- 
   <header class="bg-blue-800 text-white py-4 shadow-md">
     <div class="container mx-auto px-4">
@@ -22,39 +26,39 @@
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-gray-200">
     <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      
+
       <!-- Left: UC Logo -->
       <div class="flex items-center gap-3">
-        <img src="/static/uc-logo.png" alt="UC Logo" class="h-10 w-auto">
+        <img src="img/uclogo.png" alt="UC Logo" class="w-auto">
         <div>
-          <h1 class="text-xl font-bold text-gray-800">UCOP Financial Applications</h1>
-          <p class="text-sm text-gray-600">Org: <strong>UC Office of the President</strong> &mdash; Group: <strong>FinApps</strong></p>
+          <h1 class="text-xl font-bold text-gray-800">Financial Applications</h1>
+          <p class="text-sm text-gray-600">Office of the President</p>
         </div>
       </div>
-      
+
       <!-- Right: Org Links and Resources -->
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-gray-600">
-        
+
         <!-- Resource Links Row 1 -->
         <div class="flex gap-4 flex-wrap">
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600">
-            <span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="16"></span>
-            Confluence
-          </a>
           <a href="#" class="flex items-center gap-1 hover:text-blue-600">
             <span class="iconify" data-icon="mdi:ticket-outline" data-width="16"></span>
             ServiceNow
           </a>
           <a href="#" class="flex items-center gap-1 hover:text-blue-600">
-            <span class="iconify" data-icon="mdi:chart-box-outline" data-width="16"></span>
-            DataDog
+            <span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="16"></span>
+            Confluence
           </a>
           <a href="#" class="flex items-center gap-1 hover:text-blue-600">
             <span class="iconify" data-icon="mdi:cloud-outline" data-width="16"></span>
             Box
           </a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600">
+            <span class="iconify" data-icon="mdi:chart-box-outline" data-width="16"></span>
+            DataDog
+          </a>
         </div>
-        
+
         <!-- Resource Links Row 2 -->
         <div class="flex gap-4 flex-wrap">
           <a href="#" class="flex items-center gap-1 hover:text-blue-600">
@@ -63,50 +67,63 @@
           </a>
           <a href="#" class="flex items-center gap-1 hover:text-blue-600">
             <span class="iconify" data-icon="mdi:github" data-width="16"></span>
-            Source (CodeCommit)
+            Sources
           </a>
+          <!-- 
           <a href="#" class="flex items-center gap-1 text-yellow-600 cursor-default">
             <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
             TODO: add missing essentials
           </a>
+          -->
         </div>
-        
+
       </div>
     </div>
   </header>
-  
+
   <main class="container mx-auto px-4 py-8">
     <h2 class="text-xl font-semibold mb-6">Application Status</h2>
-    
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      
+
       <!-- Repeat this tile 6x for now with sample data -->
       <!-- App Tile 1 -->
       <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
         <div class="flex justify-between items-center mb-2">
           <div class="text-lg font-semibold">Payroll UI</div>
           <div class="flex gap-2">
-            <a href="app-detail.html?env=prod" title="prod"><span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="18"></span></a>
-            <a href="app-detail.html?env=stage" title="stage"><span class="iconify text-yellow-500" data-icon="mdi:progress-clock" data-width="18"></span></a>
-            <a href="app-detail.html?env=test" title="test"><span class="iconify text-red-500" data-icon="mdi:alert-circle" data-width="18"></span></a>
+            <a href="app-detail.html?env=prod" title="prod"><span class="iconify text-green-500"
+                data-icon="mdi:check-circle-outline" data-width="18"></span></a>
+            <a href="app-detail.html?env=stage" title="stage"><span class="iconify text-yellow-500"
+                data-icon="mdi:progress-clock" data-width="18"></span></a>
+            <a href="app-detail.html?env=test" title="test"><span class="iconify text-red-500"
+                data-icon="mdi:alert-circle" data-width="18"></span></a>
           </div>
         </div>
-        
+
         <div class="text-sm space-y-1 mb-3">
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span> Requests: 55.6k</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span> Errors: 232 (0.4%)</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span> Version: <span class="font-mono">v1.2.8</span> @ 2025-05-04</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 55.6k</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline"
+              data-width="16"></span> Errors: 232 (0.4%)</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span>
+            Version: <span class="font-mono">v1.2.8</span> @ 2025-05-04</div>
         </div>
-        
+
         <div class="flex justify-between items-center border-t pt-2 mt-3 text-xs text-gray-600">
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="16"></span> Wiki</a>
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:github" data-width="16"></span> Source</a>
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:file-document-outline" data-width="16"></span> Logs</a>
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:cloud-outline" data-width="16"></span> Box</a>
-          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:ticket-outline" data-width="16"></span> SNOW</a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify"
+              data-icon="mdi:book-open-page-variant-outline" data-width="16"></span> Wiki</a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify" data-icon="mdi:github"
+              data-width="16"></span> Source</a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify"
+              data-icon="mdi:file-document-outline" data-width="16"></span> Logs</a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify"
+              data-icon="mdi:cloud-outline" data-width="16"></span> Box</a>
+          <a href="#" class="flex items-center gap-1 hover:text-blue-600"><span class="iconify"
+              data-icon="mdi:ticket-outline" data-width="16"></span> SNOW</a>
         </div>
       </div>
-      
+
       <!-- App Tile 2 - 6 (Copy of 1 with dummy names) -->
       <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
         <div class="flex justify-between items-center mb-2">
@@ -118,9 +135,12 @@
           </div>
         </div>
         <div class="text-sm space-y-1 mb-3">
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span> Requests: 12.3k</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span> Errors: 4</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span> Version: <span class="font-mono">v1.0.5</span></div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 12.3k</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline"
+              data-width="16"></span> Errors: 4</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span>
+            Version: <span class="font-mono">v1.0.5</span></div>
         </div>
         <div class="flex justify-between items-center border-t pt-2 mt-3 text-xs text-gray-600">
           <a href="#"><span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="16"></span></a>
@@ -130,7 +150,7 @@
           <a href="#"><span class="iconify" data-icon="mdi:ticket-outline" data-width="16"></span></a>
         </div>
       </div>
-      
+
       <!-- Tile 3 -->
       <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
         <div class="flex justify-between items-center mb-2">
@@ -142,9 +162,12 @@
           </div>
         </div>
         <div class="text-sm space-y-1 mb-3">
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span> Requests: 18.9k</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span> Errors: 1</div>
-          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span> Version: <span class="font-mono">v2.0.0</span></div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 18.9k</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:alert-circle-outline"
+              data-width="16"></span> Errors: 1</div>
+          <div class="flex gap-2 items-center"><span class="iconify" data-icon="mdi:history" data-width="16"></span>
+            Version: <span class="font-mono">v2.0.0</span></div>
         </div>
         <div class="flex justify-between items-center border-t pt-2 mt-3 text-xs text-gray-600">
           <a href="#"><span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="16"></span></a>
@@ -154,14 +177,18 @@
           <a href="#"><span class="iconify" data-icon="mdi:ticket-outline" data-width="16"></span></a>
         </div>
       </div>
-      
+
       <!-- You can copy/paste the tile 3 more times for Tiles 4–6 with dummy app names like 'Budget App', 'Student Portal', etc. -->
-      
+
     </div>
   </main>
-  
-  <footer class="bg-gray-800 text-white text-center text-sm py-4 mt-12">
-    &copy; 2025 University of California, Office of the President. Dashboard v1.0.0
+
+  <footer class="text-blue-500 text-center text-sm py-4 mt-12">
+    <div style='height: 2em; background-image:url("img/footer-background.jpg")'>
+      <p>&copy; 2025 University of California, Office of the President. Dashboard v1.0.0</p>
+    </div>
+
   </footer>
 </body>
+
 </html>

@@ -1,12 +1,12 @@
 {
-  "name": "rems",
-  "short_name": "REMS",
-  "long_name": "REMS",
+  "name": "ayso",
+  "short_name": "ayso",
+  "long_name": "ayso",
   "description": "",
   "app_profile": "tomcat-java",
   "deploy_profile": "aws-cicd-fargate",
   "source": {
-    "project_name": "sptWeb",
+    "project_name": "aysWeb",
     "git_origin_url": "TODO",
     "aws": {
       "account_name": "finapps-dev"
@@ -65,17 +65,14 @@
       }
     },
     {
-      "name": "dev",
+      "name": "qa",
       "host": "aws",
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate",
       "deploy_pipeline_name": "pipeline-example-dev",
       "git_branch": "dev",
       "aws": {
-        "account_name": "finapps-dev",
-        "services": [
-          "ECS, Lambda, CloudFormation, RDS"
-        ]
+        "account_name": "finapps-dev"
       }
     },
     {
