@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100 text-gray-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Detail - MyApp (prod)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body>
+
+<div x-data="appDetail()" class="container mx-auto py-6">
+
+  <!-- 🔷 App Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold flex items-center gap-2">
+      <span class="iconify text-blue-500" data-icon="mdi:application" data-width="24"></span>
+      <span x-text="app.name"></span>
+      <span class="text-gray-500 text-sm" x-text="'(' + app.env + ')'"></span>
+    </h2>
+    <a href="/dashboard.html" class="text-sm text-blue-500 hover:underline">&larr; Back to dashboard</a>
+  </div>
+
+  <!-- 🔸 Health Summary -->
+  <div class="flex items-center gap-4 text-sm mb-6"
+       :class="app.health.status === 'Healthy' ? 'text-green-700' : 'text-red-600'">
+    <span class="iconify" data-icon="mdi:check-circle-outline" data-width="18"></span>
+    <span x-text="app.health.summary"></span>
+  </div>
+
+  <!-- 🧮 Metrics Grid -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+    <!-- 📊 Request Stats -->
+    <div class="border rounded-md p-4 shadow-sm bg-white">
+      <h3 class="text-lg font-semibold mb-2">Request Stats</h3>
+      <ul class="space-y-1">
+        <li><strong>Total Requests:</strong> <span x-text="app.stats.totalRequests"></span></li>
+        <li>
+          <strong>Errors:</strong>
+          <span x-text="app.stats.errors.count"></span>
+          (<span :class="app.stats.errors.rate > 1 ? 'text-red-600' : 'text-gray-500'" x-text="app.stats.errors.rate + '%'"></span>)
+        </li>
+        <li><strong>Rate-limited:</strong> <span x-text="app.stats.rateLimited"></span></li>
+        <li>
+          <strong>Blocked IPs:</strong>
+          <a href="#" class="text-blue-500 hover:underline">View</a>
+        </li>
+        <li>
+          <strong>Last Block Reason:</strong>
+          <span x-text="app.stats.lastBlockReason"></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 🪵 Logs -->
+    <div class="border rounded-md p-4 shadow-sm bg-white">
+      <h3 class="text-lg font-semibold mb-2">Logs (Tail)</h3>
+      <pre class="bg-gray-900 text-green-400 p-3 rounded text-xs max-h-48 overflow-y-auto"
+            x-text="app.logs.join('\n')"></pre>
+      <a href="#" class="text-blue-500 hover:underline text-xs mt-1 inline-block">Open in CloudWatch</a>
+    </div>
+
+  </section>
+
+  <!-- 📈 Monthly Aggregates -->
+  <section class="mt-8 text-sm border rounded-md p-4 shadow-sm bg-white">
+    <h3 class="text-lg font-semibold mb-2">Ingress Aggregate (Monthly)</h3>
+    <ul class="space-y-1">
+      <template x-for="month in app.aggregates" :key="month.month">
+        <li>
+          <strong x-text="month.month + ':'"></strong>
+          <span x-text="month.requests + ' req, ' + month.errors + ' errors'"></span>
+        </li>
+      </template>
+      <li><a href="#" class="text-blue-500 hover:underline text-xs">View full history →</a></li>
+    </ul>
+  </section>
+
+  <!-- 🛠️ Deployment History -->
+  <section class="mt-8 text-sm border rounded-md p-4 shadow-sm bg-white">
+    <h3 class="text-lg font-semibold mb-2">Deployment History</h3>
+    <ul class="divide-y divide-gray-200">
+      <template x-for="deploy in app.deployments" :key="deploy.version">
+        <li class="py-2 flex items-center gap-2">
+          <span class="iconify text-blue-500" data-icon="mdi:git" data-width="18"></span>
+          <span x-text="deploy.version + ' — ' + deploy.date"></span>
+          <span class="text-xs text-gray-400 italic ml-2" x-text="deploy.message"></span>
+          <a href="#" class="ml-auto text-blue-500 hover:underline text-xs">View</a>
+        </li>
+      </template>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+function appDetail() {
+  return {
+    app: {
+      name: "MyApp",
+      env: "prod",
+      health: {
+        status: "Healthy",
+        summary: "Healthy – ECS Fargate task running | ALB 2xx rate: 99.4%"
+      },
+      stats: {
+        totalRequests: "43.2k",
+        errors: { count: 8, rate: 0.02 },
+        rateLimited: 3,
+        lastBlockReason: "UA/req-pattern: suspicious-bot"
+      },
+      logs: [
+        "2025-05-04T13:22:01Z GET /api/apps 200 OK",
+        "2025-05-04T13:22:02Z POST /api/login 403 BLOCKED",
+        "2025-05-04T13:22:05Z GET /metrics 200 OK"
+      ],
+      aggregates: [
+        { month: "May 2025", requests: "43.2k", errors: 8 },
+        { month: "April 2025", requests: "38.9k", errors: 6 }
+      ],
+      deployments: [
+        { version: "v1.2.8", date: "2025-05-01", message: "Refactor ECS pipeline" },
+        { version: "v1.2.7", date: "2025-04-24", message: "Bugfix: session counter" }
+      ]
+    }
+  }
+}
+</script>
+
+</body>
+</html>

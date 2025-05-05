@@ -1,0 +1,115 @@
+<!-- File: frontend/dist/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UCOP FinApps Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .app-tile {
+      border: 1px solid #e5e7eb;
+      padding: 1.5rem;
+      text-align: center;
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+      transition: transform 0.2s;
+    }
+    .app-tile:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Iconify (for icons) -->
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>  
+
+</head>
+<body class="bg-gray-100 font-sans">
+  
+  <span class="iconify" data-icon="mdi:check-circle" data-width="24"></span>
+
+  <!-- Header -->
+  <header class="bg-blue-800 text-white p-6 shadow-md" aria-label="Site header">
+    <div class="container mx-auto">
+      <h1 class="text-2xl font-bold" id="org-group-title"></h1>
+      <p class="mt-2 text-sm" id="business-context">
+        Financial Applications for UCOP, managing campus-wide web apps.
+      </p>
+      <nav class="mt-4" aria-label="External system links">
+        <a id="confluence-link" href="#" class="text-blue-200 hover:underline mr-4">Confluence</a>
+        <a id="jira-link" href="#" class="text-blue-200 hover:underline mr-4">Jira</a>
+        <a id="servicenow-link" href="#" class="text-blue-200 hover:underline mr-4">ServiceNow</a>
+        <a id="datadog-link" href="#" class="text-blue-200 hover:underline">DataDog</a>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="container mx-auto py-8">
+    <h2 class="text-xl font-semibold mb-6">Application Status</h2>
+    <div class="app-grid" id="app-grid" aria-live="polite"></div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-400 p-6 mt-8" aria-label="Site footer">
+    <div class="container mx-auto text-center">
+      <p>&copy; <span id="current-year"></span> University of California, Office of the President. All rights reserved.</p>
+      <p class="mt-2">App Version: <span id="app-version">1.0.0</span> | Deployed: <span id="deploy-timestamp"></span></p>
+      <p class="mt-2">
+        <a href="mailto:support@ucop.edu" class="hover:underline">Contact Support</a> |
+        <a href="https://www.ucop.edu/accessibility" class="hover:underline">Accessibility</a> |
+        <a href="https://www.ucop.edu/privacy" class="hover:underline">Privacy Policy</a>
+      </p>
+    </div>
+  </footer>
+  
+  <script>
+    // Set current year and deploy timestamp
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    document.getElementById('deploy-timestamp').textContent = new Date().toISOString().split('T')[0];
+    
+    // Fetch org/group metadata
+    async function loadOrgGroup() {
+      const response = await fetch('/api/org-group');
+      const data = await response.json();
+      document.getElementById('org-group-title').textContent = `${data.org_name} - ${data.group_name}`;
+      document.getElementById('confluence-link').href = data.confluence.org_group_base_url;
+      document.getElementById('jira-link').href = data.jira.org_base_url;
+      document.getElementById('servicenow-link').href = data.service_now.org_base_url;
+      document.getElementById('datadog-link').href = data.data_dog.org_group_base_url;
+    }
+    
+    // Fetch and render apps
+    async function loadApps() {
+      const response = await fetch('/api/apps');
+      const apps = await response.json();
+      const grid = document.getElementById('app-grid');
+      grid.innerHTML = '';
+      apps.forEach(app => {
+        const tile = document.createElement('div');
+        tile.className = 'app-tile';
+        tile.innerHTML = `
+          <h3 class="text-lg font-semibold">${app.short_name}</h3>
+          <p class="text-sm text-gray-600">${app.description || 'No description'}</p>
+          <p class="text-sm mt-2">Status: <span class="font-medium">${app.status.status}</span></p>
+          <p class="text-sm">CPU: ${app.status.cpu_utilization.toFixed(1)}%</p>
+          <a href="app.html?short_name=${app.short_name}" class="text-blue-600 hover:underline mt-2 inline-block">Details</a>
+        `;
+        grid.appendChild(tile);
+      });
+    }
+    
+    // Initialize
+    loadOrgGroup();
+    loadApps();
+    setInterval(loadApps, 30000); // Refresh every 30 seconds
+  </script>
+</body>
+</html>

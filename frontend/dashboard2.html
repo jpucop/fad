@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100 text-gray-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body class="bg-gray-50">
+
+<div class="container mx-auto py-6">
+
+  <!-- 🔷 Page Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-3xl font-semibold flex items-center gap-2">
+      <span class="iconify text-blue-500" data-icon="mdi:monitor" data-width="24"></span>
+      Dashboard
+    </h1>
+    <a href="/index.html" class="text-sm text-blue-500 hover:underline">Home</a>
+  </div>
+
+  <!-- 🔸 App Tile Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <template x-for="app in apps" :key="app.id">
+      <div class="p-4 border rounded-md shadow-sm bg-white cursor-pointer hover:bg-blue-50"
+           @click="window.location.href = '/app-detail.html'">
+        <!-- App Tile Header -->
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">
+            <span x-text="app.name"></span>
+            <span class="text-sm text-gray-500" x-text="'(' + app.env + ')'"></span>
+          </div>
+          <span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="18" x-show="app.health.status === 'Healthy'"></span>
+          <span class="iconify text-yellow-500" data-icon="mdi:sync" data-width="18" x-show="app.health.status === 'Deploying'"></span>
+          <span class="iconify text-red-500" data-icon="mdi:alert-circle-outline" data-width="18" x-show="app.health.status === 'Unhealthy'"></span>
+        </div>
+
+        <!-- App Tile Body -->
+        <div class="mt-2">
+          <div class="flex items-center gap-2 text-sm">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            <span>Total Requests: <span x-text="app.stats.totalRequests"></span></span>
+          </div>
+          <div class="flex items-center gap-2 text-sm mt-1">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            <span>Errors: <span x-text="app.stats.errors.count"></span></span>
+          </div>
+          <div class="flex items-center gap-2 text-sm mt-1">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            <span>Rate-limited: <span x-text="app.stats.rateLimited"></span></span>
+          </div>
+        </div>
+
+      </div>
+    </template>
+  </div>
+
+</div>
+
+<script>
+function dashboard() {
+  return {
+    apps: [
+      {
+        id: 1,
+        name: "MyApp 1",
+        env: "prod",
+        health: { status: "Healthy" },
+        stats: { totalRequests: "43.2k", errors: { count: 8 }, rateLimited: 3 }
+      },
+      {
+        id: 2,
+        name: "MyApp 2",
+        env: "dev",
+        health: { status: "Deploying" },
+        stats: { totalRequests: "12.4k", errors: { count: 2 }, rateLimited: 0 }
+      },
+      {
+        id: 3,
+        name: "MyApp 3",
+        env: "prod",
+        health: { status: "Unhealthy" },
+        stats: { totalRequests: "99.1k", errors: { count: 22 }, rateLimited: 5 }
+      }
+    ]
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-100 text-gray-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - UCOP FinApps</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+</head>
+<body class="font-sans bg-gray-50">
+
+  <!-- 🔷 Header -->
+  <header class="bg-blue-800 text-white p-6 shadow">
+    <div class="container mx-auto">
+      <h1 class="text-2xl font-bold">UCOP FinApps Dashboard</h1>
+      <p class="text-sm mt-1">Financial Applications for UCOP, monitoring live application environments.</p>
+    </div>
+  </header>
+
+  <!-- 🔶 App Grid Section -->
+  <main class="container mx-auto py-10 px-4">
+    <h2 class="text-xl font-semibold mb-6">Application Status</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- App Tile Template -->
+      <!-- Repeat this block 6 times with different dummy content -->
+
+      <!-- App 1 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">
+            MyApp 1 <span class="text-sm text-gray-500">(prod)</span>
+          </div>
+          <span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 43.2k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 8 (0.02%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 3
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+      <!-- App 2 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">Reports API <span class="text-sm text-gray-500">(stage)</span></div>
+          <span class="iconify text-yellow-500" data-icon="mdi:progress-clock" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 12.1k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 15 (0.12%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 1
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+      <!-- App 3 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">Payroll UI <span class="text-sm text-gray-500">(prod)</span></div>
+          <span class="iconify text-red-500" data-icon="mdi:alert-circle" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 55.6k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 232 (0.4%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 21
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+      <!-- App 4 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">Timekeeper <span class="text-sm text-gray-500">(test)</span></div>
+          <span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 3.3k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 0 (0.00%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 0
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+      <!-- App 5 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">LDAP Sync <span class="text-sm text-gray-500">(prod)</span></div>
+          <span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 9.8k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 2 (0.01%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 0
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+      <!-- App 6 -->
+      <div class="p-4 border rounded-md shadow-sm bg-white hover:bg-blue-50">
+        <div class="flex justify-between items-center">
+          <div class="text-lg font-semibold">Box API <span class="text-sm text-gray-500">(prod)</span></div>
+          <span class="iconify text-yellow-500" data-icon="mdi:progress-clock" data-width="18"></span>
+        </div>
+        <div class="mt-2 text-sm space-y-1">
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:chart-line" data-width="16"></span>
+            Requests: 21.7k
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="16"></span>
+            Errors: 5 (0.02%)
+          </div>
+          <div class="flex gap-2 items-center">
+            <span class="iconify" data-icon="mdi:lock" data-width="16"></span>
+            Rate-limited: 2
+          </div>
+        </div>
+        <div class="mt-3">
+          <a href="app-detail.html" class="text-blue-500 hover:underline text-sm">View Details</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 🔻 Footer -->
+  <footer class="bg-gray-800 text-gray-400 p-6 mt-10 text-center text-sm">
+    <p>&copy; 2025 University of California, Office of the President. All rights reserved.</p>
+    <p class="mt-2">Dashboard Version: 1.0.0 | Deployed: 2025-05-04</p>
+  </footer>
+
+</body>
+</html>

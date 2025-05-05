@@ -1,28 +1,37 @@
-# Use official Python slim image as base
-FROM python:3.13-slim
+# ========================
+# FRONTEND BUILD STAGE
+# ========================
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app
+COPY frontend/ ./frontend/
+WORKDIR /app/frontend
+
+RUN npm ci && npm run build
+
+
+# ========================
+# BACKEND BUILD STAGE
+# ========================
+FROM python:3.11-slim AS backend
 
 # Set working directory
 WORKDIR /app
 
-# Copy only requirements for caching
-COPY requirements.txt .
+# Copy only requirements first to cache installs
+COPY backend/requirements.txt .
 
-# Install dependencies
+# Install only production dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire app (adjusted for your structure)
-COPY . .
+# Copy backend code
+COPY backend/ ./backend/
 
-# Create non-root user and switch to it
-RUN useradd -m -r appuser && chown appuser:appuser /app
-USER appuser
+# Copy built frontend assets into backend (to serve statically)
+COPY --from=frontend-builder /app/frontend/dist ./backend/app/static
 
-# Expose FastAPI's default port
+# Expose FastAPI port
 EXPOSE 8000
 
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD curl -f http://localhost:8000/ || exit 1
-
-# Start FastAPI with Uvicorn (tweaked for production)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Run the FastAPI app via uvicorn
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
