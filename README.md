@@ -1,59 +1,46 @@
 # FAD - FastAPI AWS Dashboard
 
-## Overview
-
 Financial Applications UCOP group aggregate dashboard widget.
 
-## Setup
-
-1. Navigate to the **backend** dir and make that the cwd for fastapi app startup.
-
-2. Run the command line project script resetenv.sh|bat
+## backend
 
 ```sh
 resetenv.sh
 ```
 
-```bat
-resetenv.bat
-```
-
-## Features
-
 ```sh
 tree -I "venv|.git|.gitignore|.gitmodules"
 ```
-
-## re-generate requirements.txt and requirements-test.txt
-
-pip-compile requirements.in
-pip-compile requirements-test.in
-
-pip-sync
-
-## pydantic - generate models.py
-
-Generate the pydantic types from the datamodel codegen tool of theirs using app.config-template.json and the other sourcing model files (mostly json file types).
-
-```sh
-datamodel-codegen --input ~/dev/fad/backend/model/app.config-template.json --input-file-type json --output ~/dev/fad/backend/app/models.py
-
-datamodel-codegen --input ~/dev/fad/backend/model/app_config_schema.json --input-file-type jsonschema --output ~/dev/fad/backend/app/models.py
-
-```
-
-## Add python dep to requirements.txt
 
 ```sh
 pip freeze > requirements.txt
 ```
 
+### requirements\[-test\].txt
+
+```sh
+pip-compile requirements.in
+pip-compile requirements-test.in
+
+pip-sync
+```
+
+### pydantic - generate models for app
+
+By convention, have a **generate.py** file that creates all pydantic model definitions for the runtime of this web app 
+models/init/ 1st level sub-dirs are to be the org and group business wise isolated in their model structures.
+
+## frontend
+
+use npm and vite to optimze js/css files since tailwind and svgs and largeness comes with it
+we only take what is needed and gzip it basically 
+
 ## AWS Tags
 
-ucop:group FinApps
-ucop:application alert-notification-api
-ucop:environment DEV
-ucop:createdBy jkirton@ucop.edu
+- ucop:group FinApps
+- ucop:application fad
+- ucop:environment dev
+- ucop:createdBy jkirton@ucop.edu
 
 ## FinApps AWS Accounts List
 
@@ -61,10 +48,6 @@ ucop:createdBy jkirton@ucop.edu
 [default]
 region = us-west-2
 output = json
-# jp aws
-[524006177124_jp]
-# finapps-poc
-[403230261384_rw]
 # finapps-dev
 [872008829419_rw]
 # finapps-prod
