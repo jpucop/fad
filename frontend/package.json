@@ -5,16 +5,21 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "clean": "rm -rf node_modules package-lock.json",
-    "postinstall": "node scripts/postinstall.js",
-    "build:css": "tailwindcss -i ./css/styles.css -o ./css/styles.min.css --minify",
+    "clean": "rimraf node_modules package-lock.json dist",
+    "build:css": "npx tailwindcss -i ./css/styles.css -o ./dist/css/styles.min.css --minify",
     "build:icons": "node ./scripts/build-icons.js",
-    "build": "npm run build:css && npm run build:icons"
+    "build:js": "node scripts/build-alpine.js",
+    "build": "npm run build:css && npm run build:icons && npm run build:js"
   },
   "devDependencies": {
+    "@iconify-json/logos": "^1.2.4",
+    "@iconify-json/mdi": "^1.2.3",
     "@iconify/json": "^2.2.336",
     "@iconify/tailwind4": "^1.0.6",
-    "iconify-cli": "git+https://github.com/iconify/cli.git",
+    "@iconify/utils": "^2.3.0",
+    "@tailwindcss/cli": "^4.1.5",
+    "alpinejs": "^3.14.9",
+    "rimraf": "^5.0.5",
     "tailwindcss": "^4.1.5"
   }
 }
