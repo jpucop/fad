@@ -6,11 +6,11 @@
   "app_profile": "tomcat-java",
   "deploy_profile": "aws-cicd-fargate",
   "source": {
-    "project_name": "",
+    "project_name": "{short_name}",
     "git_origin_url": "",
     "production_branch_name": "main",
     "aws": {
-      "account_name": ""
+      "account_name": "finapps-dev"
     }
   },
   "confluence": {

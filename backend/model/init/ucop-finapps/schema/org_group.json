@@ -11,9 +11,9 @@
           "cli_output_format": "json",
           "tags": [
             "ucop:group::FinApps",
-            "ucop:application::Dashboard",
-            "ucop:environment::dev",
-            "ucop:createdBy::jkirton@ucop.edu"
+            "ucop:application::{app_name}",
+            "ucop:environment::{env}",
+            "ucop:createdBy::z{member_email}"
           ]
         },
         "accounts": [
