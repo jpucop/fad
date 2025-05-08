@@ -1,5 +1,8 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+@plugin "@iconify/tailwind4" {
+	 prefixes: mdi, logos;
+}
 
 .watermark {
 	position: fixed;

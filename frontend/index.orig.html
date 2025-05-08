@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <title>Financial Applications</title>
@@ -8,16 +7,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   
-  <link href="css/styles.css" rel="stylesheet">
-  <script src="js/app.js" defer></script>
-  <script src="js/alpinw.js" defer></script>
-</head>
+  <link href="css/styles.min.css" rel="stylesheet">
+  <script src="js/alpine.min.js" defer></script>
+  <script src="js/icons.js" defer></script>
+  <script src="js/fad.js" defer></script>
 
+</head>
 <body class="bg-gray-100 text-gray-800 font-sans">
+  
   <div class="max-w-screen-xl mx-auto px-6">
+    
     <div class="watermark w-full flex justify-center items-center">
       <img src="img/uc_logo.gif" alt="Watermark" class="w-full h-auto" />
     </div>
+    
     <header class="bg-white shadow-sm border border-gray-300 rounded-md mt-4 mb-4 p-2">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div class="flex gap-3 items-center">
@@ -30,28 +33,31 @@
         <div class="flex items-center">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Team Members">
-              <span class="icon--mdi--account-multiple-outline w-3.5 h-3.5 inline-block"></span> Members
+              <span class="iconify" data-icon="mdi:account-multiple-outline" data-width="14"></span> Members
             </a>
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Open ServiceNow">
-              <span class="icon--mdi--ticket-outline w-3.5 h-3.5 inline-block"></span> ServiceNow
+              <span class="iconify" data-icon="mdi:ticket-outline" data-width="14"></span> ServiceNow
             </a>
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Confluence Docs">
-              <span class="icon--mdi--book-open-page-variant-outline w-3.5 h-3.5 inline-block"></span> Confluence
+              <span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="14"></span> Confluence
             </a>
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Access Box Folder">
-              <span class="icon--mdi--cloud-outline w-3.5 h-3.5 inline-block"></span> Box
+              <span class="iconify" data-icon="mdi:cloud-outline" data-width="14"></span> Box
             </a>
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Datadog Monitoring">
-              <span class="icon--mdi--chart-box-outline w-3.5 h-3.5 inline-block"></span> DataDog
+              <span class="iconify" data-icon="mdi:chart-box-outline" data-width="14"></span> DataDog
             </a>
             <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Code">
-              <span class="icon--mdi--github w-3.5 h-3.5 inline-block"></span> Sources
+              <span class="iconify" data-icon="mdi:github" data-width="14"></span> Sources
             </a>
           </div>
         </div>
       </div>
     </header>
+    
+    <!-- Apps Label -->
     <h2 class="text-base font-medium text-gray-400 mb-2">applications</h2>
+    
     <main class="px-4 py-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="p-3 border rounded-md shadow-sm bg-white hover:bg-blue-50 cursor-pointer">
@@ -63,64 +69,62 @@
           </div>
           <div class="flex justify-end gap-3 text-center text-xs mb-2">
             <div class="flex flex-col items-center opacity-30" title="Dev: Failing">
-              <span class="icon--mdi--alert-circle w-4 h-4 inline-block text-red-500"></span>
+              <span class="iconify text-red-500" data-icon="mdi:alert-circle" data-width="16"></span>
               <span class="dev">dev</span>
             </div>
             <div class="flex flex-col items-center opacity-50" title="QA: In Progress">
-              <span class="icon--mdi--progress-clock w-4 h-4 inline-block text-yellow-500"></span>
+              <span class="iconify text-yellow-500" data-icon="mdi:progress-clock" data-width="16"></span>
               <span class="qa">qa</span>
             </div>
             <div class="flex flex-col items-center" title="Prod: Healthy">
-              <span class="icon--mdi--check-circle-outline w-4 h-4 inline-block text-green-500"></span>
+              <span class="iconify text-green-500" data-icon="mdi:check-circle-outline" data-width="16"></span>
               <span class="prod">prod</span>
             </div>
           </div>
           <div class="text-sm space-y-1 mb-2">
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--chart-line w-3.5 h-3.5 inline-block"></span> Requests
+                <span class="iconify" data-icon="mdi:chart-line" data-width="14"></span> Requests
               </div>
               <span>55.6k</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--alert-circle-outline w-3.5 h-3.5 inline-block"></span> Errors
+                <span class="iconify" data-icon="mdi:alert-circle-outline" data-width="14"></span> Errors
               </div>
               <span>232 (0.4%)</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--history w-3.5 h-3.5 inline-block"></span> Version
+                <span class="iconify" data-icon="mdi:history" data-width="14"></span> Version
               </div>
               <span class="font-mono">v1.2.8 @ 2025-05-04</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--server w-3.5 h-3.5 inline-block"></span> Host
+                <span class="iconify" data-icon="mdi:server" data-width="14"></span> Host
               </div>
               <span>AWS</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--application w-3.5 h-3.5 inline-block"></span> App Host Profile
+                <span class="iconify" data-icon="mdi:application" data-width="14"></span> App Host Profile
               </div>
               <span>-</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon--mdi--rocket w-3.5 h-3.5 inline-block"></span> Deployment Profile
+                <span class="iconify" data-icon="mdi:rocket" data-width="14"></span> Deployment Profile
               </div>
               <span>-</span>
             </div>
           </div>
-          <div
-            class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-gray-500 gap-2 relative">
+          <div class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-gray-500 gap-2 relative">
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="ServiceNow Tickets">
-                <span class="icon--mdi--ticket-outline w-3.5 h-3.5 inline-block"></span> SN
+                <span class="iconify" data-icon="mdi:ticket-outline" data-width="14"></span> SN
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">ServiceNow</p>
                 <p>Open Tickets: 12</p>
                 <p>Urgent: 3</p>
@@ -129,10 +133,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Logs">
-                <span class="icon--mdi--file-document-outline w-3.5 h-3.5 inline-block"></span> Logs
+                <span class="iconify" data-icon="mdi:file-document-outline" data-width="14"></span> Logs
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Logs</p>
                 <p>Recent Errors: 5</p>
                 <p>Log Size: 1.2 GB</p>
@@ -141,10 +144,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="JIRA Issues">
-                <span class="icon--mdi--jira w-3.5 h-3.5 inline-block"></span> JIRA
+                <span class="iconify" data-icon="mdi:jira" data-width="14"></span> JIRA
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">JIRA</p>
                 <p>Open Issues: 8</p>
                 <p>Sprints Active: 2</p>
@@ -153,10 +155,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Box">
-                <span class="icon--mdi--cloud-outline w-3.5 h-3.5 inline-block"></span> Box
+                <span class="iconify" data-icon="mdi:cloud-outline" data-width="14"></span> Box
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Box</p>
                 <p>Files: 45</p>
                 <p>Storage: 2.3 GB</p>
@@ -165,10 +166,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Wiki">
-                <span class="icon--mdi--book-open-page-variant-outline w-3.5 h-3.5 inline-block"></span> Wiki
+                <span class="iconify" data-icon="mdi:book-open-page-variant-outline" data-width="14"></span> Wiki
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Wiki</p>
                 <p>Pages: 22</p>
                 <p>Last Edited: 2025-05-03</p>
@@ -177,10 +177,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Repository">
-                <span class="icon--mdi--github w-3.5 h-3.5 inline-block"></span> Source
+                <span class="iconify" data-icon="mdi:github" data-width="14"></span> Source
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Source</p>
                 <p>Branch: main</p>
                 <p>Last Commit: fix vulns</p>
@@ -188,10 +187,9 @@
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
               <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="AWS Details">
-                <span class="icon--mdi--aws w-3.5 h-3.5 inline-block"></span> AWS
+                <span class="iconify" data-icon="mdi:aws" data-width="14"></span> AWS
               </a>
-              <div x-show="show" x-cloak
-                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">AWS Details</p>
                 <p>Account Name: finapps-prod</p>
                 <p>Deployment Pipeline: ayso-prod</p>
@@ -209,5 +207,4 @@
     </footer>
   </div>
 </body>
-
 </html>
