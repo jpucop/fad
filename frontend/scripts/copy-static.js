@@ -7,7 +7,7 @@ const root = path.join(__dirname, '..');
 const dist = path.join(root, 'dist');
 
 // Only these paths will be copied
-const items = ['index.html', 'favicon.ico', 'img'];
+const items = ['favicon.ico', 'img'];
 
 // Ensure dist exists
 fs.mkdirSync(dist, { recursive: true });

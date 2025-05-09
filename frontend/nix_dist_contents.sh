@@ -1,16 +1,16 @@
 #!/bin/sh
 set -eu
 
-# Clean up previous build output
+# rm all dist/ contents
 echo "🧹 Cleaning dist/ directory..."
 rm -rf dist/
 
-# Ensure dependencies are installed
+# install
 if [ ! -d node_modules ]; then
   echo "📦 Installing dependencies..."
   npm install
 fi
 
-# Build the project
-echo "🚀 Running build..."
-npm run build
+# build
+# echo "🚀 Running build..."
+# npm run build

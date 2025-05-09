@@ -1,6 +1,9 @@
 {
   "org": {
-    "name": "UCOP",
+    "name": "Office of President",
+    "short_name": "UCOP",
+    "full_name": "University of California Office of the President",
+    "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
     "group": {
       "name": "Financial Applications",
       "short_name": "FinApps",

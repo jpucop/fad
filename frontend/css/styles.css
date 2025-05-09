@@ -1,24 +1,28 @@
 @import "tailwindcss";
 
-@plugin "@iconify/tailwind4" {
-	 prefixes: mdi, logos;
+/* Ensure SVG icons align and size correctly */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
 }
 
+/* Watermark styling */
 .watermark {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	opacity: .04;
-	width: 100;
-	height: 100%;
-	width: 60%;
-	z-index: -1;
-	pointer-events: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.04;
+  width: 60%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }
 
-.dev { color: lightgray; }
-.qa { color: gray; }
+/* Environment label colors */
+.dev { color: darkgreen; }
+.qa { color: darkblue; }
 .prod { color: black; }
 
+/* Alpine.js cloaking */
 [x-cloak] { display: none !important; }
