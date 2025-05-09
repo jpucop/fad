@@ -1,89 +1,66 @@
-import { parseIconSet } from '@iconify/utils';
-import fs from 'fs';
+import {
+  IconSet,
+  cleanupSVG,
+  isEmptyColor,
+  parseColors,
+  runSVGO
+} from '@iconify/tools';
+import { promises as fs } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { optimize } from 'svgo';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const htmlPath = path.join(__dirname, '../index.html');
-const iconsDataPath = path.join(__dirname, '../dist/icons.json');
+// Paths
+const htmlFile = './index.html';
+const outputDir = './dist/icons';
 
-// Read MDI icon set
-let mdi;
-try {
-  mdi = JSON.parse(fs.readFileSync(
-    path.join(__dirname, '../node_modules/@iconify-json/mdi/icons.json'),
-    'utf8'
-  ));
-} catch (err) {
-  console.error(`❌ Error reading MDI icons: ${err.message}`);
-  process.exit(1);
-}
 
-// Read source HTML
-let html;
-try {
-  html = fs.readFileSync(htmlPath, 'utf8');
-} catch (err) {
-  console.error(`❌ Error reading index.html: ${err.message}`);
-  process.exit(1);
-}
+const mdiIconsPath = './node_modules/@iconify-json/mdi/icons.json';
 
-// Find icon classes (e.g., i-mdi-account-multiple-outline)
-const iconRegex = /i-mdi-([\w-]+)/g;
-const icons = new Set();
-let match;
-while ((match = iconRegex.exec(html))) {
-  icons.add(match[1]);
-}
+// Load HTML
+const html = await fs.readFile(htmlFile, 'utf8');
+const matches = [...html.matchAll(/\bi-([a-z0-9]+)-([a-z0-9-]+)\b/g)];
+const uniqueIcons = Array.from(new Set(matches.map(m => `${m[1]}:${m[2]}`)));
+console.log(`🔍 Found ${uniqueIcons.length} icon references in source html`);
 
-if (icons.size === 0) {
-  console.log('No MDI icons found in index.html.');
-  fs.mkdirSync(path.dirname(iconsDataPath), { recursive: true });
-  fs.writeFileSync(iconsDataPath, '{}');
-  process.exit(0);
-}
-
-console.log(`Found ${icons.size} unique MDI icons:`, [...icons]);
-
-// Parse MDI icon set
-const parsedIcons = {};
-parseIconSet(mdi, (name, data) => {
-  parsedIcons[name] = data;
+// Load MDI icon JSON
+const iconSet = await importDirectory('files/svg', {
+  prefix: 'test',
 });
 
-// Generate icon data
-const iconsData = {};
-const missingIcons = [];
-for (const iconName of icons) {
-  const icon = parsedIcons[iconName];
-  if (!icon) {
-    missingIcons.push(iconName);
-    continue;
-  }
-  const width = icon.width || 24;
-  const height = icon.height || 24;
-  const viewBox = `0 0 ${width} ${height}`;
-  // Create SVG for optimization
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${icon.body}</svg>`;
-  // Optimize with SVGO
-  const optimized = optimize(svg, {
-    plugins: [
-      { name: 'preset-default' },
-      { name: 'removeAttrs', params: { attrs: '(fill|stroke)' } },
-      { name: 'addAttributesToSVGElement', params: { attributes: [{ fill: 'currentColor' }] } },
-    ],
-  });
-  // Extract body (remove <svg> wrapper)
-  const body = optimized.data.replace(/<svg[^>]*>|<\/svg>/g, '');
-  iconsData[iconName] = { viewBox, body };
-}
+  const mdi = JSON.parse(await fs.readFile(mdiIconsPath, 'utf8'));
 
-if (missingIcons.length > 0) {
-  console.warn(`⚠️ ${missingIcons.length} icons not found in MDI set:`, missingIcons);
-}
+await fs.mkdir(outputDir, { recursive: true });
 
-// Write icon data
-fs.mkdirSync(path.dirname(iconsDataPath), { recursive: true });
-fs.writeFileSync(iconsDataPath, JSON.stringify(iconsData, null, 2));
-console.log(`✅ Generated data for ${Object.keys(iconsData).length} icons in dist/icons.json`);
+for (const iconRef of uniqueIcons) {
+	const [prefix, name] = iconRef.split(':');
+
+	if (prefix !== 'mdi') {
+		console.warn(`⚠️ Unsupported prefix: ${prefix}`);
+		continue;
+	}
+
+	const svg = iconSet.toSVG(name);
+	if (!svg) {
+		console.warn(`⚠️ Invalid icon: ${iconRef}`);
+		continue;
+	}
+
+	try {
+		cleanupSVG(svg);
+
+		parseColors(svg, {
+			defaultColor: 'currentColor',
+			callback: (attr, colorStr, color) => {
+				return !color || isEmptyColor(color) ? colorStr : 'currentColor';
+			}
+		});
+
+		// ✅ returns string — do not call `.toString()` on it
+		const svgString = await runSVGO(svg);
+
+		const outputPath = path.join(outputDir, `${prefix}-${name}.svg`);
+		await fs.writeFile(outputPath, svgString, 'utf8');
+		console.log(`✅ Saved ${outputPath}`);
+	} catch (err) {
+		console.error(`❌ Failed to process ${iconRef}:`, err);
+	}
+}

@@ -14,12 +14,20 @@
     "build": "npm run copy:static && npm run build:css && npm run build:icons && npm run inject:icons && npm run build:js"
   },
   "devDependencies": {
-    "@iconify-json/mdi": "^1.2.3",
-    "@iconify/utils": "^2.3.0",
-    "@tailwindcss/cli": "^4.1.5",
-    "alpinejs": "^3.14.9",
-    "rimraf": "^5.0.5",
-    "svgo": "^3.0.2",
-    "tailwindcss": "^4.1.5"
+    "@iconify-json/mdi": "1.2.3",
+    "@iconify/tailwind4": "1.0.6",
+    "@iconify/tools": "4.1.2",
+    "@iconify/utils": "2.3.0",
+
+    "tailwindcss": "4.1.6",
+    "@tailwindcss/cli": "4.1.6",
+    "@tailwindcss/postcss": "4.1.6",
+    
+    "postcss": "8.5.3",
+    "svgo": "3.3.2",
+
+    "alpinejs": "3.14.9",
+    
+    "rimraf": "6.0.1"
   }
 }
