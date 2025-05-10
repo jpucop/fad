@@ -3,8 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, '..');
-const dist = path.join(root, 'dist');
+const root = path.join(__dirname, '../src');
+const dist = path.join(root, '../dist');
 
 // Only these paths will be copied
 const items = ['favicon.ico', 'img'];

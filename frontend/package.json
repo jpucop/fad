@@ -5,7 +5,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "clean": "rimraf node_modules package-lock.json",
+    "clean:node": "rimraf node_modules package-lock.json",
+    "clean:dist": "rimraf dist",
+    
     "copy:static": "node ./scripts/copy-static.js",
     "build:css": "node ./scripts/build-css.js",
     "build:icons": "node ./scripts/build-icons.js",
@@ -14,6 +16,10 @@
     "build": "npm run copy:static && npm run build:css && npm run build:icons && npm run inject:icons && npm run build:js"
   },
   "devDependencies": {
+    
+    "postcss": "8.5.3",
+    "svgo": "3.3.2",
+
     "@iconify-json/mdi": "1.2.3",
     "@iconify/tailwind4": "1.0.6",
     "@iconify/tools": "4.1.2",
@@ -23,11 +29,9 @@
     "@tailwindcss/cli": "4.1.6",
     "@tailwindcss/postcss": "4.1.6",
     
-    "postcss": "8.5.3",
-    "svgo": "3.3.2",
-
     "alpinejs": "3.14.9",
     
     "rimraf": "6.0.1"
+    
   }
 }
