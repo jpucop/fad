@@ -6,11 +6,9 @@ const inputCss = readFileSync('./src/css/styles.css', 'utf8');
 
 const result = await postcss([
   tailwindcss({
-    // TODO: verify
-    // IMPT: we need to base this on dist'd version of index.html where we assume the requisite icons are injected
     content: [
-      './dist/*.html',
-      './src/js/*.js'
+      './src/index.html',
+      './src/js/fad.js'
     ],
     theme: {
       

@@ -3,68 +3,72 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const htmlPath = path.join(__dirname, '../index.html');
+const htmlPath = path.join(__dirname, '../src/index.html');
 const distHtmlPath = path.join(__dirname, '../dist/index.html');
-const iconsDataPath = path.join(__dirname, '../dist/icons.json');
+const spritePath = path.join(__dirname, '../dist/icons/sprite.svg');
+const iconsJsonPath = path.join(__dirname, '../dist/icons.json');
 
-// Read icons data
-let iconsData;
-try {
-  iconsData = JSON.parse(fs.readFileSync(iconsDataPath, 'utf8'));
-} catch (err) {
-  console.error('❌ Error reading icons.json. Run build:icons first.');
+// === Fail fast if prerequisites missing ===
+if (!fs.existsSync(spritePath)) {
+  console.error('❌ Missing sprite.svg. Run build-icons first.');
   process.exit(1);
 }
 
-// Read source HTML
-let html;
-try {
-  html = fs.readFileSync(htmlPath, 'utf8');
-} catch (err) {
-  console.error(`❌ Error reading index.html: ${err.message}`);
+if (!fs.existsSync(iconsJsonPath)) {
+  console.error('❌ Missing icons.json. Run build-icons first.');
   process.exit(1);
 }
 
-// Generate SVG sprite
-let sprite = '<svg style="display: none;" aria-hidden="true">\n';
-const missingIcons = [];
-for (const [iconName, icon] of Object.entries(iconsData)) {
-  if (!icon.body) {
-    missingIcons.push(iconName);
-    continue;
-  }
-  sprite += `  <symbol id="mdi-${iconName}" viewBox="${icon.viewBox}">${icon.body}</symbol>\n`;
-}
-sprite += '</svg>\n';
+// === Load files ===
+const html = fs.readFileSync(htmlPath, 'utf8');
+const iconsData = JSON.parse(fs.readFileSync(iconsJsonPath, 'utf8'));
 
-if (missingIcons.length > 0) {
-  console.warn(`⚠️ ${missingIcons.length} icons missing data:`, missingIcons);
-}
+// === Replace icon <span> with <svg><use href="#..."> ===
+let updatedHtml = html;
 
-// Replace <span> with <svg><use>
-for (const iconName of Object.keys(iconsData)) {
+for (const [iconName] of Object.entries(iconsData)) {
+  const [prefix, name] = iconName.split('-');
   const spanRegex = new RegExp(
-    `<span\\s+class="([^"]*\\bi-mdi-${iconName}\\b[^"]*)"[^>]*>(.*?)</span>`,
+    `<span\\s+class="([^"]*\\bi-${prefix}-${name}\\b[^"]*)"[^>]*>(.*?)</span>`,
     'g'
   );
-  html = html.replace(spanRegex, (match, classNames) => {
-    const classes = classNames
+
+  updatedHtml = updatedHtml.replace(spanRegex, (match, classNames) => {
+    const cleanedClasses = classNames
       .split(/\s+/)
-      .filter(cls => cls !== `i-mdi-${iconName}`)
+      .filter(cls => cls !== `i-${prefix}-${name}`)
       .join(' ');
-    return `<svg class="icon ${classes}" aria-hidden="true"><use href="#mdi-${iconName}"></use></svg>`;
+    return `<svg class="icon ${cleanedClasses}" aria-hidden="true"><use href="#${prefix}-${name}"></use></svg>`;
   });
 }
 
-// Inject sprite at placeholder
-const placeholder = '<!-- SVG_SPRITE_PLACEHOLDER -->';
-if (!html.includes(placeholder)) {
-  console.error('❌ SVG sprite placeholder not found in index.html.');
+// === Inject XHR loader script before </head> ===
+const spriteScript = `
+<script>
+(function() {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', 'icons/sprite.svg', true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      const div = document.createElement('div');
+      div.style.display = 'none';
+      div.innerHTML = xhr.responseText;
+      document.body.insertBefore(div, document.body.firstChild);
+    }
+  };
+  xhr.send();
+})();
+</script>`;
+
+if (!updatedHtml.includes('</head>')) {
+  console.error('❌ No </head> tag found in HTML — cannot inject sprite loader.');
   process.exit(1);
 }
-html = html.replace(placeholder, sprite);
 
-// Write updated HTML
+updatedHtml = updatedHtml.replace('</head>', `${spriteScript}\n</head>`);
+
+// === Write output ===
 fs.mkdirSync(path.dirname(distHtmlPath), { recursive: true });
-fs.writeFileSync(distHtmlPath, html);
-console.log(`✅ Injected SVG sprite with ${Object.keys(iconsData).length - missingIcons.length} icons into dist/index.html`);
+fs.writeFileSync(distHtmlPath, updatedHtml, 'utf8');
+
+console.log(`✅ Replaced icon spans and injected sprite loader into dist/index.html`);

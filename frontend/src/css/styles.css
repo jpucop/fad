@@ -1,4 +1,9 @@
-@import "tailwindcss";
+@import "tailwindcss" 
+
+@plugin "@iconify/tailwind4" {
+ prefixes: mdi;
+ prefix: i;
+}
 
 /* Ensure SVG icons align and size correctly */
 .icon {
