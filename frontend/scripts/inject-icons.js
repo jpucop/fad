@@ -1,3 +1,5 @@
+// inject-icons.js
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,9 +10,9 @@ class Config {
     this.dirname = path.dirname(fileURLToPath(import.meta.url));
     this.srcHtmlPath = path.join(this.dirname, '../src/index.html');
     this.distHtmlPath = path.join(this.dirname, '../dist/index.html');
-    this.spritePath = path.join(this.dirname, '../dist/icons/icons.svg'); // Updated to icons.svg
+    this.spritePath = path.join(this.dirname, '../dist/icons/icons.svg');
     this.iconsJsonPath = path.join(this.dirname, '../dist/icons.json');
-    this.spriteUrl = 'icons/icons.svg'; // URL for XHR loader
+    this.spriteUrl = '/dist/icons/icons.svg';
   }
 
   // Validate required files
@@ -31,46 +33,35 @@ class Config {
 function replaceIconSpans(html, iconsData) {
   let updatedHtml = html;
 
-  for (const [iconName] of Object.entries(iconsData)) {
-    const [prefix, name] = iconName.split('-');
+  for (const iconName of Object.keys(iconsData)) {
+    console.log(`Processing icon: ${iconName}`); // Debug logging
+    // Extract prefix and name from iconName (e.g., 'i-mdi-cloud-outline' -> 'mdi', 'cloud-outline')
+    const match = iconName.match(/^i-([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+    if (!match) {
+      console.warn(`⚠️ Invalid icon name format: ${iconName}`);
+      continue;
+    }
+    const [, prefix, name] = match;
+
+    // Regex to match <span> with the icon class
     const spanRegex = new RegExp(
       `<span\\s+class="([^"]*\\bi-${prefix}-${name}\\b[^"]*)"[^>]*>(.*?)</span>`,
       'g'
     );
 
     updatedHtml = updatedHtml.replace(spanRegex, (match, classNames) => {
+      // Preserve all classes except the icon-specific class
       const cleanedClasses = classNames
         .split(/\s+/)
         .filter(cls => cls !== `i-${prefix}-${name}`)
         .join(' ');
-      return `<svg class="icon ${cleanedClasses}" aria-hidden="true"><use href="#${prefix}-${name}"></use></svg>`;
+      return `<svg class="icon ${cleanedClasses}" aria-hidden="true"><use href="#i-${prefix}-${name}"></use></svg>`;
     });
   }
 
   return updatedHtml;
 }
 
-// Generate sprite loader script
-function generateSpriteLoader(spriteUrl) {
-  return `
-<script>
-(function() {
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', '${spriteUrl}', true);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      const div = document.createElement('div');
-      div.style.display = 'none';
-      div.innerHTML = xhr.responseText;
-      document.body.insertBefore(div, document.body.firstChild);
-    }
-  };
-  xhr.send();
-})();
-</script>`;
-}
-
-// Main function
 async function injectIcons() {
   try {
     const config = new Config();
@@ -82,13 +73,6 @@ async function injectIcons() {
 
     // Replace icon spans
     let updatedHtml = replaceIconSpans(html, iconsData);
-
-    // Inject sprite loader
-    const spriteScript = generateSpriteLoader(config.spriteUrl);
-    if (!updatedHtml.includes('</head>')) {
-      throw new Error('❌ No </head> tag found in HTML — cannot inject sprite loader.');
-    }
-    updatedHtml = updatedHtml.replace('</head>', `${spriteScript}\n</head>`);
 
     // Write output
     fs.mkdirSync(path.dirname(config.distHtmlPath), { recursive: true });

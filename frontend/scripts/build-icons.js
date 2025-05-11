@@ -1,11 +1,5 @@
 // build-icons.js
 
-// Scans index.html for icon references (e.g., i-prefix-name), generates SVG sprite or individual SVG files,
-// and creates a metadata JSON file in dist/. Uses a default icon for missing references.
-// Args: mode string ('s' for sprite, 'i' for individual) via process.argv[2], defaults to 's'.
-// Outputs: dist/icons/sprite.svg or dist/icons/*.svg, dist/icons.json.
-// Operations are synchronous, with warnings for errors and fallback to default icon for missing icons.
-
 import {
   cleanupSVG,
   isEmptyColor,
@@ -99,7 +93,7 @@ class Config {
     spriteSvgClose = '</svg>\n',
   } = {}) {
     this.iconPrefix = iconPrefix;
-    this.iconRegex = new RegExp(`\\b${iconPrefix}([a-z0-9]+)-([a-z0-9-]+)\\b`, 'g');
+    this.iconRegex = new RegExp(`\\b${iconPrefix}([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)\\b`, 'g');
     this.outputSpriteName = outputSpriteName;
     this.iconHeight = iconHeight;
     this.defaultIconFile = defaultIconFile;
@@ -178,7 +172,7 @@ for (const [prefix, icons] of Object.entries(iconMap)) {
   if (!iconSet) continue;
 
   for (const name of icons) {
-    const iconName = `${prefix}-${name}`;
+    const iconName = `${config.iconPrefix}${prefix}-${name}`;
     const isDefault = false;
     const svgObj = (() => {
       const data = getIconData(iconSet, name);

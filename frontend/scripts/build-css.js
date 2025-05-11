@@ -16,8 +16,7 @@ const result = await postcss([
   tailwindcss({
     content: [
       './src/index.html',
-      './src/js/*.js',
-      // Remove './dist/index.html' unless it exists before build
+      './src/js/*.js'
     ],
     darkMode: 'class',
     theme: {
@@ -32,7 +31,7 @@ const result = await postcss([
       // Add plugins if needed, e.g.:
       // require('@tailwindcss/forms'),
       // require('@tailwindcss/typography'),
-    ],
+    ]
   }),
   autoprefixer,
 ]).process(inputCss, {

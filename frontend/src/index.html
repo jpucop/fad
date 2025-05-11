@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Financial Applications</title>
@@ -7,8 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link href="/css/styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="/js/app.js" defer></script>
 </head>
+
 <body class="bg-gray-100 text-gray-800 font-sans">
   <div class="max-w-screen-xl mx-auto px-6">
     <div class="watermark w-full flex justify-center items-center">
@@ -25,23 +28,41 @@
         </div>
         <div class="flex items-center">
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Team Members" aria-label="Team Members">
-              <span class="i-mdi-account-multiple-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Members
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Team Members"
+              aria-label="Team Members">
+              <svg class="icon i-mdi-account-multiple-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-account-multiple-outline"></use>
+              </svg> Members
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Open ServiceNow" aria-label="Open ServiceNow">
-              <span class="i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> ServiceNow
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Open ServiceNow"
+              aria-label="Open ServiceNow">
+              <svg class="icon i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-ticket-outline"></use>
+              </svg> ServiceNow
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Confluence Docs" aria-label="View Confluence Docs">
-              <span class="i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Confluence
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Confluence Docs"
+              aria-label="View Confluence Docs">
+              <svg class="icon i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-book-open-page-variant-outline"></use>
+              </svg> Confluence
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Access Box Folder" aria-label="Access Box Folder">
-              <span class="i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Box
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Access Box Folder"
+              aria-label="Access Box Folder">
+              <svg class="icon i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-cloud-outline"></use>
+              </svg> Box
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Datadog Monitoring" aria-label="Datadog Monitoring">
-              <span class="i-mdi-chart-box-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> DataDog
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Datadog Monitoring"
+              aria-label="Datadog Monitoring">
+              <svg class="icon i-mdi-chart-box-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-chart-box-outline"></use>
+              </svg> DataDog
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Code" aria-label="Source Code">
-              <span class="i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Sources
+            <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Code"
+              aria-label="Source Code">
+              <svg class="icon i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true">
+                <use href="#i-mdi-github"></use>
+              </svg> Sources
             </a>
           </div>
         </div>
@@ -59,62 +80,85 @@
           </div>
           <div class="flex justify-end gap-3 text-center text-xs mb-2">
             <div class="flex flex-col items-center opacity-30" title="Dev: Failing">
-              <span class="i-mdi-alert-circle w-4 h-4 inline-block text-red-500" aria-hidden="true"></span>
+              <svg class="icon i-mdi-alert-circle w-4 h-4 inline-block text-red-500" aria-hidden="true">
+                <use href="#i-mdi-alert-circle"></use>
+              </svg>
               <span class="dev">dev</span>
             </div>
             <div class="flex flex-col items-center opacity-50" title="QA: In Progress">
-              <span class="i-mdi-progress-clock w-4 h-4 inline-block text-yellow-500" aria-hidden="true"></span>
+              <svg class="icon i-mdi-progress-clock w-4 h-4 inline-block text-yellow-500" aria-hidden="true">
+                <use href="#i-mdi-progress-clock"></use>
+              </svg>
               <span class="qa">qa</span>
             </div>
             <div class="flex flex-col items-center" title="Prod: Healthy">
-              <span class="i-mdi-check-circle-outline w-4 h-4 inline-block text-green-500" aria-hidden="true"></span>
+              <svg class="icon i-mdi-check-circle-outline w-4 h-4 inline-block text-green-500" aria-hidden="true">
+                <use href="#i-mdi-check-circle-outline"></use>
+              </svg>
               <span class="prod">prod</span>
             </div>
           </div>
           <div class="text-sm space-y-1 mb-2">
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-chart-line w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Requests
+                <svg class="icon i-mdi-chart-line w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-chart-line"></use>
+                </svg> Requests
               </div>
               <span>55.6k</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-alert-circle-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Errors
+                <svg class="icon i-mdi-alert-circle-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-alert-circle-outline"></use>
+                </svg> Errors
               </div>
               <span>232 (0.4%)</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-history w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Version
+                <svg class="icon i-mdi-history w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-history"></use>
+                </svg> Version
               </div>
               <span class="font-mono">v1.2.8 @ 2025-05-04</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-server w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Host
+                <svg class="icon i-mdi-server w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-server"></use>
+                </svg> Host
               </div>
               <span>AWS</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-application w-3.5 h-3.5 inline-block" aria-hidden="true"></span> App Host Profile
+                <svg class="icon i-mdi-application w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-application"></use>
+                </svg> App Host Profile
               </div>
               <span>-</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="i-mdi-rocket w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Deployment Profile
+                <svg class="icon i-mdi-rocket w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-rocket"></use>
+                </svg> Deployment Profile
               </div>
               <span>-</span>
             </div>
           </div>
-          <div class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-gray-500 gap-2 relative">
+          <div
+            class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-gray-500 gap-2 relative">
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="ServiceNow Tickets" aria-label="ServiceNow Tickets">
-                <span class="i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> SN
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="ServiceNow Tickets"
+                aria-label="ServiceNow Tickets">
+                <svg class="icon i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-ticket-outline"></use>
+                </svg> SN
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">ServiceNow</p>
                 <p>Open Tickets: 12</p>
                 <p>Urgent: 3</p>
@@ -122,10 +166,14 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Logs" aria-label="View Logs">
-                <span class="i-mdi-file-document-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Logs
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Logs"
+                aria-label="View Logs">
+                <svg class="icon i-mdi-file-document-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-file-document-outline"></use>
+                </svg> Logs
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Logs</p>
                 <p>Recent Errors: 5</p>
                 <p>Log Size: 1.2 GB</p>
@@ -133,10 +181,14 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="JIRA Issues" aria-label="JIRA Issues">
-                <span class="i-mdi-jira w-3.5 h-3.5 inline-block" aria-hidden="true"></span> JIRA
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="JIRA Issues"
+                aria-label="JIRA Issues">
+                <svg class="icon i-mdi-jira w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-jira"></use>
+                </svg> JIRA
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">JIRA</p>
                 <p>Open Issues: 8</p>
                 <p>Sprints Active: 2</p>
@@ -144,10 +196,14 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Box" aria-label="View Box">
-                <span class="i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Box
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Box"
+                aria-label="View Box">
+                <svg class="icon i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-cloud-outline"></use>
+                </svg> Box
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Box</p>
                 <p>Files: 45</p>
                 <p>Storage: 2.3 GB</p>
@@ -155,10 +211,14 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Wiki" aria-label="View Wiki">
-                <span class="i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Wiki
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="View Wiki"
+                aria-label="View Wiki">
+                <svg class="icon i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-book-open-page-variant-outline"></use>
+                </svg> Wiki
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Wiki</p>
                 <p>Pages: 22</p>
                 <p>Last Edited: 2025-05-03</p>
@@ -166,20 +226,28 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Repository" aria-label="Source Repository">
-                <span class="i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Source
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="Source Repository"
+                aria-label="Source Repository">
+                <svg class="icon i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-github"></use>
+                </svg> Source
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">Source</p>
                 <p>Branch: main</p>
                 <p>Last Commit: fix vulns</p>
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="AWS Details" aria-label="AWS Details">
-                <span class="i-mdi-aws w-3.5 h-3.5 inline-block" aria-hidden="true"></span> AWS
+              <a href="#" class="flex items-center gap-1 hover:text-blue-500 cursor-pointer" title="AWS Details"
+                aria-label="AWS Details">
+                <svg class="icon i-mdi-aws w-3.5 h-3.5 inline-block" aria-hidden="true">
+                  <use href="#i-mdi-aws"></use>
+                </svg> AWS
               </a>
-              <div x-show="show" x-cloak class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
+              <div x-show="show" x-cloak
+                class="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-gray-700 z-10 transition-opacity duration-200">
                 <p class="font-semibold">AWS Details</p>
                 <p>Account Name: finapps-prod</p>
                 <p>Deployment Pipeline: ayso-prod</p>
@@ -197,4 +265,5 @@
     </footer>
   </div>
 </body>
+
 </html>

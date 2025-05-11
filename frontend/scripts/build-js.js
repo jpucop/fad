@@ -21,6 +21,8 @@ class Config {
   }
 }
 
+const minify = false;
+
 // Main function
 async function buildJs() {
   try {
@@ -36,7 +38,7 @@ async function buildJs() {
     await esbuild.build({
       entryPoints: [config.appSrc],
       bundle: true,
-      minify: true,
+      minify: minify,
       outfile: config.appDest,
       format: 'iife', // For browser compatibility with Alpine.js
       globalName: 'app', // Optional, ensures global scope
