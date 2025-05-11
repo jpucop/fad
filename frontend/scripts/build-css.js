@@ -1,5 +1,5 @@
-import tailwindcss from '@tailwindcss/postcss'; // Use the PostCSS plugin
-import autoprefixer from 'autoprefixer'; // Explicitly import autoprefixer
+import tailwindcss from '@tailwindcss/postcss';
+import autoprefixer from 'autoprefixer';
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import postcss from 'postcss';
@@ -17,25 +17,27 @@ const result = await postcss([
     content: [
       './src/index.html',
       './src/js/*.js',
-      './dist/index.html'
+      // Remove './dist/index.html' unless it exists before build
     ],
-    darkMode: 'class', // or 'media'
+    darkMode: 'class',
     theme: {
       extend: {
         colors: {
           primary: '#1a56db',
-          secondary: '#7e22ce',
+          secondary: '#7e22ce'
         },
       },
     },
     plugins: [
-      // missing any?
+      // Add plugins if needed, e.g.:
+      // require('@tailwindcss/forms'),
+      // require('@tailwindcss/typography'),
     ],
   }),
   autoprefixer,
 ]).process(inputCss, {
   from: './src/css/styles.css',
-  to: './dist/css/styles.css',
+  to: './dist/css/styles.css'
 });
 
 // Write result

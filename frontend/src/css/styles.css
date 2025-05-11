@@ -1,24 +1,21 @@
-
+/* Import Tailwind's base, components, and utilities */
+/*
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+*/
+@import "tailwindcss";
 
-/* Ensure SVG icons align and size correctly */
 .icon {
-  display: inline-block;
-  vertical-align: middle;
-  width: 1.5rem; /* Default size, adjust as needed */
-  height: 1.5rem;
+  @apply inline-block align-middle w-6 h-6;
 }
 
-/* Optional: Add custom components */
 @layer components {
-  /* Example: .btn {
-    @apply px-4 py-2 bg-primary text-white rounded;
-  } */
+  .btn {
+    @apply px-4 py-2 text-white rounded;
+  }
 }
 
-/* Watermark styling */
 .watermark {
   position: fixed;
   top: 50%;
@@ -32,9 +29,19 @@
 }
 
 /* Environment label colors */
-.dev { color: darkgreen; }
-.qa { color: darkblue; }
-.prod { color: black; }
+.dev {
+  color: darkgreen;
+}
+
+.qa {
+  color: darkblue;
+}
+
+.prod {
+  color: black;
+}
 
 /* Alpine.js cloaking */
-[x-cloak] { display: none !important; }
+[x-cloak] {
+  display: none !important;
+}
