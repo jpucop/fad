@@ -1,58 +1,51 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-// const require = createRequire(import.meta.url);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import * as esbuild from 'esbuild';
 
 // Config class to encapsulate paths
 class Config {
   constructor() {
     this.dirname = path.dirname(fileURLToPath(import.meta.url));
-    this.srcDir = path.join(this.dirname, '..', 'src'); // Project src/
-    this.distDir = path.join(this.dirname, '..', 'dist', 'js'); // Project dist/js/
-    this.nodeModulesDir = path.join(this.dirname, '..', 'node_modules'); // Project node_modules/
-    this.alpineSrc = path.join(this.nodeModulesDir, 'alpinejs', 'dist', 'cdn.min.js');
-    this.alpineDest = path.join(this.distDir, 'alpine.js');
+    this.srcDir = path.join(this.dirname, '..', 'src');
+    this.distDir = path.join(this.dirname, '..', 'dist', 'js');
     this.appSrc = path.join(this.srcDir, 'js', 'app.js');
     this.appDest = path.join(this.distDir, 'app.js');
   }
 
-  // Validate source files
+  // Validate source file
   validate() {
-    if (!fs.existsSync(this.alpineSrc)) {
-      throw new Error(`❌ Alpine.js source file not found: ${this.alpineSrc}`);
-    }
     if (!fs.existsSync(this.appSrc)) {
       throw new Error(`❌ App.js source file not found: ${this.appSrc}`);
     }
   }
 }
 
-// Copy files with error handling
-function copyFile(src, dest) {
-  fs.copyFileSync(src, dest);
-  console.log(`✅ Copied ${path.basename(src)} to ${path.relative(path.join(__dirname, '..'), dest)}`);
-}
-
 // Main function
-function buildJs() {
+async function buildJs() {
   try {
     const config = new Config();
+
+    // Validate source file
+    config.validate();
 
     // Create output directory
     fs.mkdirSync(config.distDir, { recursive: true });
 
-    // Validate files
-    config.validate();
+    // Run esbuild
+    await esbuild.build({
+      entryPoints: [config.appSrc],
+      bundle: true,
+      minify: true,
+      outfile: config.appDest,
+      format: 'iife', // For browser compatibility with Alpine.js
+      globalName: 'app', // Optional, ensures global scope
+      sourcemap: false, // Set to true for debugging
+    });
 
-    // Copy files
-    copyFile(config.alpineSrc, config.alpineDest);
-    copyFile(config.appSrc, config.appDest);
-
-    console.log('✅ JavaScript build complete: dist/js/');
+    console.log(`✅ Bundled and minified ${path.basename(config.appSrc)} to ${path.relative(path.join(config.dirname, '..'), config.appDest)}`);
   } catch (error) {
-    console.error(error.message);
+    console.error(`❌ Build failed: ${error.message}`);
     process.exit(1);
   }
 }

@@ -16,7 +16,8 @@ const result = await postcss([
   tailwindcss({
     content: [
       './src/index.html',
-      './src/js/**/*.js', // Match all JS files
+      './src/js/*.js',
+      './dist/index.html'
     ],
     darkMode: 'class', // or 'media'
     theme: {
@@ -27,7 +28,9 @@ const result = await postcss([
         },
       },
     },
-    plugins: [],
+    plugins: [
+      // missing any?
+    ],
   }),
   autoprefixer,
 ]).process(inputCss, {

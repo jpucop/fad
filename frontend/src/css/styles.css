@@ -1,14 +1,21 @@
-@import "tailwindcss" 
 
-@plugin "@iconify/tailwind4" {
- prefixes: mdi;
- prefix: i;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Ensure SVG icons align and size correctly */
 .icon {
   display: inline-block;
   vertical-align: middle;
+  width: 1.5rem; /* Default size, adjust as needed */
+  height: 1.5rem;
+}
+
+/* Optional: Add custom components */
+@layer components {
+  /* Example: .btn {
+    @apply px-4 py-2 bg-primary text-white rounded;
+  } */
 }
 
 /* Watermark styling */
