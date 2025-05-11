@@ -18,7 +18,7 @@ import { fileURLToPath } from 'url';
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// mode class
+// Mode class
 class Mode {
   constructor(val, formalName) {
     this.val = val;
@@ -33,11 +33,11 @@ class Mode {
   genIconSprite(iconsJson, spriteContent, config) {
     try {
       fs.writeFileSync(path.join(config.outputDir, config.outputSpriteName), spriteContent, 'utf8');
-      console.log(`✅ wrote ${config.outputSpriteName} with ${Object.keys(iconsJson).length} symbols`);
-      console.log(`📄 sprite markup: <svg xmlns="${config.svgNs}" ...><symbol id="prefix-name" viewBox="...">...</symbol>...</svg>`);
+      console.log(`✅ Wrote ${config.outputSpriteName} with ${Object.keys(iconsJson).length} symbols`);
+      console.log(`📄 Sprite markup: <svg xmlns="${config.svgNs}" ...><symbol id="prefix-name" viewBox="...">...</symbol>...</svg>`);
       return true;
     } catch (err) {
-      console.warn(`⚠️ failed to write ${config.outputSpriteName}: ${err.message}`);
+      console.error(`❌ Failed to write ${config.outputSpriteName}: ${err.message}`);
       return false;
     }
   }
@@ -58,13 +58,13 @@ class Mode {
         fs.writeFileSync(path.join(config.outputDir, fileName), svg.toMinifiedString(), 'utf8');
         fileNames.push(fileName);
       } catch (err) {
-        console.warn(`⚠️ failed to write ${fileName}: ${err.message}`);
+        console.error(`❌ Failed to write ${fileName}: ${err.message}`);
         success = false;
       }
     }
     if (success) {
-      console.log(`✅ wrote ${fileNames.length} svgs: ${fileNames.join(', ')}`);
-      console.log(`📄 individual svg markup: <svg xmlns="${config.svgNs}" viewBox="...">...</svg>`);
+      console.log(`✅ Wrote ${fileNames.length} SVGs: ${fileNames.join(', ')}`);
+      console.log(`📄 Individual SVG markup: <svg xmlns="${config.svgNs}" viewBox="...">...</svg>`);
     }
     return success;
   }
@@ -72,12 +72,12 @@ class Mode {
   static #I = new Mode('i', 'individual svgs');
   static fromString(val) {
     const mode = val === 'i' ? Mode.#I : Mode.#S;
-    if (val && val !== 's' && val !== 'i') console.warn(`⚠️ invalid mode "${val}", defaulting to "s" (svg sprite)`);
+    if (val && val !== 's' && val !== 'i') console.warn(`⚠️ Invalid mode "${val}", defaulting to "s" (svg sprite)`);
     return mode;
   }
 }
 
-// config class
+// Config class
 class Config {
   constructor({
     iconPrefix = 'i-',
@@ -109,35 +109,36 @@ class Config {
 
 const config = new Config();
 
-// cli toggle
-console.log(`🔧 mode: ${config.mode}`);
+// CLI toggle
+console.log(`🔧 Mode: ${config.mode}`);
 
-// load html
+// Load HTML
 const html = (() => {
   try {
     return fs.readFileSync(config.htmlFile, 'utf8');
   } catch (err) {
-    console.warn(`⚠️ failed to read html file "${config.htmlFile}": ${err.message}`);
+    console.error(`❌ Failed to read HTML file "${config.htmlFile}": ${err.message}`);
     process.exit(1);
   }
 })();
 
-// extract icon usage
+// Extract icon usage
 const iconMap = {};
 for (const [, prefix, name] of html.matchAll(config.iconRegex)) {
   (iconMap[prefix] ||= new Set()).add(name);
 }
-console.log(`🔍 found ${Object.values(iconMap).reduce((sum, set) => sum + set.size, 0)} icons: ${Object.entries(iconMap).map(([p, s]) => `${p}(${s.size})`).join(', ')}`);
+const totalIcons = Object.values(iconMap).reduce((sum, set) => sum + set.size, 0);
+console.log(`🔍 Found ${totalIcons} icons: ${Object.entries(iconMap).map(([p, s]) => `${p}(${s.size})`).join(', ')}`);
 
-// ensure output dir exists
+// Ensure output directory exists
 try {
   fs.mkdirSync(config.outputDir, { recursive: true });
 } catch (err) {
-  console.warn(`⚠️ failed to create output directory "${config.outputDir}": ${err.message}`);
+  console.error(`❌ Failed to create output directory "${config.outputDir}": ${err.message}`);
   process.exit(1);
 }
 
-// load default icon
+// Load default icon
 const defaultIcon = (() => {
   try {
     const svg = new SVG(fs.readFileSync(config.defaultIconFile, 'utf8'));
@@ -145,19 +146,19 @@ const defaultIcon = (() => {
     const body = svg.getBody();
     return { viewBox, body };
   } catch (err) {
-    console.warn(`⚠️ failed to read default icon file "${config.defaultIconFile}": ${err.message}`);
+    console.error(`❌ Failed to read default icon file "${config.defaultIconFile}": ${err.message}`);
     process.exit(1);
   }
 })();
 
-// scan and retain unique icon refs in given input sources
+// Scan and retain unique icon refs
 const iconsJson = {};
 let spriteContent = config.spriteSvgOpen;
 
 for (const [prefix, icons] of Object.entries(iconMap)) {
   const iconSetPath = resolveIconSetPath(prefix);
   if (!iconSetPath) {
-    console.warn(`⚠️ skipping prefix "${prefix}": no icon set found`);
+    console.warn(`⚠️ Skipping prefix "${prefix}": no icon set found in @iconify-json/${prefix}`);
     continue;
   }
 
@@ -165,7 +166,7 @@ for (const [prefix, icons] of Object.entries(iconMap)) {
     try {
       return JSON.parse(fs.readFileSync(iconSetPath, 'utf8'));
     } catch (err) {
-      console.warn(`⚠️ failed to read icon set for prefix "${prefix}": ${err.message}`);
+      console.error(`❌ Failed to read icon set for prefix "${prefix}": ${err.message}`);
       return null;
     }
   })();
@@ -173,11 +174,12 @@ for (const [prefix, icons] of Object.entries(iconMap)) {
 
   for (const name of icons) {
     const iconName = `${config.iconPrefix}${prefix}-${name}`;
+    console.log(`Processing icon: ${iconName}`); // Debug logging
     const isDefault = false;
     const svgObj = (() => {
       const data = getIconData(iconSet, name);
       if (!data) {
-        console.warn(`⚠️ missing icon: ${iconName}, using default icon`);
+        console.warn(`⚠️ Missing icon "${iconName}" in @iconify-json/${prefix}, using default icon`);
         return { attributes: { viewBox: defaultIcon.viewBox }, body: defaultIcon.body, isDefault: true };
       }
       return iconToSVG(data, { height: config.iconHeight });
@@ -190,7 +192,7 @@ for (const [prefix, icons] of Object.entries(iconMap)) {
   }
 }
 
-// write output
+// Write output
 if (config.mode.isSprite()) {
   spriteContent += config.spriteSvgClose;
   if (!config.mode.genIconSprite(iconsJson, spriteContent, config)) process.exit(1);
@@ -198,21 +200,21 @@ if (config.mode.isSprite()) {
   process.exit(1);
 }
 
-// write metadata json
+// Write metadata JSON
 try {
   fs.writeFileSync(config.outputJson, JSON.stringify(iconsJson, null, 2), 'utf8');
-  console.log(`✅ wrote dist/: ${path.basename(config.outputJson)}`);
+  console.log(`✅ Wrote dist/: ${path.basename(config.outputJson)} with ${Object.keys(iconsJson).length} icons`);
 } catch (err) {
-  console.warn(`⚠️ failed to write ${path.basename(config.outputJson)}: ${err.message}`);
+  console.error(`❌ Failed to write ${path.basename(config.outputJson)}: ${err.message}`);
   process.exit(1);
 }
 
-// resolve icon set path
+// Resolve icon set path
 function resolveIconSetPath(prefix) {
   try {
     return require.resolve(`@iconify-json/${prefix}/icons.json`);
   } catch (err) {
-    console.warn(`⚠️ cannot resolve icon set: ${prefix}`);
+    console.warn(`⚠️ Cannot resolve icon set: @iconify-json/${prefix}`);
     return null;
   }
 }

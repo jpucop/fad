@@ -22,16 +22,19 @@ const result = await postcss([
     theme: {
       extend: {
         colors: {
-          primary: '#1a56db',
-          secondary: '#7e22ce'
+          primary: '#6ba1b7', // Muted cyan-blue (baseline)
+          secondary: '#00A3E0', // UC Blue
+          accent: '#FFC107', // UC Gold
+          warning: '#E57373', // Soft red
+          neutral: {
+            light: '#F5F6F5', // Off-white
+            mid: '#A8B1A6', // Light gray
+            dark: '#333333', // Dark gray
+          },
         },
       },
     },
-    plugins: [
-      // Add plugins if needed, e.g.:
-      // require('@tailwindcss/forms'),
-      // require('@tailwindcss/typography'),
-    ]
+    plugins: []
   }),
   autoprefixer,
 ]).process(inputCss, {

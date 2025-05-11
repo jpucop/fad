@@ -12,7 +12,6 @@ class Config {
     this.distHtmlPath = path.join(this.dirname, '../dist/index.html');
     this.spritePath = path.join(this.dirname, '../dist/icons/icons.svg');
     this.iconsJsonPath = path.join(this.dirname, '../dist/icons.json');
-    this.spriteUrl = '/dist/icons/icons.svg';
   }
 
   // Validate required files
@@ -32,6 +31,7 @@ class Config {
 // Replace <span> with <svg><use>
 function replaceIconSpans(html, iconsData) {
   let updatedHtml = html;
+  let replacements = 0;
 
   for (const iconName of Object.keys(iconsData)) {
     console.log(`Processing icon: ${iconName}`); // Debug logging
@@ -55,10 +55,13 @@ function replaceIconSpans(html, iconsData) {
         .split(/\s+/)
         .filter(cls => cls !== `i-${prefix}-${name}`)
         .join(' ');
+      replacements++;
       return `<svg class="icon ${cleanedClasses}" aria-hidden="true"><use href="#i-${prefix}-${name}"></use></svg>`;
     });
+
   }
 
+  console.log(`🔄 Replaced ${replacements} icon spans`);
   return updatedHtml;
 }
 
@@ -72,15 +75,15 @@ async function injectIcons() {
     const iconsData = JSON.parse(fs.readFileSync(config.iconsJsonPath, 'utf8'));
 
     // Replace icon spans
-    let updatedHtml = replaceIconSpans(html, iconsData);
+    const updatedHtml = replaceIconSpans(html, iconsData);
 
     // Write output
     fs.mkdirSync(path.dirname(config.distHtmlPath), { recursive: true });
     fs.writeFileSync(config.distHtmlPath, updatedHtml, 'utf8');
 
-    console.log(`✅ Replaced icon spans and injected sprite loader into ${config.distHtmlPath}`);
+    console.log(`✅ Generated ${config.distHtmlPath}`);
   } catch (error) {
-    console.error(error.message);
+    console.error(`❌ Error: ${error.message}`);
     process.exit(1);
   }
 }
