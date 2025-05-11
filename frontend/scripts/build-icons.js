@@ -1,115 +1,224 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
-import process from 'process';
+// build-icons.js
+
+// Scans index.html for icon references (e.g., i-prefix-name), generates SVG sprite or individual SVG files,
+// and creates a metadata JSON file in dist/. Uses a default icon for missing references.
+// Args: mode string ('s' for sprite, 'i' for individual) via process.argv[2], defaults to 's'.
+// Outputs: dist/icons/sprite.svg or dist/icons/*.svg, dist/icons.json.
+// Operations are synchronous, with warnings for errors and fallback to default icon for missing icons.
+
 import {
   cleanupSVG,
-  parseColors,
   isEmptyColor,
+  parseColors,
   runSVGO,
   SVG,
 } from '@iconify/tools';
 import { getIconData } from '@iconify/utils';
 import { iconToSVG } from '@iconify/utils/lib/svg/build';
+import fs from 'fs';
+import { createRequire } from 'module';
+import path from 'path';
+import process from 'process';
+import { fileURLToPath } from 'url';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// === CLI toggle ===
-const mode = process.argv[2] === 'individual' ? 'individual' : 'sprite';
-console.log(`🔧 Mode: ${mode === 'individual' ? 'Individual SVGs' : 'SVG Sprite'}`);
-
-// === Config ===
-const iconPrefix = 'i-';
-const iconRegEx = new RegExp(`\\b${iconPrefix}([a-z0-9]+)-([a-z0-9-]+)\\b`, 'g');
-const htmlFile = path.join(__dirname, '../src/index.html');
-const outputDir = path.join(__dirname, '../dist/icons');
-const outputJson = path.join(__dirname, '../dist/icons.json');
-const height = '1em';
-
-// === Load HTML ===
-const html = await fs.readFile(htmlFile, 'utf8');
-
-// === Extract icon usage ===
-const iconMap = {};
-
-for (const [, prefix, name] of html.matchAll(iconRegEx)) {
-  const icons = iconMap[prefix] ||= new Set();
-  icons.add(name);
+// mode class
+class Mode {
+  constructor(val, formalName) {
+    this.val = val;
+    this.formalName = formalName;
+  }
+  toString() {
+    return this.formalName;
+  }
+  isSprite() {
+    return this.val === 's';
+  }
+  genIconSprite(iconsJson, spriteContent, config) {
+    try {
+      fs.writeFileSync(path.join(config.outputDir, config.outputSpriteName), spriteContent, 'utf8');
+      console.log(`✅ wrote ${config.outputSpriteName} with ${Object.keys(iconsJson).length} symbols`);
+      console.log(`📄 sprite markup: <svg xmlns="${config.svgNs}" ...><symbol id="prefix-name" viewBox="...">...</symbol>...</svg>`);
+      return true;
+    } catch (err) {
+      console.warn(`⚠️ failed to write ${config.outputSpriteName}: ${err.message}`);
+      return false;
+    }
+  }
+  genIndividualSvgIcons(iconsJson, config) {
+    const fileNames = [];
+    let success = true;
+    for (const [iconName, { viewBox, body }] of Object.entries(iconsJson)) {
+      const fileName = `${iconName}.svg`;
+      try {
+        const rawSVG = `<svg viewBox="${viewBox}" xmlns="${config.svgNs}">${body}</svg>`;
+        const svg = new SVG(rawSVG);
+        cleanupSVG(svg);
+        parseColors(svg, {
+          defaultColor: 'currentColor',
+          callback: (attr, colorStr, color) => !color || isEmptyColor(color) ? colorStr : 'currentColor',
+        });
+        runSVGO(svg);
+        fs.writeFileSync(path.join(config.outputDir, fileName), svg.toMinifiedString(), 'utf8');
+        fileNames.push(fileName);
+      } catch (err) {
+        console.warn(`⚠️ failed to write ${fileName}: ${err.message}`);
+        success = false;
+      }
+    }
+    if (success) {
+      console.log(`✅ wrote ${fileNames.length} svgs: ${fileNames.join(', ')}`);
+      console.log(`📄 individual svg markup: <svg xmlns="${config.svgNs}" viewBox="...">...</svg>`);
+    }
+    return success;
+  }
+  static #S = new Mode('s', 'svg sprite');
+  static #I = new Mode('i', 'individual svgs');
+  static fromString(val) {
+    const mode = val === 'i' ? Mode.#I : Mode.#S;
+    if (val && val !== 's' && val !== 'i') console.warn(`⚠️ invalid mode "${val}", defaulting to "s" (svg sprite)`);
+    return mode;
+  }
 }
 
-const totalFoundIconRefs = Object.values(iconMap).reduce((sum, set) => sum + set.size, 0);
-const summary = Object.entries(iconMap).map(([prefix, set]) => `${prefix}(${set.size})`).join(', ');
-console.log(`🔍 Found ${totalFoundIconRefs} icons: ${summary}`);
+// config class
+class Config {
+  constructor({
+    iconPrefix = 'i-',
+    outputSpriteName = 'icons.svg',
+    iconHeight = '1em',
+    defaultIconFile = path.join(__dirname, '../src/icons/default-icon.svg'),
+    mode = Mode.fromString(process.argv[2]),
+    htmlFile = path.join(__dirname, '../src/index.html'),
+    outputDir = path.join(__dirname, '../dist/icons'),
+    outputJson = path.join(__dirname, '../dist/icons.json'),
+    svgNs = 'http://www.w3.org/2000/svg',
+    spriteSvgOpen = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;" aria-hidden="true">\n`,
+    spriteSvgClose = '</svg>\n',
+  } = {}) {
+    this.iconPrefix = iconPrefix;
+    this.iconRegex = new RegExp(`\\b${iconPrefix}([a-z0-9]+)-([a-z0-9-]+)\\b`, 'g');
+    this.outputSpriteName = outputSpriteName;
+    this.iconHeight = iconHeight;
+    this.defaultIconFile = defaultIconFile;
+    this.mode = mode;
+    this.htmlFile = htmlFile;
+    this.outputDir = outputDir;
+    this.outputJson = outputJson;
+    this.svgNs = svgNs;
+    this.spriteSvgOpen = spriteSvgOpen;
+    this.spriteSvgClose = spriteSvgClose;
+  }
+}
 
-// === Ensure output dir exists ===
-await fs.mkdir(outputDir, { recursive: true });
+const config = new Config();
 
-// === Main loop ===
+// cli toggle
+console.log(`🔧 mode: ${config.mode}`);
+
+// load html
+const html = (() => {
+  try {
+    return fs.readFileSync(config.htmlFile, 'utf8');
+  } catch (err) {
+    console.warn(`⚠️ failed to read html file "${config.htmlFile}": ${err.message}`);
+    process.exit(1);
+  }
+})();
+
+// extract icon usage
+const iconMap = {};
+for (const [, prefix, name] of html.matchAll(config.iconRegex)) {
+  (iconMap[prefix] ||= new Set()).add(name);
+}
+console.log(`🔍 found ${Object.values(iconMap).reduce((sum, set) => sum + set.size, 0)} icons: ${Object.entries(iconMap).map(([p, s]) => `${p}(${s.size})`).join(', ')}`);
+
+// ensure output dir exists
+try {
+  fs.mkdirSync(config.outputDir, { recursive: true });
+} catch (err) {
+  console.warn(`⚠️ failed to create output directory "${config.outputDir}": ${err.message}`);
+  process.exit(1);
+}
+
+// load default icon
+const defaultIcon = (() => {
+  try {
+    const svg = new SVG(fs.readFileSync(config.defaultIconFile, 'utf8'));
+    const viewBox = svg.viewBox.toString();
+    const body = svg.getBody();
+    return { viewBox, body };
+  } catch (err) {
+    console.warn(`⚠️ failed to read default icon file "${config.defaultIconFile}": ${err.message}`);
+    process.exit(1);
+  }
+})();
+
+// scan and retain unique icon refs in given input sources
 const iconsJson = {};
-
-let spriteContent = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none;" aria-hidden="true">\n';
+let spriteContent = config.spriteSvgOpen;
 
 for (const [prefix, icons] of Object.entries(iconMap)) {
   const iconSetPath = resolveIconSetPath(prefix);
-  if (!iconSetPath) continue;
+  if (!iconSetPath) {
+    console.warn(`⚠️ skipping prefix "${prefix}": no icon set found`);
+    continue;
+  }
 
-  const iconSet = JSON.parse(await fs.readFile(iconSetPath, 'utf8'));
+  const iconSet = (() => {
+    try {
+      return JSON.parse(fs.readFileSync(iconSetPath, 'utf8'));
+    } catch (err) {
+      console.warn(`⚠️ failed to read icon set for prefix "${prefix}": ${err.message}`);
+      return null;
+    }
+  })();
+  if (!iconSet) continue;
 
   for (const name of icons) {
-    const data = getIconData(iconSet, name);
-    if (!data) {
-      console.warn(`⚠️  Missing icon: ${prefix}-${name}`);
-      continue;
-    }
+    const iconName = `${prefix}-${name}`;
+    const isDefault = false;
+    const svgObj = (() => {
+      const data = getIconData(iconSet, name);
+      if (!data) {
+        console.warn(`⚠️ missing icon: ${iconName}, using default icon`);
+        return { attributes: { viewBox: defaultIcon.viewBox }, body: defaultIcon.body, isDefault: true };
+      }
+      return iconToSVG(data, { height: config.iconHeight });
+    })();
 
-    const svgObj = iconToSVG(data, { height });
-
-    // Save metadata
-    iconsJson[`${prefix}-${name}`] = {
-      viewBox: svgObj.attributes.viewBox,
-      body: svgObj.body,
-    };
-
-    if (mode === 'sprite') {
-      // Append to sprite
-      spriteContent += `  <symbol id="${prefix}-${name}" viewBox="${svgObj.attributes.viewBox}">${svgObj.body}</symbol>\n`;
-    } else {
-      // Create individual minified SVG file
-      const rawSVG = `<svg viewBox="${svgObj.attributes.viewBox}" xmlns="http://www.w3.org/2000/svg">${svgObj.body}</svg>`;
-      const svg = new SVG(rawSVG);
-
-      await cleanupSVG(svg);
-      await parseColors(svg, {
-        defaultColor: 'currentColor',
-        callback: (attr, colorStr, color) =>
-          !color || isEmptyColor(color) ? colorStr : 'currentColor',
-      });
-      await runSVGO(svg);
-
-      const outputPath = path.join(outputDir, `${prefix}-${name}.svg`);
-      await fs.writeFile(outputPath, svg.toMinifiedString(), 'utf8');
+    iconsJson[iconName] = { viewBox: svgObj.attributes.viewBox, body: svgObj.body, isDefault: svgObj.isDefault || isDefault };
+    if (config.mode.isSprite()) {
+      spriteContent += `  <symbol id="${iconName}" viewBox="${svgObj.attributes.viewBox}">${svgObj.body}</symbol>\n`;
     }
   }
 }
 
-if (mode === 'sprite') {
-  spriteContent += '</svg>\n';
-  await fs.writeFile(path.join(outputDir, 'sprite.svg'), spriteContent, 'utf8');
-  console.log(`✅ Wrote SVG sprite with ${Object.keys(iconsJson).length} symbols`);
-} else {
-  console.log(`✅ Wrote ${Object.keys(iconsJson).length} individual SVGs`);
+// write output
+if (config.mode.isSprite()) {
+  spriteContent += config.spriteSvgClose;
+  if (!config.mode.genIconSprite(iconsJson, spriteContent, config)) process.exit(1);
+} else if (!config.mode.genIndividualSvgIcons(iconsJson, config)) {
+  process.exit(1);
 }
 
-// === Write metadata JSON (for injection) ===
-await fs.writeFile(outputJson, JSON.stringify(iconsJson, null, 2), 'utf8');
+// write metadata json
+try {
+  fs.writeFileSync(config.outputJson, JSON.stringify(iconsJson, null, 2), 'utf8');
+  console.log(`✅ wrote dist/: ${path.basename(config.outputJson)}`);
+} catch (err) {
+  console.warn(`⚠️ failed to write ${path.basename(config.outputJson)}: ${err.message}`);
+  process.exit(1);
+}
 
+// resolve icon set path
 function resolveIconSetPath(prefix) {
   try {
     return require.resolve(`@iconify-json/${prefix}/icons.json`);
   } catch (err) {
-    console.error(`❌ Cannot resolve icon set: ${prefix}`);
+    console.warn(`⚠️ cannot resolve icon set: ${prefix}`);
     return null;
   }
 }
