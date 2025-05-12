@@ -11,61 +11,68 @@
   <script src="/js/app.js" defer></script>
 </head>
 
-<body class="bg-neutral-light text-neutral-dark font-sans relative min-h-screen">
-  <div class="watermark fixed inset-0 flex justify-center items-center opacity-10 pointer-events-none z-0">
-    <img src="/img/uc_logo.gif" alt="Watermark" class="w-1/2 h-auto" />
+<body class="bg-uc-light text-uc-dark font-sans relative min-h-screen">
+  <div class="watermark">
+    <img src="/icons/uc-seal.svg" alt="Watermark" class="w-full h-auto text-uc-dark" />
   </div>
   <div class="max-w-screen-xl mx-auto px-6 relative z-10">
-    <header class="bg-secondary text-neutral-light shadow-md border border-neutral-mid rounded-md mt-4 mb-4 p-4">
+    <header class="bg-uc-primary text-uc-light shadow-md border border-uc-mid rounded-md mt-4 mb-4 p-4">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div class="flex gap-3 items-center">
-          <img src="/img/uc_logo.gif" alt="UC Insignia Seal" class="w-auto object-contain" style="height:140px;">
+          <img src="/icons/uc-seal.svg" alt="UC Insignia Seal" class="w-auto h-24 text-uc-dark" />
           <div>
-            <h1 class="text-2xl font-bold text-accent leading-tight">Financial Applications Group</h1>
-            <p class="text-md text-neutral-light/80">Office of the President</p>
+            <h1 class="text-3xl font-bold text-uc-accent leading-tight">Financial Applications Group</h1>
+            <p class="text-lg italic text-uc-light/80">Office of the President</p>
           </div>
         </div>
         <div class="flex items-center">
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-neutral-light bg-primary/20 p-2 rounded-md">
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="Team Members"
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-uc-light bg-uc-primary/20 p-2 rounded-md">
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="Team Members"
               aria-label="Team Members">
-              <span class="icon i-mdi-account-multiple-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span>
+              <span class="icon i-mdi-account-multiple-outline w-4 h-4 inline-block text-uc-dark"
+                aria-hidden="true"></span>
               Members
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="Open ServiceNow"
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="Open ServiceNow"
               aria-label="Open ServiceNow">
-              <span class="icon i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> ServiceNow
+              <span class="icon i-mdi-ticket-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span>
+              ServiceNow
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="View Confluence Docs"
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="View Confluence Docs"
               aria-label="View Confluence Docs">
-              <span class="icon i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block"
+              <span class="icon i-mdi-book-open-page-variant-outline w-4 h-4 inline-block text-uc-dark"
                 aria-hidden="true"></span> Confluence
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="Access Box Folder"
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="Access Box Folder"
               aria-label="Access Box Folder">
-              <span class="icon i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Box
+              <span class="icon i-mdi-cloud-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Box
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="Datadog Monitoring"
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="Datadog Monitoring"
               aria-label="Datadog Monitoring">
-              <span class="icon i-mdi-chart-box-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> DataDog
+              <span class="icon i-mdi-chart-box-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span>
+              DataDog
             </a>
-            <a href="#" class="flex items-center gap-1 hover:text-accent cursor-pointer" title="Source Code"
+            <a href="#" class="flex items-center gap-1 hover:text-uc-accent cursor-pointer" title="Source Code"
               aria-label="Source Code">
-              <span class="icon i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Sources
+              <span class="icon i-mdi-github w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Sources
             </a>
           </div>
         </div>
       </div>
     </header>
-    <h2 class="text-base font-medium text-neutral-mid mb-2">applications</h2>
-    <main class="px-4 py-4 bg-white/50 backdrop-blur-sm border border-neutral-mid rounded-md shadow-sm">
+    
+    <!-- app grid -->
+    <main class="px-4 py-4 bg-white/50 backdrop-blur-sm border border-uc-mid rounded-md shadow-sm">
+      <h2 class="text-base font-medium text-uc-mid mb-2">Apps</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div
-          class="p-3 border border-neutral-mid rounded-md shadow-md bg-neutral-light hover:bg-secondary/10 cursor-pointer transition-colors">
+        
+        <!-- app tile -->
+        <div class="p-3 border border-uc-dark rounded-md shadow-md bg-uc-light hover:bg-uc-primary/10 cursor-pointer transition-colors">
+          
           <div class="flex justify-between items-center mb-2">
-            <div class="text-lg font-semibold text-secondary">Payroll UI</div>
+            <div class="text-lg font-semibold text-uc-primary">Payroll UI</div>
             <div class="text-sm font-bold">
-              <span class="inline-block px-2 py-1 bg-accent text-neutral-dark rounded">PROD</span>
+              <span class="inline-block px-2 py-1 bg-uc-accent text-uc-dark rounded">PROD</span>
             </div>
           </div>
           <div class="flex justify-end gap-3 text-center text-xs mb-2">
@@ -86,51 +93,55 @@
           <div class="text-sm space-y-1 mb-2">
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-chart-line w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Requests
+                <span class="icon i-mdi-chart-line w-2 h-2 inline-block text-uc-dark" aria-hidden="true"></span>
+                Requests
               </div>
               <span>55.6k</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-alert-circle-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Errors
+                <span class="icon i-mdi-alert-circle-outline w-4 h-4 inline-block text-uc-dark"
+                  aria-hidden="true"></span> Errors
               </div>
               <span>232 (0.4%)</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-history w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Version
+                <span class="icon i-mdi-history w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Version
               </div>
               <span class="font-mono">v1.2.8 @ 2025-05-04</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-server w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Host
+                <span class="icon i-mdi-server w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Host
               </div>
               <span>AWS</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-application w-3.5 h-3.5 inline-block" aria-hidden="true"></span> App Host
-                Profile
+                <span class="icon i-mdi-application w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> App
+                Host Profile
               </div>
               <span>-</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-rocket w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Deployment Profile
+                <span class="icon i-mdi-rocket w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Deployment
+                Profile
               </div>
               <span>-</span>
             </div>
           </div>
-          <div
-            class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-neutral-mid gap-2 relative">
+          
+          <!-- app footer -->
+          <div class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-uc-mid gap-2 relative">
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="ServiceNow Tickets"
-                aria-label="ServiceNow Tickets">
-                <span class="icon i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> SN
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer"
+                title="ServiceNow Tickets" aria-label="ServiceNow Tickets">
+                <span class="icon i-mdi-ticket-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> SN
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">ServiceNow</p>
                 <p>Open Tickets: 12</p>
                 <p>Urgent: 3</p>
@@ -138,12 +149,13 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="View Logs"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="View Logs"
                 aria-label="View Logs">
-                <span class="icon i-mdi-file-document-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Logs
+                <span class="icon i-mdi-file-document-outline w-4 h-4 inline-block text-uc-dark"
+                  aria-hidden="true"></span> Logs
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">Logs</p>
                 <p>Recent Errors: 5</p>
                 <p>Log Size: 1.2 GB</p>
@@ -151,12 +163,12 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="JIRA Issues"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="JIRA Issues"
                 aria-label="JIRA Issues">
-                <span class="icon i-mdi-jira w-3.5 h-3.5 inline-block" aria-hidden="true"></span> JIRA
+                <span class="icon i-mdi-jira w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> JIRA
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">JIRA</p>
                 <p>Open Issues: 8</p>
                 <p>Sprints Active: 2</p>
@@ -164,12 +176,12 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="View Box"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="View Box"
                 aria-label="View Box">
-                <span class="icon i-mdi-cloud-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Box
+                <span class="icon i-mdi-cloud-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Box
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">Box</p>
                 <p>Files: 45</p>
                 <p>Storage: 2.3 GB</p>
@@ -177,13 +189,13 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="View Wiki"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="View Wiki"
                 aria-label="View Wiki">
-                <span class="icon i-mdi-book-open-page-variant-outline w-3.5 h-3.5 inline-block"
+                <span class="icon i-mdi-book-open-page-variant-outline w-4 h-4 inline-block text-uc-dark"
                   aria-hidden="true"></span> Wiki
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">Wiki</p>
                 <p>Pages: 22</p>
                 <p>Last Edited: 2025-05-03</p>
@@ -191,24 +203,24 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="Source Repository"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="Source Repository"
                 aria-label="Source Repository">
-                <span class="icon i-mdi-github w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Source
+                <span class="icon i-mdi-github w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Source
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-2 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">Source</p>
                 <p>Branch: main</p>
                 <p>Last Commit: fix vulns</p>
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="AWS Details"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="AWS Details"
                 aria-label="AWS Details">
-                <span class="icon i-mdi-aws w-3.5 h-3.5 inline-block" aria-hidden="true"></span> AWS
+                <span class="icon i-mdi-aws w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> AWS
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">AWS Details</p>
                 <p>Account Name: finapps-prod</p>
                 <p>Deployment Pipeline: ayso-prod</p>
@@ -216,13 +228,14 @@
             </div>
           </div>
         </div>
+       
         <!-- Placeholder for another app -->
         <div
-          class="p-3 border border-neutral-mid rounded-md shadow-md bg-neutral-light hover:bg-secondary/10 cursor-pointer transition-colors">
+          class="p-3 border border-uc-mid rounded-md shadow-md bg-uc-light hover:bg-uc-primary/10 cursor-pointer transition-colors">
           <div class="flex justify-between items-center mb-2">
-            <div class="text-lg font-semibold text-secondary">Budget Tracker</div>
+            <div class="text-lg font-semibold text-uc-primary">Budget Tracker</div>
             <div class="text-sm font-bold">
-              <span class="inline-block px-2 py-1 bg-accent text-neutral-dark rounded">PROD</span>
+              <span class="inline-block px-2 py-1 bg-uc-accent text-uc-dark rounded">PROD</span>
             </div>
           </div>
           <div class="flex justify-end gap-3 text-center text-xs mb-2">
@@ -244,38 +257,40 @@
           <div class="text-sm space-y-1 mb-2">
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-chart-line w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Requests
+                <span class="icon i-mdi-chart-line w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span>
+                Requests
               </div>
               <span>42.3k</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-alert-circle-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Errors
+                <span class="icon i-mdi-alert-circle-outline w-4 h-4 inline-block text-uc-dark"
+                  aria-hidden="true"></span> Errors
               </div>
               <span>150 (0.3%)</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-history w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Version
+                <span class="icon i-mdi-history w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Version
               </div>
               <span class="font-mono">v2.0.1 @ 2025-05-03</span>
             </div>
             <div class="flex justify-between items-center">
               <div class="flex gap-2 items-center">
-                <span class="icon i-mdi-server w-3.5 h-3.5 inline-block" aria-hidden="true"></span> Host
+                <span class="icon i-mdi-server w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> Host
               </div>
               <span>AWS</span>
             </div>
           </div>
           <div
-            class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-neutral-mid gap-2 relative">
+            class="flex flex-wrap justify-between items-center border-t pt-2 mt-2 text-xs text-uc-mid gap-2 relative">
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="ServiceNow Tickets"
-                aria-label="ServiceNow Tickets">
-                <span class="icon i-mdi-ticket-outline w-3.5 h-3.5 inline-block" aria-hidden="true"></span> SN
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer"
+                title="ServiceNow Tickets" aria-label="ServiceNow Tickets">
+                <span class="icon i-mdi-ticket-outline w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> SN
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">ServiceNow</p>
                 <p>Open Tickets: 10</p>
                 <p>Urgent: 2</p>
@@ -283,12 +298,12 @@
               </div>
             </div>
             <div x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
-              <a href="#" class="flex items-center gap-1 hover:text-secondary cursor-pointer" title="JIRA Issues"
+              <a href="#" class="flex items-center gap-1 hover:text-uc-primary cursor-pointer" title="JIRA Issues"
                 aria-label="JIRA Issues">
-                <span class="icon i-mdi-jira w-3.5 h-3.5 inline-block" aria-hidden="true"></span> JIRA
+                <span class="icon i-mdi-jira w-4 h-4 inline-block text-uc-dark" aria-hidden="true"></span> JIRA
               </a>
               <div x-show="show" x-cloak
-                class="absolute bg-neutral-light border border-neutral-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-neutral-dark z-10 transition-opacity duration-200">
+                class="absolute bg-uc-light border border-uc-mid rounded-md shadow-lg p-3 w-48 max-w-xs -top-24 left-0 text-xs text-uc-dark z-10 transition-opacity duration-200">
                 <p class="font-semibold">JIRA</p>
                 <p>Open Issues: 5</p>
                 <p>Sprints Active: 1</p>
@@ -300,7 +315,7 @@
       </div>
     </main>
     <footer class="mt-4">
-      <div class="text-center text-xs text-neutral-mid py-2 bg-neutral-dark">
+      <div class="text-center text-xs text-uc-mid py-2 bg-uc-dark">
         <div>© 2025 University of California, Office of the President</div>
         <div>FAD v1.0.0-SNAPSHOT @ 2025-05-01 13:05 UTC</div>
       </div>
