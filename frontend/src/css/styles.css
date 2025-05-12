@@ -31,7 +31,7 @@ header {
 
 /* Header Icons */
 header .grid a .icon {
-  @apply text-current w-5 h-5; /* Match icon size to text-lg (18px) */
+  @apply w-5 h-5 text-gray-600;
 }
 
 /* UCOP Logo */
@@ -41,7 +41,7 @@ header img[src="/icons/ucop-logo.svg"] {
 
 /* Footer */
 footer {
-  background-color: oklch(0.35 0.02 145); /* UCOP dark */
+  background-color: oklch(0.35 0.02 145);
   border-radius: 8px;
   padding: 4px;
 }
@@ -57,7 +57,7 @@ footer .icon {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60vw;
+  width: 50vw; /* Reduced from 60vw to 50vw */
   height: auto;
   margin: 16px;
   opacity: 0.15;
@@ -75,24 +75,24 @@ footer .icon {
   height: 12px;
 }
 .app-tile:hover {
-  border: 1px solid #B7C53B; /* Olive accent */
+  border: 1px solid #B7C53B;
 }
 
 /* Environment label colors */
 .dev {
-  color: oklch(0.55 0.15 20); /* Muted red for dev */
+  color: oklch(0.55 0.15 20);
 }
 .dev .icon {
   color: oklch(0.55 0.15 20);
 }
 .qa {
-  color: oklch(0.65 0.15 90); /* Muted yellow for qa */
+  color: oklch(0.65 0.15 90);
 }
 .qa .icon {
   color: oklch(0.65 0.15 90);
 }
 .prod {
-  color: oklch(0.55 0.10 145); /* Muted green for prod */
+  color: oklch(0.55 0.10 145);
 }
 .prod .icon {
   color: oklch(0.55 0.10 145);

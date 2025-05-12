@@ -64,10 +64,7 @@
       "deploy_pipeline_name": "",
       "git_branch": "dev",
       "aws": {
-        "account_name": "",
-        "services": [
-          ""
-        ]
+        "account_name": ""
       }
     }
   ]

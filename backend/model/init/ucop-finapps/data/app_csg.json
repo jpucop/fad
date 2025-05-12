@@ -58,10 +58,7 @@
       "deploy_pipeline_name": "pipeline-example-dev",
       "git_branch": "dev",
       "aws": {
-        "account_name": "finapps-dev",
-        "services": [
-          "ECS, Lambda, CloudFormation, RDS"
-        ]
+        "account_name": "finapps-dev"
       }
     },
     {
@@ -72,10 +69,7 @@
       "deploy_pipeline_name": "pipeline-example-dev",
       "git_branch": "dev",
       "aws": {
-        "account_name": "finapps-dev",
-        "services": [
-          "ECS, Lambda, CloudFormation, RDS"
-        ]
+        "account_name": "finapps-dev"
       }
     },
     {
@@ -86,10 +80,7 @@
       "deploy_pipeline_name": "pipeline-example-dev",
       "git_branch": "dev",
       "aws": {
-        "account_name": "finapps-dev",
-        "services": [
-          "ECS, Lambda, CloudFormation, RDS"
-        ]
+        "account_name": "finapps-dev"
       }
     }
   ]
