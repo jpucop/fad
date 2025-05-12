@@ -3,7 +3,7 @@
 @import "tailwindcss" source("../../src");
 
 .icon {
-  @apply inline-block align-middle w-4 h-4;
+  @apply inline-block align-middle w-3 h-3;
 }
 
 @layer components {
@@ -17,15 +17,26 @@
   --color-uc-dark: oklch(0.35 0.02 145); /* Approx #464B44 */
   --color-uc-light: oklch(0.97 0.01 120); /* Approx #F5F6F5 */
   --color-uc-mid: oklch(0.65 0.02 120); /* Approx #A0A0A0 */
-  --color-uc-primary: oklch(0.35 0.02 145); /* Approx #00A3E0 (UCOP sky blue) */
+  --color-uc-primary: oklch(0.65 0.18 218.7); /* Approx #00A3E0 (UCOP sky blue) */
   --color-uc-accent: oklch(0.85 0.18 80.5); /* Approx #F59E0B (UCOP orange) */
+  --color-uc-olive: oklch(0.45 0.07 120); /* Approx #5C6B47 (UCOP dark olive from ucop.edu) */
 }
 
 /* Header */
 header {
-  background-color: #ffffff; /* White from index-orig */
+  background-color: #ffffff;
   border-radius: 8px;
   padding: 8px;
+}
+
+/* Header Icons */
+header .grid a .icon {
+  @apply text-current w-5 h-5; /* Match icon size to text-lg (18px) */
+}
+
+/* UCOP Logo */
+header img[src="/icons/ucop-logo.svg"] {
+  filter: grayscale(100%);
 }
 
 /* Footer */
@@ -46,16 +57,20 @@ footer .icon {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 60vw; /* 90% of viewport width */
+  width: 60vw;
   height: auto;
-  margin: 16px; /* Margin to prevent edge clipping */
+  margin: 16px;
   opacity: 0.15;
   z-index: -1;
   pointer-events: none;
 }
+.watermark img {
+  filter: grayscale(100%);
+}
+
 /* App Tiles */
 .app-tile .icon {
-  color: #4B5EAA; /* Dimmed gray */
+  color: #4B5EAA;
   width: 12px;
   height: 12px;
 }
@@ -65,13 +80,22 @@ footer .icon {
 
 /* Environment label colors */
 .dev {
-  color: darkgreen;
+  color: oklch(0.55 0.15 20); /* Muted red for dev */
+}
+.dev .icon {
+  color: oklch(0.55 0.15 20);
 }
 .qa {
-  color: darkblue;
+  color: oklch(0.65 0.15 90); /* Muted yellow for qa */
+}
+.qa .icon {
+  color: oklch(0.65 0.15 90);
 }
 .prod {
-  color: black;
+  color: oklch(0.55 0.10 145); /* Muted green for prod */
+}
+.prod .icon {
+  color: oklch(0.55 0.10 145);
 }
 
 /* Alpine.js cloaking */
@@ -89,9 +113,10 @@ footer .icon {
 .text-uc-mid { color: oklch(0.65 0.02 120); }
 .bg-uc-mid { background-color: oklch(0.65 0.02 120); }
 .border-uc-mid { border-color: oklch(0.65 0.02 120); }
-.text-uc-primary { color: oklch(0.35 0.02 145); }
+.text-uc-primary { color: oklch(0.65 0.18 218.7); }
 .bg-uc-primary { background-color: oklch(0.65 0.18 218.7); }
-.border-uc-primary { border-color: oklch(0.35 0.02 145); }
+.border-uc-primary { border-color: oklch(0.65 0.18 218.7); }
 .text-uc-accent { color: oklch(0.85 0.18 80.5); }
 .bg-uc-accent { background-color: oklch(0.85 0.18 80.5); }
 .border-uc-accent { border-color: oklch(0.85 0.18 80.5); }
+.text-uc-olive { color: oklch(0.45 0.07 120); }
