@@ -13,6 +13,7 @@
     "inject:icons": "node ./scripts/inject-icons.js",
     "build:js": "node ./scripts/build-js.js",
     "build": "npm run copy:static && npm run build:css && npm run build:icons && npm run inject:icons && npm run build:js",
+    "re": "npm run copy:static && npm run build:css && npm run build:js",
     "dev": "npx serve ./dist"
   },
   "devDependencies": {

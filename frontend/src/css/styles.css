@@ -3,7 +3,7 @@
 @import "tailwindcss" source("../../src");
 
 .icon {
-  @apply inline-block align-middle w-6 h-6;
+  @apply inline-block align-middle w-4 h-4;
 }
 
 @layer components {
@@ -13,72 +13,63 @@
 }
 
 @theme {
-  /* Colors in OKLCH */
-  --color-primary: oklch(0.65 0.08 216.5); /* Approx #6ba1b7 */
-  --color-secondary: oklch(0.65 0.18 218.7); /* Approx #00A3E0 */
-  --color-accent: oklch(0.85 0.18 80.5); /* Approx #FFC107 */
-  --color-warning: oklch(0.65 0.12 30.2); /* Approx #E57373 */
-  --color-neutral-light: oklch(0.97 0.01 120); /* Approx #F5F6F5 */
-  --color-neutral-mid: oklch(0.75 0.02 120); /* Approx #A8B1A6 */
-  --color-neutral-dark: oklch(0.25 0.01 0); /* Approx #333333 */
-
   /* UCOP-specific colors (light mode only) */
   --color-uc-dark: oklch(0.35 0.02 145); /* Approx #464B44 */
-  --color-uc-light: oklch(0.97 0.01 120); /* Approx #F5F5F5 */
+  --color-uc-light: oklch(0.97 0.01 120); /* Approx #F5F6F5 */
   --color-uc-mid: oklch(0.65 0.02 120); /* Approx #A0A0A0 */
-  --color-uc-primary: #2ca5df; /* UCOP favico color (sky blue) */
-  --color-uc-accent: oklch(0.85 0.18 80.5); /* Approx #F59E0B (orange, matches existing accent) */
+  --color-uc-primary: oklch(0.35 0.02 145); /* Approx #00A3E0 (UCOP sky blue) */
+  --color-uc-accent: oklch(0.85 0.18 80.5); /* Approx #F59E0B (UCOP orange) */
 }
 
 /* Header */
 header {
-  background-color: rgba(0, 48, 135, 0.8); /* Muted UCOP blue */
+  background-color: #ffffff; /* White from index-orig */
   border-radius: 8px;
-  padding: 16px;
+  padding: 8px;
 }
 
 /* Footer */
 footer {
-  background-color: rgba(0, 48, 135, 0.8); /* Matching muted blue */
+  background-color: oklch(0.35 0.02 145); /* UCOP dark */
   border-radius: 8px;
-  padding: 16px;
+  padding: 4px;
 }
 footer .icon {
-  color: #4B5EAA; /* Dark gray for icons */
-  font-size: 14px; /* Reduced size */
+  color: #4B5EAA;
+  width: 12px;
+  height: 12px;
 }
 
 /* Watermark */
-watermark {
+.watermark {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-height: calc(100% - 32px);
+  width: 60vw; /* 90% of viewport width */
+  height: auto;
+  margin: 16px; /* Margin to prevent edge clipping */
   opacity: 0.15;
-  fill: #A8B53B;
+  z-index: -1;
+  pointer-events: none;
 }
-
 /* App Tiles */
 .app-tile .icon {
   color: #4B5EAA; /* Dimmed gray */
-  font-size: 36px; /* Reduced size */
+  width: 12px;
+  height: 12px;
 }
 .app-tile:hover {
   border: 1px solid #B7C53B; /* Olive accent */
 }
 
-
 /* Environment label colors */
 .dev {
   color: darkgreen;
 }
-
 .qa {
   color: darkblue;
 }
-
 .prod {
   color: black;
 }
@@ -89,62 +80,18 @@ watermark {
 }
 
 /* Utility classes for UCOP colors */
-.text-uc-dark {
-  color: oklch(0.35 0.02 145);
-}
-
-.bg-uc-dark {
-  background-color: oklch(0.35 0.02 145);
-}
-
-.border-uc-dark {
-  border-color: oklch(0.35 0.02 145);
-}
-
-.text-uc-light {
-  color: oklch(0.97 0.01 120);
-}
-
-.bg-uc-light {
-  background-color: oklch(0.97 0.01 120);
-}
-
-.border-uc-light {
-  border-color: oklch(0.97 0.01 120);
-}
-
-.text-uc-mid {
-  color: oklch(0.65 0.02 120);
-}
-
-.bg-uc-mid {
-  background-color: oklch(0.65 0.02 120);
-}
-
-.border-uc-mid {
-  border-color: oklch(0.65 0.02 120);
-}
-
-.text-uc-primary {
-  color: oklch(0.45 0.15 245);
-}
-
-.bg-uc-primary {
-  background-color: oklch(0.45 0.15 245);
-}
-
-.border-uc-primary {
-  border-color: oklch(0.45 0.15 245);
-}
-
-.text-uc-accent {
-  color: oklch(0.85 0.18 80.5);
-}
-
-.bg-uc-accent {
-  background-color: oklch(0.85 0.18 80.5);
-}
-
-.border-uc-accent {
-  border-color: oklch(0.85 0.18 80.5);
-}
+.text-uc-dark { color: oklch(0.35 0.02 145); }
+.bg-uc-dark { background-color: oklch(0.35 0.02 145); }
+.border-uc-dark { border-color: oklch(0.35 0.02 145); }
+.text-uc-light { color: oklch(0.97 0.01 120); }
+.bg-uc-light { background-color: oklch(0.97 0.01 120); }
+.border-uc-light { border-color: oklch(0.97 0.01 120); }
+.text-uc-mid { color: oklch(0.65 0.02 120); }
+.bg-uc-mid { background-color: oklch(0.65 0.02 120); }
+.border-uc-mid { border-color: oklch(0.65 0.02 120); }
+.text-uc-primary { color: oklch(0.35 0.02 145); }
+.bg-uc-primary { background-color: oklch(0.65 0.18 218.7); }
+.border-uc-primary { border-color: oklch(0.35 0.02 145); }
+.text-uc-accent { color: oklch(0.85 0.18 80.5); }
+.bg-uc-accent { background-color: oklch(0.85 0.18 80.5); }
+.border-uc-accent { border-color: oklch(0.85 0.18 80.5); }
