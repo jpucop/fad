@@ -1,25 +1,17 @@
-/* styles.css */
-
 @import "tailwindcss" source("../../src");
 
-.icon {
-  @apply inline-block align-middle w-3 h-3;
-}
-
-@layer components {
-  .btn {
-    @apply px-4 py-2 text-white rounded;
-  }
-}
-
 @theme {
-  /* UCOP-specific colors (light mode only) */
-  --color-uc-dark: oklch(0.35 0.02 145); /* Approx #464B44 */
-  --color-uc-light: oklch(0.97 0.01 120); /* Approx #F5F6F5 */
-  --color-uc-mid: oklch(0.65 0.02 120); /* Approx #A0A0A0 */
-  --color-uc-primary: oklch(0.65 0.18 218.7); /* Approx #00A3E0 (UCOP sky blue) */
-  --color-uc-accent: oklch(0.85 0.18 80.5); /* Approx #F59E0B (UCOP orange) */
-  --color-uc-olive: oklch(0.45 0.07 120); /* Approx #5C6B47 (UCOP dark olive from ucop.edu) */
+  --color-uc-dark: oklch(0.35 0.02 145);     /* Approx #464B44 */
+  --color-uc-light: oklch(0.97 0.01 120);    /* Approx #F5F6F5 */
+  --color-uc-mid: oklch(0.65 0.02 120);      /* Approx #A0A0A0 */
+  --color-uc-primary: oklch(0.65 0.18 218.7);/* Approx #00A3E0 */
+  --color-uc-accent: oklch(0.85 0.18 80.5);  /* Approx #F59E0B */
+  --color-uc-olive: oklch(0.45 0.07 120);    /* Approx #5C6B47 */
+}
+
+/* Alpine.js cloaking */
+[x-cloak] {
+  display: none !important;
 }
 
 /* Header */
@@ -29,19 +21,19 @@ header {
   padding: 8px;
 }
 
+/* UCOP Logo in Header */
+header img[src="/icons/ucop-logo.svg"] {
+  filter: grayscale(100%);
+}
+
 /* Header Icons */
 header .grid a .icon {
   @apply w-5 h-5 text-gray-600;
 }
 
-/* UCOP Logo */
-header img[src="/icons/ucop-logo.svg"] {
-  filter: grayscale(100%);
-}
-
 /* Footer */
 footer {
-  background-color: oklch(0.35 0.02 145);
+  background-color: var(--color-uc-dark);
   border-radius: 8px;
   padding: 4px;
 }
@@ -49,23 +41,6 @@ footer .icon {
   color: #4B5EAA;
   width: 12px;
   height: 12px;
-}
-
-/* Watermark */
-.watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50vw; /* Reduced from 60vw to 50vw */
-  height: auto;
-  margin: 16px;
-  opacity: 0.15;
-  z-index: -1;
-  pointer-events: none;
-}
-.watermark img {
-  filter: grayscale(100%);
 }
 
 /* App Tiles */
@@ -78,7 +53,24 @@ footer .icon {
   border: 1px solid #B7C53B;
 }
 
-/* Environment label colors */
+/* Watermark */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  height: auto;
+  margin: 16px;
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
+}
+.watermark img {
+  filter: grayscale(100%);
+}
+
+/* Environment Labels */
 .dev {
   color: oklch(0.55 0.15 20);
 }
@@ -98,25 +90,36 @@ footer .icon {
   color: oklch(0.55 0.10 145);
 }
 
-/* Alpine.js cloaking */
-[x-cloak] {
-  display: none !important;
+/* Utility classes for UCOP colors */
+.text-uc-dark         { color: var(--color-uc-dark); }
+.bg-uc-dark           { background-color: var(--color-uc-dark); }
+.border-uc-dark       { border-color: var(--color-uc-dark); }
+
+.text-uc-light        { color: var(--color-uc-light); }
+.bg-uc-light          { background-color: var(--color-uc-light); }
+.border-uc-light      { border-color: var(--color-uc-light); }
+
+.text-uc-mid          { color: var(--color-uc-mid); }
+.bg-uc-mid            { background-color: var(--color-uc-mid); }
+.border-uc-mid        { border-color: var(--color-uc-mid); }
+
+.text-uc-primary      { color: var(--color-uc-primary); }
+.bg-uc-primary        { background-color: var(--color-uc-primary); }
+.border-uc-primary    { border-color: var(--color-uc-primary); }
+
+.text-uc-accent       { color: var(--color-uc-accent); }
+.bg-uc-accent         { background-color: var(--color-uc-accent); }
+.border-uc-accent     { border-color: var(--color-uc-accent); }
+
+.text-uc-olive        { color: var(--color-uc-olive); }
+
+/* Tailwind layer/utility usage */
+.icon {
+  @apply inline-block align-middle w-3 h-3;
 }
 
-/* Utility classes for UCOP colors */
-.text-uc-dark { color: oklch(0.35 0.02 145); }
-.bg-uc-dark { background-color: oklch(0.35 0.02 145); }
-.border-uc-dark { border-color: oklch(0.35 0.02 145); }
-.text-uc-light { color: oklch(0.97 0.01 120); }
-.bg-uc-light { background-color: oklch(0.97 0.01 120); }
-.border-uc-light { border-color: oklch(0.97 0.01 120); }
-.text-uc-mid { color: oklch(0.65 0.02 120); }
-.bg-uc-mid { background-color: oklch(0.65 0.02 120); }
-.border-uc-mid { border-color: oklch(0.65 0.02 120); }
-.text-uc-primary { color: oklch(0.65 0.18 218.7); }
-.bg-uc-primary { background-color: oklch(0.65 0.18 218.7); }
-.border-uc-primary { border-color: oklch(0.65 0.18 218.7); }
-.text-uc-accent { color: oklch(0.85 0.18 80.5); }
-.bg-uc-accent { background-color: oklch(0.85 0.18 80.5); }
-.border-uc-accent { border-color: oklch(0.85 0.18 80.5); }
-.text-uc-olive { color: oklch(0.45 0.07 120); }
+@layer components {
+  .btn {
+    @apply px-4 py-2 text-white rounded;
+  }
+}
