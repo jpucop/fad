@@ -1,6 +1,6 @@
 /* styles.css */
 
-@import "tailwindcss";
+@import "tailwindcss" source("../../src");
 
 .icon {
   @apply inline-block align-middle w-6 h-6;
@@ -10,6 +10,17 @@
   .btn {
     @apply px-4 py-2 text-white rounded;
   }
+}
+
+@theme {
+  /* Colors in OKLCH */
+  --color-primary: oklch(0.65 0.08 216.5); /* Approx #6ba1b7 */
+  --color-secondary: oklch(0.65 0.18 218.7); /* Approx #00A3E0 */
+  --color-accent: oklch(0.85 0.18 80.5); /* Approx #FFC107 */
+  --color-warning: oklch(0.65 0.12 30.2); /* Approx #E57373 */
+  --color-neutral-light: oklch(0.97 0.01 120); /* Approx #F5F6F5 */
+  --color-neutral-mid: oklch(0.75 0.02 120); /* Approx #A8B1A6 */
+  --color-neutral-dark: oklch(0.25 0.01 0); /* Approx #333333 */
 }
 
 .watermark {
