@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Config class to encapsulate input parameters
+// Config class
 class Config {
   constructor() {
     this.dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,16 +14,15 @@ class Config {
     this.iconsJsonPath = path.join(this.dirname, '../dist/icons.json');
   }
 
-  // Validate required files
   validate() {
     if (!fs.existsSync(this.srcHtmlPath)) {
-      throw new Error('❌ Source HTML file not found: src/index.html');
+      throw new Error(`❌ Source HTML not found: ${this.srcHtmlPath}`);
     }
     if (!fs.existsSync(this.spritePath)) {
-      throw new Error('❌ Sprite file not found. Run build:icons first.');
+      throw new Error(`❌ Sprite not found: ${this.spritePath}. Run build-icons.js first.`);
     }
     if (!fs.existsSync(this.iconsJsonPath)) {
-      throw new Error('❌ Icons JSON file not found. Run build:icons first.');
+      throw new Error(`❌ icons.json not found: ${this.iconsJsonPath}. Run build-icons.js first.`);
     }
   }
 }
@@ -33,32 +32,49 @@ function replaceIconSpans(html, iconsData) {
   let updatedHtml = html;
   let replacements = 0;
 
-  for (const iconName of Object.keys(iconsData)) {
-    console.log(`Processing icon: ${iconName}`); // Debug logging
-    // Extract prefix and name from iconName (e.g., 'i-mdi-cloud-outline' -> 'mdi', 'cloud-outline')
-    const match = iconName.match(/^i-([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-    if (!match) {
-      console.warn(`⚠️ Invalid icon name format: ${iconName}`);
-      continue;
+  for (const iconKey of Object.keys(iconsData)) {
+    console.log(`🔍 Processing icon: ${iconKey}`);
+
+    let regex = null;
+    let symbolId = null;
+
+    // Match Iconify icon: i-prefix-name
+    const iconifyMatch = iconKey.match(/^i-([a-z0-9]+)-([a-z0-9-]+)$/);
+    if (iconifyMatch) {
+      const [, prefix, name] = iconifyMatch;
+      symbolId = `i-${prefix}-${name}`;
+      regex = new RegExp(
+        `<span\\s+class="([^"]*\\bi-${prefix}-${name}\\b[^"]*)"[^>]*>(.*?)</span>`,
+        'g'
+      );
+    } else {
+      // Match local icon: l-name
+      const localMatch = iconKey.match(/^l-([a-z0-9-]+)$/);
+      if (localMatch) {
+        const [, name] = localMatch;
+        symbolId = `l-${name}`;
+        regex = new RegExp(
+          `<span\\s+class="([^"]*\\bl-${name}\\b[^"]*)"[^>]*>(.*?)</span>`,
+          'g'
+        );
+      } else {
+        console.warn(`⚠️ Invalid icon format: ${iconKey}`);
+        continue;
+      }
     }
-    const [, prefix, name] = match;
 
-    // Regex to match <span> with the icon class
-    const spanRegex = new RegExp(
-      `<span\\s+class="([^"]*\\bi-${prefix}-${name}\\b[^"]*)"[^>]*>(.*?)</span>`,
-      'g'
-    );
-
-    updatedHtml = updatedHtml.replace(spanRegex, (match, classNames) => {
-      // Preserve all classes except the icon-specific class
-      const cleanedClasses = classNames
+    updatedHtml = updatedHtml.replace(regex, (match, classNames) => {
+      // Filter out the icon-specific class and ensure 'icon' is added only once
+      const classList = classNames
         .split(/\s+/)
-        .filter(cls => cls !== `i-${prefix}-${name}`)
-        .join(' ');
+        .filter(cls => cls && cls !== symbolId);
+      if (!classList.includes('icon')) {
+        classList.push('icon');
+      }
+      const cleanedClasses = classList.length > 0 ? classList.join(' ') : 'icon';
       replacements++;
-      return `<svg class="icon ${cleanedClasses}" aria-hidden="true"><use href="#i-${prefix}-${name}"></use></svg>`;
+      return `<svg class="${cleanedClasses}" aria-hidden="true"><use href="#${symbolId}"></use></svg>`;
     });
-
   }
 
   console.log(`🔄 Replaced ${replacements} icon spans`);
@@ -70,14 +86,11 @@ async function injectIcons() {
     const config = new Config();
     config.validate();
 
-    // Load files
     const html = fs.readFileSync(config.srcHtmlPath, 'utf8');
     const iconsData = JSON.parse(fs.readFileSync(config.iconsJsonPath, 'utf8'));
 
-    // Replace icon spans
     const updatedHtml = replaceIconSpans(html, iconsData);
 
-    // Write output
     fs.mkdirSync(path.dirname(config.distHtmlPath), { recursive: true });
     fs.writeFileSync(config.distHtmlPath, updatedHtml, 'utf8');
 
@@ -88,5 +101,4 @@ async function injectIcons() {
   }
 }
 
-// Run
 injectIcons();
