@@ -64,7 +64,7 @@ class Mode {
     }
     if (success) {
       console.log(`✅ Wrote ${fileNames.length} SVGs: ${fileNames.join(', ')}`);
-      console.log(`📄 Individual SVG markup: <svg xmlns="${config.svgNs}" viewBox="...">...</svg>`);
+      // console.log(`📄 Individual SVG markup: <svg xmlns="${config.svgNs}" viewBox="...">...</svg>`);
     }
     return success;
   }
@@ -81,6 +81,7 @@ class Mode {
 class Config {
   constructor({
     iconPrefix = 'i-',
+    localIconPrefix = 'l-',
     outputSpriteName = 'icons.svg',
     iconHeight = '1em',
     defaultIconFile = path.join(__dirname, '../src/icons/default-icon.svg'),
@@ -89,10 +90,11 @@ class Config {
     outputDir = path.join(__dirname, '../dist/icons'),
     outputJson = path.join(__dirname, '../dist/icons.json'),
     svgNs = 'http://www.w3.org/2000/svg',
-    spriteSvgOpen = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none;" aria-hidden="true">\n`,
+    spriteSvgOpen = '<svg xmlns="http://www.w3.org/2000/svg" style="display:none;" aria-hidden="true">\n',
     spriteSvgClose = '</svg>\n',
   } = {}) {
     this.iconPrefix = iconPrefix;
+    this.localIconPrefix = localIconPrefix;
     this.iconRegex = new RegExp(`\\b${iconPrefix}([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)\\b`, 'g');
     this.outputSpriteName = outputSpriteName;
     this.iconHeight = iconHeight;

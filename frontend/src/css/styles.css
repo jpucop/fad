@@ -4,7 +4,7 @@
   --color-uc-dark: oklch(0.35 0.02 145);     /* Approx #464B44 */
   --color-uc-light: oklch(0.97 0.01 120);    /* Approx #F5F6F5 */
   --color-uc-mid: oklch(0.65 0.02 120);      /* Approx #A0A0A0 */
-  --color-uc-primary: oklch(0.65 0.18 218.7);/* Approx #00A3E0 */
+  --color-uc-primary: oklch(0.4 0.15 240);   /* UC navy blue, approx #003087 */
   --color-uc-accent: oklch(0.85 0.18 80.5);  /* Approx #F59E0B */
   --color-uc-olive: oklch(0.45 0.07 120);    /* Approx #5C6B47 */
 }
@@ -14,43 +14,251 @@
   display: none !important;
 }
 
+/* Body */
+body {
+  font-family: sans-serif; /* font-sans */
+  position: relative;
+  min-height: 100vh; /* min-h-screen */
+  background-color: oklch(0.95 0.01 120); /* Slightly grayed background */
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack children vertically */
+}
+
+/* Main Container */
+.max-w-screen-xl {
+  flex: 1; /* Grow to fill available space */
+  display: flex;
+  flex-direction: column; /* Stack header, main, footer */
+}
+
 /* Header */
 header {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 8px;
+  background-color: theme('colors.white'); /* White background */
+  border: 1px solid theme('colors.gray.300'); /* Light gray border */
+  border-radius: 0.5rem; /* 8px rounded corners */
+  margin-top: 1.5rem; /* 24px */
+  margin-bottom: 1.5rem; /* 24px */
+  padding: 1rem; /* 16px */
+}
+
+/* Header Content */
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* 24px */
+  align-items: center; /* Center vertically on all screen sizes */
+}
+
+@media (min-width: 640px) {
+  .header-content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Header Left Section (Seal + Title Group) */
+.header-left {
+  display: flex;
+  align-items: center; /* Vertically center seal and title group */
+  gap: 1rem; /* 16px between seal and title group */
+}
+
+/* UC Seal */
+.header-seal {
+  height: 5rem; /* 80px fixed height */
+  width: auto;
+  opacity: 0.5; /* Dimmed as desired */
+}
+
+/* Title Group (Title + UCOP Logo) */
+.header-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px between title and UCOP logo */
+  height: 5rem; /* Match UC seal height */
+  justify-content: center; /* Vertically center content */
+  align-items: flex-start; /* Explicitly left-align */
+}
+
+/* Header Title */
+.header-title {
+  font-size: 1.5rem; /* 24px (reduced from 30px) */
+  font-weight: 700; /* font-bold */
+  color: var(--color-uc-olive); /* UC olive */
+  line-height: 1.2; /* leading-tight */
 }
 
 /* UCOP Logo in Header */
-header img[src="/icons/ucop-logo.svg"] {
-  filter: grayscale(100%);
+.header-ucop-logo {
+  filter: grayscale(100%); /* Grayscale effect */
+  height: 1.5rem; /* 24px */
+  width: auto;
+  object-fit: contain; /* Prevent skewing */
+  opacity: 0.5; /* Dimmed as desired */
+  margin-left: 0; /* Ensure no left margin */
+}
+
+/* Header Nav */
+.header-nav {
+  background-color: theme('colors.white'); /* Match header background */
+  border-radius: 0.5rem; /* 8px rounded corners */
+  padding: 1rem; /* 16px padding */
+}
+
+/* Header Nav Grid */
+.header-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column on small screens */
+  gap: 1rem; /* 16px */
+  font-size: 1.125rem; /* 18px (text-lg) */
+  color: var(--color-uc-dark); /* UC dark */
+}
+
+@media (min-width: 640px) {
+  .header-nav-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns on medium screens */
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-nav-grid {
+    grid-template-columns: repeat(3, 1fr); /* Three columns on large screens */
+  }
+}
+
+/* Header Nav Links */
+.header-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  transition: color 0.2s ease; /* Smooth color transition */
+  position: relative; /* Position tooltip relative to link */
+}
+
+/* Tooltip for Links */
+.header-nav-link,
+.app-tile {
+  position: relative; /* Position tooltip relative to link */
+}
+
+/* Tooltip Content */
+.header-nav-link::after,
+.app-tile::after {
+  content: attr(aria-label); /* Use aria-label as tooltip text */
+  position: absolute;
+  top: 100%; /* Position below the link */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: theme('colors.gray.800'); /* Dark gray background */
+  color: theme('colors.white'); /* White text */
+  padding: 0.25rem 0.5rem; /* 4px 8px */
+  border-radius: 0.25rem; /* 4px */
+  font-size: 0.75rem; /* 12px */
+  white-space: nowrap; /* Prevent wrapping */
+  opacity: 0; /* Hidden by default */
+  visibility: hidden; /* Hidden by default */
+  transition: opacity 0.2s ease, visibility 0.2s ease; /* Smooth transition */
+  z-index: 10; /* Above other elements */
+}
+
+/* Tooltip Arrow */
+.header-nav-link::before,
+.app-tile::before {
+  content: '';
+  position: absolute;
+  top: 100%; /* Position above tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: theme('colors.gray.800'); /* Match tooltip background */
+  opacity: 0; /* Hidden by default */
+  visibility: hidden; /* Hidden by default */
+  transition: opacity 0.2s ease, visibility 0.2s ease; /* Smooth transition */
+}
+
+/* Show Tooltip on Hover */
+.header-nav-link:hover::after,
+.header-nav-link:hover::before,
+.app-tile:hover::after,
+.app-tile:hover::before {
+  opacity: 1; /* Show tooltip */
+  visibility: visible; /* Show tooltip */
+}
+
+/* Adjust Tooltip Position for Header Links */
+.header-nav-link::after {
+  margin-top: 0.25rem; /* Small offset below link */
+}
+
+/* Adjust Tooltip Position for App Tiles */
+.app-tile::after {
+  margin-top: 0.5rem; /* Slightly larger offset for tiles */
+}
+
+/* Header Nav Links */
+.header-nav-link:hover,
+.header-nav-link:hover .icon {
+  color: var(--color-uc-primary); /* UC primary on hover */
 }
 
 /* Header Icons */
-header .grid a .icon {
-  @apply w-5 h-5 text-gray-600;
+.header-nav-link .icon {
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
+  color: var(--color-uc-dark); /* UC dark color */
+  transition: color 0.2s ease; /* Smooth color transition */
+}
+
+/* Main */
+main {
+  padding: 1rem 1rem 1.5rem 1rem; /* px-4 py-6 */
+  background-color: theme('colors.white'); /* White background */
+  border: 1px solid theme('colors.gray.300'); /* Light gray border */
+  border-radius: 0.5rem; /* 8px rounded corners */
+  flex: 1; /* Grow to fill remaining space */
+}
+
+/* App Grid Section */
+main section h2 {
+  font-size: 1rem; /* 16px (text-base) */
+  font-weight: 500; /* font-medium */
+  color: var(--color-uc-mid); /* UC mid */
+  margin-bottom: 0.75rem; /* 12px */
+}
+
+main section div {
+  color: var(--color-uc-mid); /* UC mid for "No applications available" */
+  text-align: center;
 }
 
 /* Footer */
 footer {
-  background-color: var(--color-uc-dark);
-  border-radius: 8px;
-  padding: 4px;
+  margin-top: 2rem; /* 32px */
 }
+
+footer div {
+  color: var(--color-uc-mid); /* UC mid for dimmed text */
+  opacity: 0.6; /* Further dim the text */
+  text-align: center; /* Centered text */
+  font-size: 0.75rem; /* 12px (text-xs) */
+  line-height: 1.5; /* Improved readability */
+}
+
+/* Footer Icons (if added later) */
 footer .icon {
-  color: #4B5EAA;
-  width: 12px;
-  height: 12px;
+  color: var(--color-uc-mid); /* UC mid color */
+  width: 0.875rem; /* 14px */
+  height: 0.875rem; /* 14px */
 }
 
 /* App Tiles */
 .app-tile .icon {
-  color: #4B5EAA;
-  width: 12px;
-  height: 12px;
+  color: var(--color-uc-primary); /* UC primary color */
+  width: 0.875rem; /* 14px */
+  height: 0.875rem; /* 14px */
 }
 .app-tile:hover {
-  border: 1px solid #B7C53B;
+  border: 1px solid var(--color-uc-primary); /* UC primary border on hover */
 }
 
 /* Watermark */
@@ -60,14 +268,14 @@ footer .icon {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 50vw;
-  height: auto;
-  margin: 16px;
-  opacity: 0.15;
+  max-width: 600px; /* Constrain max size */
+  min-width: 200px; /* Ensure minimum size */
+  opacity: 0.1; /* Subtle watermark */
   z-index: -1;
   pointer-events: none;
 }
 .watermark img {
-  filter: grayscale(100%);
+  filter: grayscale(100%); /* Grayscale effect */
 }
 
 /* Environment Labels */
@@ -113,13 +321,18 @@ footer .icon {
 
 .text-uc-olive        { color: var(--color-uc-olive); }
 
-/* Tailwind layer/utility usage */
+/* General Icon Styling */
 .icon {
-  @apply inline-block align-middle w-3 h-3;
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 text-white rounded;
+    padding: 0.5rem 1rem; /* 8px 16px */
+    color: theme('colors.white'); /* White text */
+    border-radius: 0.25rem; /* 4px */
   }
 }

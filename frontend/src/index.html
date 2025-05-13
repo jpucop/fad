@@ -4,81 +4,85 @@
 <head>
   <meta charset="UTF-8">
   <title>Financial Applications Group</title>
-  <meta name="description" content="Financial Applications Group UCOP">
+  <meta name="description" content="Financial Applications Group Office of the President">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link href="/css/styles.css" rel="stylesheet">
   <script src="/js/app.js" defer></script>
 </head>
+
 <body class="font-sans relative min-h-screen">
 
   <!-- watermark -->
   <div class="watermark">
-    <img src="/icons/uc-seal.svg" alt="Watermark" class="w-full h-auto" />
+    <span class="icon l-uc-seal w-full h-auto" aria-hidden="true"></span>
   </div>
 
   <div class="max-w-screen-xl mx-auto px-6 relative z-10">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border border-gray-500 rounded-md mt-6 mb-6 p-4 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
-
+    <header class="header">
+      <div class="header-content">
         <!-- Group Title + UCOP Logo -->
-        <div class="flex gap-4 items-start">
-          <img src="/icons/uc-seal.svg" alt="UC Seal" class="h-32 opacity-50" />
-          <div class="flex flex-col gap-2">
-            <h1 class="text-3xl font-bold text-uc-olive leading-tight">Financial Applications Group</h1>
-            <img src="/icons/ucop-logo.svg" alt="UCOP Logo" class="h-12 grayscale mt-2" />
+        <div class="header-left">
+          <span class="icon l-ucop-logo header-seal"></span>
+          <div class="header-title-group">
+            <h1 class="header-title">Financial Applications Group</h1>
+            <span class="icon l-ucop-logo header-ucop-logo"></span>
           </div>
         </div>
 
-        <!-- Resource Links -->
-        <nav class="bg-uc-light/60 p-4 rounded-md" aria-label="Resource Links">
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-lg text-uc-dark">
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="Team Members">
+        <!-- org group icon links -->
+        <nav class="header-nav" aria-label="Resource Links">
+          <div class="header-nav-grid">
+            <a href="#" class="header-nav-link" aria-label="View Team Members">
               <span class="icon i-mdi-account-multiple-outline" aria-hidden="true"></span> Members
             </a>
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="ServiceNow">
+            <a href="#" class="header-nav-link" aria-label="Access ServiceNow">
               <span class="icon i-mdi-ticket-outline" aria-hidden="true"></span> ServiceNow
             </a>
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="Confluence">
+            <a href="#" class="header-nav-link" aria-label="Visit Confluence">
               <span class="icon i-mdi-book-open-page-variant-outline" aria-hidden="true"></span> Confluence
             </a>
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="Box Folder">
+            <a href="#" class="header-nav-link" aria-label="Access Box Folder">
               <span class="icon i-mdi-cloud-outline" aria-hidden="true"></span> Box
             </a>
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="Datadog">
+            <a href="#" class="header-nav-link" aria-label="Monitor with Datadog">
               <span class="icon i-mdi-chart-box-outline" aria-hidden="true"></span> DataDog
             </a>
-            <a href="#" class="flex items-center gap-2 hover:text-uc-primary" title="Source Code">
+            <a href="#" class="header-nav-link" aria-label="View Source Code">
               <span class="icon i-mdi-github" aria-hidden="true"></span> Sources
             </a>
           </div>
         </nav>
-
       </div>
     </header>
 
     <main class="px-4 py-6">
-      
+
       <!-- app grid -->
       <section>
         <h2 class="text-base font-medium text-uc-mid mb-3">Apps</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Dynamic App Cards Here -->
+          <div x-show="!apps?.length" class="text-uc-mid text-center col-span-full">
+            No applications available.
+          </div>
         </div>
       </section>
-
-      <!-- footer -->
-      <footer class="mt-8">
-        <div class="text-center text-[10px] text-uc-light bg-uc-dark border border-gray-500 rounded-md py-2 bg-opacity-90">
-          <div>© 2025 University of California, Office of the President</div>
-          <div>FAD v1.0.0-SNAPSHOT @ 2025-05-01 13:05 UTC</div>
-        </div>
-      </footer>
+      <!-- END app grid -->
 
     </main>
+    <!-- END main -->
+
+    <!-- footer -->
+    <footer class="mt-8" role="contentinfo">
+      <div>
+        <div>© 2025 University of California, Office of the President</div>
+        <div>FAD v1.0.0-SNAPSHOT @ 2025-05-01 13:05 UTC</div>
+      </div>
+    </footer>
 
   </div>
 </body>
+
 </html>
