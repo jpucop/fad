@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { iconToSVG } from '@iconify/utils';
+import { optimize } from 'svgo';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +21,19 @@ const config = {
   iconsJsonPath: path.join(__dirname, '../dist/icons.json'),
   iconifyPath: path.join(__dirname, '../node_modules/@iconify-json'),
   localIconsPath: path.join(__dirname, '../src/icons'),
+};
+
+// SVGO configuration for optimizing local SVGs
+const svgoConfig = {
+  plugins: [
+    { name: 'removeDimensions' }, // Remove width/height attributes
+    { name: 'removeAttrs', params: { attrs: ['fill'] } }, // Remove fill attributes
+    { name: 'convertTransform' }, // Bake transforms into path data
+    { name: 'cleanupNumericValues', params: { floatPrecision: 0 } }, // Reduce precision to integers
+    { name: 'removeUselessStrokeAndFill' }, // Remove unnecessary stroke/fill
+    { name: 'mergePaths' }, // Merge paths where possible (careful with visual impact)
+    { name: 'removeXMLNS' }, // Remove xmlns (we set it in the sprite)
+  ],
 };
 
 // Validate config paths
@@ -80,6 +94,37 @@ function processIconifyIcon(iconSet, name, ref) {
   return { svg, symbol };
 }
 
+// Calculate viewBox from SVG paths
+function calculateViewBox(svgContent) {
+  const pathRegex = /d="([^"]+)"/g;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+  let match;
+  while ((match = pathRegex.exec(svgContent)) !== null) {
+    const d = match[1];
+    const coords = d.match(/[\d.-]+/g)?.map(Number) || [];
+    for (let i = 0; i < coords.length; i += 2) {
+      const x = coords[i];
+      const y = coords[i + 1];
+      if (!isNaN(x) && !isNaN(y)) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (minX === Infinity || minY === Infinity || maxX === -Infinity || maxY === -Infinity) {
+    return '0 0 24 24'; // Fallback if no valid coordinates found
+  }
+
+  const padding = 10;
+  const width = maxX - minX;
+  const height = maxY - minY;
+  return `${minX - padding} ${minY - padding} ${width + 2 * padding} ${height + 2 * padding}`;
+}
+
 // Load and process local SVG
 function processLocalSVG(name, ref) {
   const svgPath = path.join(config.localIconsPath, `${name}.svg`);
@@ -91,12 +136,15 @@ function processLocalSVG(name, ref) {
   // Remove XML declaration
   svg = svg.replace(/<\?xml[^?]*\?>\s*/, '');
 
-  // Extract viewBox or default
-  const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
-  const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 24 24';
+  // Optimize SVG with SVGO
+  const optimizedSvg = optimize(svg, svgoConfig).data;
+
+  // Extract viewBox or calculate it
+  const viewBoxMatch = optimizedSvg.match(/viewBox="([^"]+)"/);
+  let viewBox = viewBoxMatch ? viewBoxMatch[1] : calculateViewBox(optimizedSvg);
 
   // Extract SVG content (remove <svg> tags and any leading/trailing whitespace)
-  const content = svg
+  const content = optimizedSvg
     .replace(/^<svg[^>]*>/, '')
     .replace(/<\/svg>\s*$/, '')
     .trim();
@@ -106,8 +154,10 @@ function processLocalSVG(name, ref) {
     throw new Error(`❌ No valid SVG content found in ${svgPath}`);
   }
 
+  // Reconstruct SVG for individual output (if needed)
+  const svgOutput = `<svg viewBox="${viewBox}" width="1em" height="1em">${content}</svg>`;
   const symbol = `<symbol id="${ref}" viewBox="${viewBox}">${content}</symbol>`;
-  return { svg, symbol };
+  return { svg: svgOutput, symbol };
 }
 
 // MAIN build function
@@ -161,7 +211,8 @@ function build() {
 
   // Write sprite
   if (mode !== 'i' && spriteSymbols.length > 0) {
-    const spriteContent = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n${spriteSymbols.join('\n')}\n</svg>`;
+    // Minify sprite output by removing unnecessary whitespace
+    const spriteContent = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">${spriteSymbols.join('')}</svg>`;
     const spritePath = path.join(config.outputDir, 'icons.svg');
     fs.mkdirSync(config.outputDir, { recursive: true });
     fs.writeFileSync(spritePath, spriteContent, 'utf8');

@@ -9,44 +9,105 @@
   --color-uc-olive: oklch(0.45 0.07 120);    /* Approx #5C6B47 */
 }
 
-/* Alpine.js cloaking */
+/* Utility Classes for UC Colors */
+.text-uc-dark       { color: var(--color-uc-dark); }
+.bg-uc-dark         { background-color: var(--color-uc-dark); }
+.border-uc-dark     { border-color: var(--color-uc-dark); }
+
+.text-uc-light      { color: var(--color-uc-light); }
+.bg-uc-light        { background-color: var(--color-uc-light); }
+.border-uc-light    { border-color: var(--color-uc-light); }
+
+.text-uc-mid        { color: var(--color-uc-mid); }
+.bg-uc-mid          { background-color: var(--color-uc-mid); }
+.border-uc-mid      { border-color: var(--color-uc-mid); }
+
+.text-uc-primary    { color: var(--color-uc-primary); }
+.bg-uc-primary      { background-color: var(--color-uc-primary); }
+.border-uc-primary  { border-color: var(--color-uc-primary); }
+
+.text-uc-accent     { color: var(--color-uc-accent); }
+.bg-uc-accent       { background-color: var(--color-uc-accent); }
+.border-uc-accent   { border-color: var(--color-uc-accent); }
+
+.text-uc-olive      { color: var(--color-uc-olive); }
+.bg-uc-olive        { background-color: var(--color-uc-olive); }
+.border-uc-olive    { border-color: var(--color-uc-olive); }
+
+/* General Icon Styling */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.25rem; /* Default size */
+  height: 1.25rem;
+}
+
+/* Ensure Inlined SVGs Inherit Color and Render Smoothly */
+.icon svg {
+  fill: currentColor; /* Inlined SVGs inherit parent color */
+  width: 100%;
+  height: 100%;
+  display: block; /* Prevent extra spacing */
+}
+
+/* Alpine.js Cloaking */
 [x-cloak] {
   display: none !important;
 }
 
 /* Body */
 body {
-  font-family: sans-serif; /* font-sans */
+  font-family: sans-serif;
   position: relative;
-  min-height: 100vh; /* min-h-screen */
-  background-color: oklch(0.95 0.01 120); /* Slightly grayed background */
-  display: flex; /* Use flexbox for layout */
-  flex-direction: column; /* Stack children vertically */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Main Container */
 .max-w-screen-xl {
-  flex: 1; /* Grow to fill available space */
+  flex: 1;
   display: flex;
-  flex-direction: column; /* Stack header, main, footer */
+  flex-direction: column;
+}
+
+/* Watermark */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  max-width: 600px;
+  min-width: 200px;
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.watermark .icon {
+  filter: grayscale(100%);
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1; /* Ensure the SVG maintains a square aspect ratio to prevent clipping */
 }
 
 /* Header */
-header {
-  background-color: theme('colors.white'); /* White background */
-  border: 1px solid theme('colors.gray.300'); /* Light gray border */
-  border-radius: 0.5rem; /* 8px rounded corners */
-  margin-top: 1.5rem; /* 24px */
-  margin-bottom: 1.5rem; /* 24px */
-  padding: 1rem; /* 16px */
+.header {
+  background-color: theme('colors.white');
+  border: 1px solid theme('colors.gray.300');
+  border-radius: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
 }
 
 /* Header Content */
 .header-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* 24px */
-  align-items: center; /* Center vertically on all screen sizes */
+  gap: 1.5rem;
+  align-items: center;
 }
 
 @media (min-width: 640px) {
@@ -59,70 +120,67 @@ header {
 /* Header Left Section (Seal + Title Group) */
 .header-left {
   display: flex;
-  align-items: center; /* Vertically center seal and title group */
-  gap: 1rem; /* 16px between seal and title group */
+  align-items: center;
+  gap: 1rem;
 }
 
-/* UC Seal */
+/* UC Seal in Header */
 .header-seal {
-  height: 5rem; /* 80px fixed height */
-  width: auto;
-  opacity: 0.5; /* Dimmed as desired */
+  width: 5rem; /* Fixed width */
+  height: 5rem; /* Fixed height to match width, creating a square container */
+  aspect-ratio: 1 / 1; /* Ensure the SVG maintains a square aspect ratio */
+  opacity: 0.5;
 }
 
 /* Title Group (Title + UCOP Logo) */
 .header-title-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* 8px between title and UCOP logo */
-  height: 5rem; /* Match UC seal height */
-  justify-content: center; /* Vertically center content */
-  align-items: flex-start; /* Explicitly left-align */
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Header Title */
 .header-title {
-  font-size: 1.5rem; /* 24px (reduced from 30px) */
-  font-weight: 700; /* font-bold */
-  color: var(--color-uc-olive); /* UC olive */
-  line-height: 1.2; /* leading-tight */
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 /* UCOP Logo in Header */
 .header-ucop-logo {
-  filter: grayscale(100%); /* Grayscale effect */
-  height: 1.5rem; /* 24px */
-  width: auto;
-  object-fit: contain; /* Prevent skewing */
-  opacity: 0.5; /* Dimmed as desired */
-  margin-left: 0; /* Ensure no left margin */
+  filter: grayscale(100%);
+  width: 3rem;
+  height: auto;
+  opacity: 0.5;
 }
 
 /* Header Nav */
 .header-nav {
-  background-color: theme('colors.white'); /* Match header background */
-  border-radius: 0.5rem; /* 8px rounded corners */
-  padding: 1rem; /* 16px padding */
+  background-color: theme('colors.white');
+  border-radius: 0.5rem;
+  padding: 1rem;
 }
 
 /* Header Nav Grid */
 .header-nav-grid {
   display: grid;
-  grid-template-columns: 1fr; /* Single column on small screens */
-  gap: 1rem; /* 16px */
-  font-size: 1.125rem; /* 18px (text-lg) */
-  color: var(--color-uc-dark); /* UC dark */
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  font-size: 1.125rem;
+  color: var(--color-uc-dark);
 }
 
 @media (min-width: 640px) {
   .header-nav-grid {
-    grid-template-columns: repeat(2, 1fr); /* Two columns on medium screens */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
   .header-nav-grid {
-    grid-template-columns: repeat(3, 1fr); /* Three columns on large screens */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -130,209 +188,164 @@ header {
 .header-nav-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* 8px */
-  transition: color 0.2s ease; /* Smooth color transition */
-  position: relative; /* Position tooltip relative to link */
+  gap: 0.5rem;
+  transition: color 0.2s ease;
+  position: relative;
+  color: var(--color-uc-dark);
 }
 
-/* Tooltip for Links */
+.header-nav-link:hover,
+.header-nav-link:hover .icon {
+  color: var(--color-uc-primary);
+}
+
+/* Fix Header Nav Icons (Prevent Clipping and Jankiness) */
+.header-nav-link .icon {
+  width: 1.25rem; /* Match the default icon size for consistency */
+  height: 1.25rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Tooltip for Links and App Tiles */
 .header-nav-link,
 .app-tile {
-  position: relative; /* Position tooltip relative to link */
+  position: relative;
 }
 
-/* Tooltip Content */
 .header-nav-link::after,
 .app-tile::after {
-  content: attr(aria-label); /* Use aria-label as tooltip text */
+  content: attr(aria-label);
   position: absolute;
-  top: 100%; /* Position below the link */
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: theme('colors.gray.800'); /* Dark gray background */
-  color: theme('colors.white'); /* White text */
-  padding: 0.25rem 0.5rem; /* 4px 8px */
-  border-radius: 0.25rem; /* 4px */
-  font-size: 0.75rem; /* 12px */
-  white-space: nowrap; /* Prevent wrapping */
-  opacity: 0; /* Hidden by default */
-  visibility: hidden; /* Hidden by default */
-  transition: opacity 0.2s ease, visibility 0.2s ease; /* Smooth transition */
-  z-index: 10; /* Above other elements */
+  background-color: theme('colors.gray.800');
+  color: theme('colors.white');
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 10;
 }
 
-/* Tooltip Arrow */
 .header-nav-link::before,
 .app-tile::before {
   content: '';
   position: absolute;
-  top: 100%; /* Position above tooltip */
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-bottom-color: theme('colors.gray.800'); /* Match tooltip background */
-  opacity: 0; /* Hidden by default */
-  visibility: hidden; /* Hidden by default */
-  transition: opacity 0.2s ease, visibility 0.2s ease; /* Smooth transition */
+  border-bottom-color: theme('colors.gray.800');
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
-/* Show Tooltip on Hover */
 .header-nav-link:hover::after,
 .header-nav-link:hover::before,
 .app-tile:hover::after,
 .app-tile:hover::before {
-  opacity: 1; /* Show tooltip */
-  visibility: visible; /* Show tooltip */
+  opacity: 1;
+  visibility: visible;
 }
 
-/* Adjust Tooltip Position for Header Links */
 .header-nav-link::after {
-  margin-top: 0.25rem; /* Small offset below link */
+  margin-top: 0.25rem;
 }
 
-/* Adjust Tooltip Position for App Tiles */
 .app-tile::after {
-  margin-top: 0.5rem; /* Slightly larger offset for tiles */
+  margin-top: 0.5rem;
 }
 
-/* Header Nav Links */
-.header-nav-link:hover,
-.header-nav-link:hover .icon {
-  color: var(--color-uc-primary); /* UC primary on hover */
+/* Main Content */
+.main-content {
+  padding: 1rem 1rem 1.5rem;
+  min-height: 100px;
+  border-radius: 0.5rem;
+  flex: 1;
 }
 
-/* Header Icons */
-.header-nav-link .icon {
-  width: 1.25rem; /* 20px */
-  height: 1.25rem; /* 20px */
-  color: var(--color-uc-dark); /* UC dark color */
-  transition: color 0.2s ease; /* Smooth color transition */
+/* App Section */
+.app-section .section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-uc-mid);
+  margin-bottom: 0.75rem;
 }
 
-/* Main */
-main {
-  padding: 1rem 1rem 1.5rem 1rem; /* px-4 py-6 */
-  background-color: theme('colors.white'); /* White background */
-  border: 1px solid theme('colors.gray.300'); /* Light gray border */
-  border-radius: 0.5rem; /* 8px rounded corners */
-  flex: 1; /* Grow to fill remaining space */
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
-/* App Grid Section */
-main section h2 {
-  font-size: 1rem; /* 16px (text-base) */
-  font-weight: 500; /* font-medium */
-  color: var(--color-uc-mid); /* UC mid */
-  margin-bottom: 0.75rem; /* 12px */
+@media (min-width: 640px) {
+  .app-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-main section div {
-  color: var(--color-uc-mid); /* UC mid for "No applications available" */
+@media (min-width: 1024px) {
+  .app-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.no-apps-message {
+  color: var(--color-uc-mid);
   text-align: center;
-}
-
-/* Footer */
-footer {
-  margin-top: 2rem; /* 32px */
-}
-
-footer div {
-  color: var(--color-uc-mid); /* UC mid for dimmed text */
-  opacity: 0.6; /* Further dim the text */
-  text-align: center; /* Centered text */
-  font-size: 0.75rem; /* 12px (text-xs) */
-  line-height: 1.5; /* Improved readability */
-}
-
-/* Footer Icons (if added later) */
-footer .icon {
-  color: var(--color-uc-mid); /* UC mid color */
-  width: 0.875rem; /* 14px */
-  height: 0.875rem; /* 14px */
+  grid-column: 1 / -1;
 }
 
 /* App Tiles */
 .app-tile .icon {
-  color: var(--color-uc-primary); /* UC primary color */
-  width: 0.875rem; /* 14px */
-  height: 0.875rem; /* 14px */
-}
-.app-tile:hover {
-  border: 1px solid var(--color-uc-primary); /* UC primary border on hover */
+  color: var(--color-uc-primary);
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
-/* Watermark */
-.watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50vw;
-  max-width: 600px; /* Constrain max size */
-  min-width: 200px; /* Ensure minimum size */
-  opacity: 0.1; /* Subtle watermark */
-  z-index: -1;
-  pointer-events: none;
+.app-tile:hover {
+  border: 1px solid var(--color-uc-primary);
 }
-.watermark img {
-  filter: grayscale(100%); /* Grayscale effect */
+
+/* Footer */
+.footer {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.footer-content {
+  color: var(--color-uc-mid);
+  opacity: 0.6;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.footer .icon {
+  color: var(--color-uc-mid);
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 /* Environment Labels */
-.dev {
-  color: oklch(0.55 0.15 20);
-}
-.dev .icon {
-  color: oklch(0.55 0.15 20);
-}
-.qa {
-  color: oklch(0.65 0.15 90);
-}
-.qa .icon {
-  color: oklch(0.65 0.15 90);
-}
-.prod {
-  color: oklch(0.55 0.10 145);
-}
-.prod .icon {
-  color: oklch(0.55 0.10 145);
-}
+.dev { color: oklch(0.42 0.1365 278.18); }
+.dev .icon { color: oklch(0.55 0.15 20); }
+.qa { color: oklch(0.65 0.15 90); }
+.qa .icon { color: oklch(0.65 0.15 90); }
+.prod { color: oklch(0.55 0.10 145); }
+.prod .icon { color: oklch(0.55 0.10 145); }
 
-/* Utility classes for UCOP colors */
-.text-uc-dark         { color: var(--color-uc-dark); }
-.bg-uc-dark           { background-color: var(--color-uc-dark); }
-.border-uc-dark       { border-color: var(--color-uc-dark); }
-
-.text-uc-light        { color: var(--color-uc-light); }
-.bg-uc-light          { background-color: var(--color-uc-light); }
-.border-uc-light      { border-color: var(--color-uc-light); }
-
-.text-uc-mid          { color: var(--color-uc-mid); }
-.bg-uc-mid            { background-color: var(--color-uc-mid); }
-.border-uc-mid        { border-color: var(--color-uc-mid); }
-
-.text-uc-primary      { color: var(--color-uc-primary); }
-.bg-uc-primary        { background-color: var(--color-uc-primary); }
-.border-uc-primary    { border-color: var(--color-uc-primary); }
-
-.text-uc-accent       { color: var(--color-uc-accent); }
-.bg-uc-accent         { background-color: var(--color-uc-accent); }
-.border-uc-accent     { border-color: var(--color-uc-accent); }
-
-.text-uc-olive        { color: var(--color-uc-olive); }
-
-/* General Icon Styling */
-.icon {
-  display: inline-block;
-  vertical-align: middle;
-  width: 1.25rem; /* 20px */
-  height: 1.25rem; /* 20px */
-}
-
+/* Button Component */
 @layer components {
   .btn {
-    padding: 0.5rem 1rem; /* 8px 16px */
-    color: theme('colors.white'); /* White text */
-    border-radius: 0.25rem; /* 4px */
+    padding: 0.5rem 1rem;
+    color: theme('colors.white');
+    border-radius: 0.25rem;
   }
 }
