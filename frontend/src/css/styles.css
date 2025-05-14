@@ -127,32 +127,34 @@ body {
 
 /* UC Seal in Header */
 .header-seal {
-  width: 2.5rem; /* Reduced size for better proportion */
-  height: 2.5rem;
-  aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
-  opacity: 0.7; /* Slightly more visible */
+  width: 9rem; /* Reduced size for better proportion */
+  height: 9rem;
+  opacity: 0.5; /* Slightly more visible */
+  fill: var(--color-uc-olive);
 }
 
 /* Title Group (Title + UCOP Logo) */
 .header-title-group {
   display: flex;
-  flex-direction: row; /* Changed to row to place logo beside title */
+  flex-direction: column;
   gap: 0.5rem;
-  align-items: center; /* Center title and logo vertically */
+  align-items: baseline;
 }
 
 /* Header Title */
 .header-title {
   font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 0.8;
+  border-bottom: .3rem;
+  border-color: var(--color-uc-mid);
 }
 
 /* UCOP Logo in Header */
 .header-ucop-logo {
-  width: 2rem; /* Slightly larger for balance */
-  height: auto;
-  opacity: 0.7; /* Slightly more visible */
+  width: 10rem;
+  height: 6rem;
+  opacity: 0.4;
   /* Removed filter: grayscale(100%) to restore color */
 }
 
