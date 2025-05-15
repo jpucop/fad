@@ -4,123 +4,134 @@
     "short_name": "UCOP",
     "full_name": "University of California Office of the President",
     "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
-    "group": {
-      "name": "Financial Applications",
-      "short_name": "FinApps",
-      "aws": {
-        "defaults": {
-          "region": "us-west-2",
-          "account_name": "finapps-dev",
-          "cli_output_format": "json",
-          "tags": [
-            "ucop:group::FinApps",
-            "ucop:application::{app_name}",
-            "ucop:environment::{env}",
-            "ucop:createdBy::z{member_email}"
-          ]
-        },
-        "accounts": [
-          {
-            "name": "finapps-dev",
-            "account_id": "999",
-            "region": "us-west-2",
-            "description": "Base FinApps AWS account holding project source repositoryies and all DEV and QA environments."
-          },
-          {
-            "name": "finapps-prod",
-            "account_id": "777",
-            "region": "us-west-2",
-            "description": "Production FinApps AWS account."
-          },
-          {
-            "name": "fis-dev",
-            "account_id": "111",
-            "region": "us-west-2",
-            "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
-          },
-          {
-            "name": "fis-prod",
-            "account_id": "555",
-            "region": "us-west-2",
-            "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
-          }
-        ]
-      },
-      "confluence": {
-        "org_group_base_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
-      },
-      "box": {
-        "org_base_url": "https://ucop.app.box.com/"
-      },
-      "jira": {
-        "org_base_url": "https://ucopedu.atlassian.net/jira/"
-      },
-      "data_dog": {
-        "org_group_base_url": "https://dd.com/ucop/finapps/index.html"
-      },
-      "service_now": {
-        "org_base_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
-        "group": {
-          "assignment_groups": [
-            {
-              "name": "AYSO",
-              "description": ""
-            },
-            {
-              "name": "CAF AWS Support",
-              "description": ""
-            },
-            {
-              "name": "Corporate Systems Gateway (CSG)",
-              "description": ""
-            },
-            {
-              "name": "FDW Tech Support",
-              "description": ""
-            },
-            {
-              "name": "ITF Retrofit Team",
-              "description": ""
-            },
-            {
-              "name": "TM1 AWS Support",
-              "description": ""
-            },
-            {
-              "name": "FIS AWS Tech Support",
-              "description": ""
-            },
-            {
-              "name": "FINAPPS AWS Tech Support",
-              "description": ""
-            },
-            {
-              "name": "FIS Concur Support",
-              "description": ""
-            },
-            {
-              "name": "Endowment & Investment Accounting Svcs",
-              "description": ""
-            },
-            {
-              "name": "TCS Support",
-              "description": ""
-            },
-            {
-              "name": "Research Enterprise Management System (REMS)",
-              "description": ""
-            },
-            {
-              "name": "BUD Retrofit Team",
-              "description": ""
-            },
-            {
-              "name": "ACA Web Support",
-              "description": ""
-            }
-          ]
-        }
+    "confluence": {
+      "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+    },
+    "box": {
+      "web_url": "https://ucop.app.box.com"
+    },
+    "jira": {
+      "web_url": "https://ucopedu.atlassian.net/jira/"
+    },
+    "data_dog": {
+      "web_url": "https://dd.com/ucop/index.html"
+    },
+    "service_now": {
+      "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+    }
+  },
+  "group": {
+    "name": "Financial Applications",
+    "short_name": "FinApps",
+    "description": "Central hub for finances and bookeeping for UC campuses",
+    "members": [
+      {
+        "name": "",
+        "work_email": "",
+        "title": "",
+        "web_url": ""
       }
+    ],
+    "aws": {
+      "accounts": [
+        {
+          "name": "finapps-dev",
+          "account_id": "999",
+          "region": "us-west-2",
+          "description": "Base FinApps AWS account holding project source repositories and all DEV and QA web app hosted environments."
+        },
+        {
+          "name": "finapps-prod",
+          "account_id": "777",
+          "region": "us-west-2",
+          "description": "Production AWS account for web apps managed by Financial Applications group."
+        },
+        {
+          "name": "fis-dev",
+          "account_id": "111",
+          "region": "us-west-2",
+          "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+        },
+        {
+          "name": "fis-prod",
+          "account_id": "555",
+          "region": "us-west-2",
+          "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+        }
+      ]
+    },
+    "confluence": {
+      "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+    },
+    "box": {
+      "web_url": "https://ucop.app.box.com/FA/"
+    },
+    "jira": {
+      "web_url": "https://ucopedu.atlassian.net/jira/FA/"
+    },
+    "data_dog": {
+      "web_url": "https://dd.com/ucop/finapps/index.html"
+    },
+    "service_now": {
+      "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+      "assignment_groups": [
+        {
+          "name": "AYSO",
+          "description": ""
+        },
+        {
+          "name": "CAF AWS Support",
+          "description": ""
+        },
+        {
+          "name": "Corporate Systems Gateway (CSG)",
+          "description": ""
+        },
+        {
+          "name": "FDW Tech Support",
+          "description": ""
+        },
+        {
+          "name": "ITF Retrofit Team",
+          "description": ""
+        },
+        {
+          "name": "TM1 AWS Support",
+          "description": ""
+        },
+        {
+          "name": "FIS AWS Tech Support",
+          "description": ""
+        },
+        {
+          "name": "FINAPPS AWS Tech Support",
+          "description": ""
+        },
+        {
+          "name": "FIS Concur Support",
+          "description": ""
+        },
+        {
+          "name": "Endowment & Investment Accounting Svcs",
+          "description": ""
+        },
+        {
+          "name": "TCS Support",
+          "description": ""
+        },
+        {
+          "name": "Research Enterprise Management System (REMS)",
+          "description": ""
+        },
+        {
+          "name": "BUD Retrofit Team",
+          "description": ""
+        },
+        {
+          "name": "ACA Web Support",
+          "description": ""
+        }
+      ]
     }
   }
 }
