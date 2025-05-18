@@ -1,0 +1,33 @@
+{
+  "apps": [
+    "csg, rems, ayso, wage, itf, ise"
+  ],
+  "defaults": {
+    "app": {
+      "name": "",
+      "short_name": "{name}",
+      "long_name": "",
+      "description": "",
+      "org": "ucop",
+      "group": "finapps",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "source": {
+        "project_name": "{app.name}",
+        "git_origin_url": "",
+        "production_branch_name": "main",
+        "aws": {
+          "account_name": "finapps-dev"
+        }
+      },
+      "environment": [
+        {
+          "host": "aws",
+          "app_profile": "tomcat-java",
+          "deploy_profile": "aws-cicd-fargate-rds",
+          "git_branch": "{env}"
+        }
+      ]
+    }
+  }
+}

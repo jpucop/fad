@@ -63,7 +63,7 @@
       },
       {
         "name": "Corporate Systems Gateway (CSG)",
-        "apps": "csg,csa,spt,bud"
+        "apps": "csg"
       },
       {
         "name": "FDW Tech Support",
@@ -103,7 +103,7 @@
       },
       {
         "name": "BUD Retrofit Team",
-        "apps": "bud"
+        "apps": "csg"
       },
       {
         "name": "ACA Web Support",

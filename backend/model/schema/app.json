@@ -4,16 +4,15 @@
   "long_name": "",
   "description": "",
   "org": "ucop",
-  "group": "finapps",
-  "app_profile": "tomcat-java",
-  "deploy_profile": "aws-cicd-fargate-rds",
+  "group": "",
+  "app_profile": "",
+  "deploy_profile": "",
   "source": {
     "project_name": "",
     "git_origin_url": "",
     "production_branch_name": "main",
     "aws": {
       "account_name": ""
-      
     }
   },
   "confluence": {
