@@ -3,43 +3,32 @@
   "short_name": "",
   "long_name": "",
   "description": "",
+  "org": "ucop",
+  "group": "finapps",
   "app_profile": "tomcat-java",
-  "deploy_profile": "aws-cicd-fargate",
+  "deploy_profile": "aws-cicd-fargate-rds",
   "source": {
-    "project_name": "{short_name}",
+    "project_name": "",
     "git_origin_url": "",
     "production_branch_name": "main",
     "aws": {
-      "account_name": "finapps-dev"
+      "account_name": ""
+      
     }
   },
   "confluence": {
-    "links": [
-      {
-        "name": "",
-        "description": "",
-        "url": ""
-      }
-    ]
+    "links": []
   },
   "box": {
-    "links": [
-      {
-        "name": "",
-        "description": "",
-        "url": ""
-      }
-    ]
+    "links": []
   },
   "jira": {
-    "project_keys": [
-      ""
-    ]
+    "project_keys": [],
+    "links": []
   },
   "service_now": {  
-    "assignment_groups": [
-      ""
-    ]
+    "assignment_groups": [],
+    "links": []
   },
   "datadog": {
     "links": []

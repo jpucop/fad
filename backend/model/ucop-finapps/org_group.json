@@ -1,7 +1,6 @@
 {
   "org": {
-    "name": "Office of President",
-    "short_name": "UCOP",
+    "name": "ucop",
     "full_name": "University of California Office of the President",
     "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
     "confluence": {
@@ -21,8 +20,8 @@
     }
   },
   "group": {
-    "name": "Financial Applications",
-    "short_name": "FinApps",
+    "name": "finapps",
+    "full_name": "Financial Applications",
     "description": "Central hub for finances and bookeeping for UC campuses",
     "members": [
       {
@@ -77,59 +76,59 @@
       "assignment_groups": [
         {
           "name": "AYSO",
-          "description": ""
+          "apps": "ayso"
         },
         {
           "name": "CAF AWS Support",
-          "description": ""
+          "apps": ""
         },
         {
           "name": "Corporate Systems Gateway (CSG)",
-          "description": ""
+          "apps": "csg,csa,spt,bud"
         },
         {
           "name": "FDW Tech Support",
-          "description": ""
+          "apps": "fdw"
         },
         {
           "name": "ITF Retrofit Team",
-          "description": ""
+          "apps": "itf"
         },
         {
           "name": "TM1 AWS Support",
-          "description": ""
+          "apps": "mf"
         },
         {
           "name": "FIS AWS Tech Support",
-          "description": ""
+          "apps": "ulo,itf"
         },
         {
           "name": "FINAPPS AWS Tech Support",
-          "description": ""
+          "apps": "ALL"
         },
         {
           "name": "FIS Concur Support",
-          "description": ""
+          "apps": "itf,ulo"
         },
         {
           "name": "Endowment & Investment Accounting Svcs",
-          "description": ""
+          "apps": "eias"
         },
         {
           "name": "TCS Support",
-          "description": ""
+          "apps": "tcs"
         },
         {
           "name": "Research Enterprise Management System (REMS)",
-          "description": ""
+          "apps": "rems"
         },
         {
           "name": "BUD Retrofit Team",
-          "description": ""
+          "apps": "bud"
         },
         {
           "name": "ACA Web Support",
-          "description": ""
+          "apps": "aca"
         }
       ]
     }

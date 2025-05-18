@@ -8,6 +8,6 @@
   "deploy_pipeline_name": "",
   "git_branch": "dev|qa|main",
   "aws": {
-    "account_name": "finapps-{env}"
+    "account_name": "finapps-dev"
   }
 }
