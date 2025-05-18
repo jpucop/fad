@@ -1,6 +1,6 @@
 {
-  "name": "finapps-{env}",
-  "account_id": "999",
+  "name": "{group_name}-{env}",
+  "account_id": "",
   "region": "us-west-2",
   "description": ""
 }

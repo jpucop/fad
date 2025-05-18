@@ -1,0 +1,25 @@
+{
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "members": [],
+  "aws": {
+    "accounts": []
+  },
+  "confluence": {
+    "web_url": ""
+  },
+  "box": {
+    "web_url": ""
+  },
+  "jira": {
+    "web_url": ""
+  },
+  "data_dog": {
+    "web_url": ""
+  },
+  "service_now": {
+    "web_url": "",
+    "assignment_groups": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "org": {
+    "name": "",
+    "full_name": "",
+    "description": "",
+    "confluence": {
+      "web_url": ""
+    },
+    "box": {
+      "web_url": ""
+    },
+    "jira": {
+      "web_url": ""
+    },
+    "data_dog": {
+      "web_url": ""
+    },
+    "service_now": {
+      "web_url": ""
+    },
+    "aws": {
+      "accounts": []
+    }
+  }
+}

@@ -1,73 +1,115 @@
-import csv
 import json
 import os
+from pathlib import Path
 
-# Define paths
-SCHEMA_DIR = "model/init/ucop-finapps/schema"
-DATA_DIR = "model/init/ucop-finapps/data"
-APP_NAMES_CSV = os.path.join(SCHEMA_DIR, "app_names.csv")
-APP_JSON = os.path.join(SCHEMA_DIR, "app.json")
+def load_json(file_path):
+  with open(file_path, 'r') as f:
+    return json.load(f)
 
-# Ensure data directory exists
-os.makedirs(DATA_DIR, exist_ok=True)
+def save_json(data, file_path):
+  with open(file_path, 'w') as f:
+    json.dump(data, f, indent=2)
 
-# Read app.json template
-with open(APP_JSON, "r") as f:
-    app_template = json.load(f)
-
-# Define environment configurations
-ENVIRONMENTS = [
+def generate_app_json(app_name, org_group_data, app_schema, output_dir):
+  # Base app.json structure from schema
+  app_data = app_schema.copy()
+  
+  # Set basic app details
+  app_data['name'] = app_name
+  app_data['short_name'] = app_name.upper()
+  app_data['long_name'] = f"Financial Applications - {app_name.upper()}"
+  app_data['description'] = f"{app_name.upper()} application managed by Financial Applications group"
+  
+  # Set org and group
+  app_data['org'] = org_group_data['org']['name']
+  app_data['group'] = org_group_data['group']['name']
+  
+  # Default profiles (can be customized per app)
+  app_data['app_profile'] = 'tomcat-java'
+  app_data['deploy_profile'] = 'aws-cicd-fargate-rds'
+  
+  # Source configuration
+  app_data['source']['project_name'] = app_name
+  app_data['source']['git_origin_url'] = f"https://github.com/ucop/{app_name}.git"
+  app_data['source']['production_branch_name'] = 'main'
+  
+  # AWS account mapping
+  aws_accounts = org_group_data['group']['aws']['accounts']
+  app_data['source']['aws']['account_name'] = next(
+    acc['name'] for acc in aws_accounts if 'prod' in acc['name']
+  )
+  
+  # ServiceNow assignment groups
+  assignment_groups = org_group_data['group']['service_now']['assignment_groups']
+  app_groups = [g['name'] for g in assignment_groups if app_name in g.get('apps', '').split(',') or g['apps'] == 'ALL']
+  app_data['service_now']['assignment_groups'] = app_groups
+  
+  # Environment configurations
+  environments = [
     {
-        "env": "dev",
-        "name": "development",
-        "git_branch": "dev",
-        "aws_account_name": "finapps-dev"
+      'env': 'dev',
+      'name': 'development',
+      'host': 'aws',
+      'app_profile': 'tomcat-java',
+      'deploy_profile': 'aws-cicd-fargate-rds',
+      'deploy_pipeline_name': f"{app_name}-dev-pipeline",
+      'git_branch': 'dev',
+      'aws': {'account_name': 'finapps-dev'}
     },
     {
-        "env": "qa",
-        "name": "staging",
-        "git_branch": "qa",
-        "aws_account_name": "finapps-qa"
+      'env': 'qa',
+      'name': 'staging',
+      'host': 'aws',
+      'app_profile': 'tomcat-java',
+      'deploy_profile': 'aws-cicd-fargate-rds',
+      'deploy_pipeline_name': f"{app_name}-qa-pipeline",
+      'git_branch': 'qa',
+      'aws': {'account_name': 'finapps-dev'}
     },
     {
-        "env": "prod",
-        "name": "production",
-        "git_branch": "main",
-        "aws_account_name": "finapps-prod"
+      'env': 'prod',
+      'name': 'production',
+      'host': 'aws',
+      'app_profile': 'tomcat-java',
+      'deploy_profile': 'aws-cicd-fargate-rds',
+      'deploy_pipeline_name': f"{app_name}-prod-pipeline",
+      'git_branch': 'main',
+      'aws': {'account_name': 'finapps-prod'}
     }
-]
+  ]
+  app_data['environments'] = environments
+  
+  # Save the generated app.json
+  output_path = output_dir / f"{app_name}.json"
+  save_json(app_data, output_path)
+  print(f"Generated app.json for {app_name} at {output_path}")
 
-# Read app names from CSV
-with open(APP_NAMES_CSV, "r") as f:
-    reader = csv.reader(f)
-    app_names = next(reader)  # Assuming single row with app names
+def main():
+  # Paths
+  base_dir = Path(__file__).parent.parent
+  schema_dir = base_dir / 'schema'
+  org_group_file = base_dir / 'ucop-finapps' / 'org_group.json'
+  output_dir = base_dir / 'ucop-finapps' / 'apps'
+  
+  # Create output directory if it doesn't exist
+  output_dir.mkdir(exist_ok=True)
+  
+  # Load schema and org_group data
+  app_schema = load_json(schema_dir / 'app.json')
+  org_group_data = load_json(org_group_file)
+  
+  # Get list of apps from service_now assignment groups
+  assignment_groups = org_group_data['group']['service_now']['assignment_groups']
+  apps = set()
+  for group in assignment_groups:
+    if group['apps'] == 'ALL':
+      continue
+    apps.update(group.get('apps', '').split(','))
+  
+  # Generate app.json for each app
+  for app in apps:
+    if app:  # Skip empty app names
+      generate_app_json(app, org_group_data, app_schema, output_dir)
 
-# Generate a JSON file for each app
-for app_name in app_names:
-    # Copy the template
-    app_config = json.deepcopy(app_template)
-    
-    # Update short_name and source.project_name
-    app_config["short_name"] = app_name
-    app_config["source"]["project_name"] = app_name
-    
-    # Create environment configurations
-    app_config["environments"] = []
-    for env in ENVIRONMENTS:
-        # Copy the template environment
-        env_config = json.deepcopy(app_template["environments"][0])
-        # Update environment-specific fields
-        env_config["env"] = env["env"]
-        env_config["name"] = env["name"]
-        env_config["git_branch"] = env["git_branch"]
-        env_config["aws"]["account_name"] = env["aws_account_name"]
-        app_config["environments"].append(env_config)
-    
-    # Write to data directory
-    output_file = os.path.join(DATA_DIR, f"{app_name}.json")
-    with open(output_file, "w") as f:
-        json.dump(app_config, f, indent=2)
-    
-    print(f"Generated {output_file}")
-
-print("App declaration files generated successfully.")
+if __name__ == '__main__':
+  main()

@@ -1,0 +1,30 @@
+{
+  "name": "ucop",
+  "full_name": "University of California Office of the President",
+  "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
+  "confluence": {
+    "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "web_url": "https://ucop.app.box.com"
+  },
+  "jira": {
+    "web_url": "https://ucopedu.atlassian.net/jira/"
+  },
+  "data_dog": {
+    "web_url": "https://dd.com/ucop/index.html"
+  },
+  "service_now": {
+    "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "aws": {
+    "accounts": [
+      {
+        "name": "shs-prod",
+        "account_id": "999",
+        "region": "us-west-2",
+        "description": "UCOP Infra group managed assets over groups in UCOP."
+      }
+    ]
+  }
+}

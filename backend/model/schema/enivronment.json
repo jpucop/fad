@@ -1,13 +1,13 @@
 
 {
-  "env": "dev|qa|prod",
-  "name": "development|staging|production",
+  "env": "[dev|qa|prod]",
+  "name": "[development|staging|production]",
   "host": "aws",
-  "app_profile": "tomcat-java",
-  "deploy_profile": "aws-cicd-fargate",
+  "app_profile": "",
+  "deploy_profile": "",
   "deploy_pipeline_name": "",
-  "git_branch": "dev|qa|main",
+  "git_branch": "[dev|qa|main]",
   "aws": {
-    "account_name": "finapps-dev"
+    "account_name": ""
   }
 }
