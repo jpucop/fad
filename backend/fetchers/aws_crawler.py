@@ -1,30 +1,32 @@
 # app/fetchers/aws_crawler.py
-import subprocess
-import json
+import boto3
 import os
 import tempfile
 import shutil
-from typing import List, Dict, Any, Optional
-from model.app_definition import AppDefinition
-from model.app_snapshot import AppSnapshot, AppSnapshotMetadata, App, Version, AppServer, Dependency, AWSInfrastructure, CodePipelineStatus, FargateStatus, Container, ALBStatus, RDSStatus, AWSAccount, Source, Commit, Certificate, Cost, Jira, JiraTicket, ServiceNow, ServiceNowTicket, Logs, AppLogs, LogEntry, Metrics, Uptime, ResourceUsage, Security, Vulnerabilities, Vulnerability
+import subprocess
 import xml.etree.ElementTree as ET
-import yaml
-import time
-from datetime import datetime
+from typing import Dict, Any, List
+from datetime import datetime, timedelta
+from model.app_definition import AppDefinition
+from model.app_snapshot import AppSnapshot
+from app.fetchers.transform import transform_app_snapshot
 
-def run_aws_cli_command(command: list) -> Dict[str, Any]:
-    try:
-        result = subprocess.run(
-            ["aws"] + command + ["--output", "json"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        return json.loads(result.stdout) if result.stdout else {}
-    except subprocess.CalledProcessError as e:
-        raise Exception(f"AWS CLI error: {e.stderr}")
-    except json.JSONDecodeError as e:
-        raise Exception(f"Failed to parse AWS CLI output: {str(e)}")
+# In-memory cache for snapshots
+SNAPSHOT_CACHE: Dict[str, Dict[str, Any]] = {}
+
+# Initialize boto3 clients
+sts_client = boto3.client("sts")
+codecommit_client = boto3.client("codecommit")
+codepipeline_client = boto3.client("codepipeline")
+ecs_client = boto3.client("ecs")
+cloudwatch_client = boto3.client("cloudwatch")
+elbv2_client = boto3.client("elbv2")
+acm_client = boto3.client("acm")
+rds_client = boto3.client("rds")
+ce_client = boto3.client("ce")
+s3_client = boto3.client("s3")
+logs_client = boto3.client("logs")
+inspector_client = boto3.client("inspector2")
 
 def run_mvn_command(repo_dir: str, command: list) -> str:
     try:
@@ -48,12 +50,23 @@ def load_app_definition(app_name: str) -> AppDefinition:
         data = json.load(f)
     return AppDefinition(**data)
 
+def get_cached_snapshot(app_name: str, env: str) -> Dict[str, Any]:
+    return SNAPSHOT_CACHE.get(f"{app_name}#{env}", {})
+
+def update_cached_snapshot(app_name: str, env: str, snapshot: Dict[str, Any]):
+    SNAPSHOT_CACHE[f"{app_name}#{env}"] = snapshot
+
+def should_fetch_section(section_path: str, config: Dict[str, bool], last_updated: Dict[str, str], current_time: str) -> bool:
+    if not config.get(section_path, False):
+        return False
+    last_updated_time = last_updated.get(section_path, "1970-01-01T00:00:00Z")
+    last_updated_dt = datetime.strptime(last_updated_time, "%Y-%m-%dT%H:%M:%SZ")
+    current_dt = datetime.strptime(current_time, "%Y-%m-%dT%H:%M:%SZ")
+    # Fetch if data is older than 5 minutes
+    return (current_dt - last_updated_dt).total_seconds() > 300
+
 def clone_codecommit_repo(repo_name: str, region: str) -> str:
-    repo_data = run_aws_cli_command([
-        "codecommit", "get-repository",
-        "--repository-name", repo_name,
-        "--region", region
-    ])
+    repo_data = codecommit_client.get_repository(repositoryName=repo_name)
     clone_url = repo_data.get("repositoryMetadata", {}).get("cloneUrlHttp")
     if not clone_url:
         raise Exception(f"Clone URL not found for repository {repo_name}")
@@ -71,12 +84,9 @@ def clone_codecommit_repo(repo_name: str, region: str) -> str:
         shutil.rmtree(temp_dir)
         raise Exception(f"Failed to clone repository {repo_name}: {e.stderr}")
 
-def parse_dependency_tree(mvn_tree_output: str) -> List[Dependency]:
-    """
-    Parse the output of 'mvn dependency:tree' into a nested dependency structure.
-    """
+def parse_dependency_tree(mvn_tree_output: str) -> List[Dict[str, Any]]:
     dependencies = []
-    stack = []  # Stack to keep track of parent dependencies
+    stack = []
     lines = mvn_tree_output.splitlines()
 
     for line in lines:
@@ -84,48 +94,36 @@ def parse_dependency_tree(mvn_tree_output: str) -> List[Dependency]:
         if not line or line.startswith("[INFO]") or line.startswith("---"):
             continue
 
-        # Determine the level of nesting by counting leading symbols (e.g., |, +-, \-, etc.)
         level = 0
         for char in line:
             if char in "|\\+- ":
                 level += 1
             else:
                 break
-        level = level // 4  # Approximate level based on indentation
+        level = level // 4
 
-        # Extract dependency info (format: groupId:artifactId:packaging:version:scope)
         dep_info = line[level * 4:].strip()
         if not dep_info:
             continue
 
         parts = dep_info.split(":")
         if len(parts) < 5:
-            continue  # Skip malformed lines
+            continue
 
         group_id, artifact_id, _, version, scope = parts[:5]
-        dep = Dependency(
-            group_id=group_id,
-            artifact_id=artifact_id,
-            version=version,
-            scope=scope,
-            children=[]
-        )
+        dep = {"group_id": group_id, "artifact_id": artifact_id, "version": version, "scope": scope, "children": []}
 
-        # Adjust the stack based on the level
         while len(stack) > level:
             stack.pop()
         if level > 0:
-            stack[-1].children.append(dep)
+            stack[-1]["children"].append(dep)
         else:
             dependencies.append(dep)
         stack.append(dep)
 
     return dependencies
 
-def analyze_app_server(app_name: str, env: str, app_profile: str, repo_name: str, region: str) -> AppServer:
-    """
-    Analyze the app server type, version, Java version, and dependency tree.
-    """
+def analyze_app_server(app_name: str, env: str, app_profile: str, repo_name: str, region: str) -> Dict[str, Any]:
     repo_dir = clone_codecommit_repo(repo_name, region)
     try:
         server_type = "unknown"
@@ -134,13 +132,10 @@ def analyze_app_server(app_name: str, env: str, app_profile: str, repo_name: str
         dependencies = []
 
         if app_profile.startswith("java-"):
-            # Determine app server type from app_profile
-            server_type = app_profile.split("-")[1]  # "tomcat" or "jboss"
+            server_type = app_profile.split("-")[1]
 
-            # Look for pom.xml to get server version and dependencies
             pom_path = os.path.join(repo_dir, "pom.xml")
             if os.path.exists(pom_path):
-                # Parse pom.xml for server version
                 tree = ET.parse(pom_path)
                 root = tree.getroot()
                 ns = {"ns": "http://maven.apache.org/POM/4.0.0"}
@@ -155,23 +150,21 @@ def analyze_app_server(app_name: str, env: str, app_profile: str, repo_name: str
                     elif server_type == "jboss" and "jboss" in artifact_id.lower():
                         server_version = version
 
-                # Get Java version (from maven.compiler.source or runtime)
                 java_version_elem = root.find(".//ns:maven.compiler.source", ns) or root.find(".//ns:java.version", ns)
                 java_version = java_version_elem.text if java_version_elem is not None else "unknown"
 
-                # Run 'mvn dependency:tree' to get dependency tree
                 try:
                     mvn_tree_output = run_mvn_command(repo_dir, ["dependency:tree", "-DoutputType=text"])
                     dependencies = parse_dependency_tree(mvn_tree_output)
                 except Exception as e:
                     print(f"Failed to get dependency tree: {str(e)}")
 
-        return AppServer(
-            type=server_type,
-            version=server_version,
-            java_version=java_version,
-            dependencies=dependencies
-        )
+        return {
+            "server_type": server_type,
+            "server_version": server_version,
+            "java_version": java_version,
+            "dependencies": dependencies
+        }
     finally:
         shutil.rmtree(repo_dir)
 
@@ -181,13 +174,13 @@ def fetch_jira_tickets(app_name: str) -> Dict[str, Any]:
         "tickets": {
             "open": 5,
             "latest": [
-                JiraTicket(
-                    id="JIRA-123",
-                    title="Fix login bug",
-                    description="Users can’t log in",
-                    status="open",
-                    created="2025-05-18T08:00:00Z"
-                )
+                {
+                    "id": "JIRA-123",
+                    "title": "Fix login bug",
+                    "description": "Users can’t log in",
+                    "status": "open",
+                    "created": "2025-05-18T08:00:00Z"
+                }
             ]
         }
     }
@@ -197,36 +190,33 @@ def fetch_servicenow_tickets(app_name: str) -> Dict[str, Any]:
         "open": 3,
         "overdue": 1,
         "tickets": [
-            ServiceNowTicket(
-                id="INC001",
-                title="Server down",
-                description="Prod server offline",
-                created="2025-05-17T14:00:00Z",
-                impact="high",
-                approvers=["user1@myapp.com"]
-            )
+            {
+                "id": "INC001",
+                "title": "Server down",
+                "description": "Prod server offline",
+                "created": "2025-05-17T14:00:00Z",
+                "impact": "high",
+                "approvers": ["user1@myapp.com"]
+            }
         ]
     }
 
 def fetch_security_vulnerabilities(app_name: str, region: str) -> Dict[str, Any]:
-    inspector_data = run_aws_cli_command([
-        "inspector2", "list-findings",
-        "--filter-criteria", json.dumps({
+    findings = inspector_client.list_findings(
+        filterCriteria={
             "resourceType": [{"comparison": "EQUALS", "value": "AWS_ECS_SERVICE"}],
             "resourceId": [{"comparison": "EQUALS", "value": f"{app_name}-prod-service"}]
-        }),
-        "--region", region
-    ])
-    findings = inspector_data.get("findings", [])
+        }
+    ).get("findings", [])
     open_vulns = len(findings)
     critical_vulns = sum(1 for f in findings if f.get("severity") == "CRITICAL")
     latest_vulns = [
-        Vulnerability(
-            id=f.get("id", "CVE-UNKNOWN"),
-            severity=f.get("severity", "unknown"),
-            description=f.get("title", "No description"),
-            reported=f.get("firstObservedAt", "2025-05-05T12:00:00Z")
-        )
+        {
+            "id": f.get("id", "CVE-UNKNOWN"),
+            "severity": f.get("severity", "unknown"),
+            "description": f.get("title", "No description"),
+            "reported": f.get("firstObservedAt", "2025-05-05T12:00:00Z")
+        }
         for f in findings[:3]
     ]
     return {
@@ -235,8 +225,20 @@ def fetch_security_vulnerabilities(app_name: str, region: str) -> Dict[str, Any]
         "latest": latest_vulns
     }
 
-def crawl_app_infrastructure(app_name: str, env: str) -> AppSnapshot:
-    # Step 1: Load app definition
+def crawl_app_infrastructure(app_name: str, env: str, config: Dict[str, bool]) -> AppSnapshot:
+    """
+    Publicly visible function to crawl app infrastructure data with event-driven updates.
+    Uses boto3 SDK instead of AWS CLI, stores snapshots in memory.
+    
+    Args:
+        app_name (str): Name of the app.
+        env (str): Environment (e.g., "prod").
+        config (Dict[str, bool]): Configuration specifying which subsections to fetch.
+            Example: {"source": true, "aws_infrastructure.ecs": true, "logs.app": true}
+    
+    Returns:
+        AppSnapshot: The updated app snapshot.
+    """
     app_def = load_app_definition(app_name)
     environment = app_def.environments.get(env)
     if not environment:
@@ -245,385 +247,255 @@ def crawl_app_infrastructure(app_name: str, env: str) -> AppSnapshot:
     pipeline_name = environment.deploy_pipeline
     region = environment.region
     app_profile = app_def.app_profile
+    repo_name = app_def.codecommit_repo.repo_name
+    repo_region = app_def.codecommit_repo.region
+    current_time = "2025-05-19T01:29:00Z"  # Current time: 01:29 AM PDT on May 19, 2025
 
-    # Step 2: Initialize snapshot
-    current_time = "2025-05-18T21:57:00Z"  # Using provided time: 09:57 PM PDT on May 18, 2025
-    snapshot_data = {
-        "app_snapshot": AppSnapshotMetadata(
-            id=f"app-snap-{current_time.replace(':', '').replace('-', '')}",
-            timestamp=current_time
-        ),
-        "app": App(
-            name=app_name,
-            environment=env,
-            app_profile=app_profile,
-            status="unknown",
-            health="unknown",
-            version=Version(number="unknown", timestamp=current_time)
-        ),
-        "app_server": None,
-        "aws_infrastructure": {},
-        "aws": AWSAccount(
-            account_id="unknown",
-            region=region
-        ),
-        "source": Source(
-            git_origin=f"https://codecommit.{region}.amazonaws.com/v1/repos/{app_def.codecommit_repo.repo_name}",
-            latest_commits=[]
-        ),
-        "certificate": None,
-        "cost": Cost(currency="USD", current_monthly_total=0.0),
-        "jira": None,
-        "servicenow": None,
-        "logs": Logs(app=AppLogs(cloudwatch_url="", recent=[], errors=0)),
-        "metrics": Metrics(
-            uptime=Uptime(percentage=0.0, last_downtime=""),
-            resource_usage=ResourceUsage(cpu_percent=0.0, memory_mb=0.0, disk_gb=0.0)
-        ),
-        "security": Security(vulnerabilities=Vulnerabilities(open=0, critical=0, latest=[]))
+    # Load cached snapshot from memory
+    cached_snapshot = get_cached_snapshot(app_name, env)
+    last_updated = cached_snapshot.get("app_snapshot", {}).get("last_updated", {
+        "source": "1970-01-01T00:00:00Z",
+        "aws": "1970-01-01T00:00:00Z",
+        "logs": "1970-01-01T00:00:00Z",
+        "jira": "1970-01-01T00:00:00Z",
+        "servicenow": "1970-01-01T00:00:00Z",
+        "security": "1970-01-01T00:00:00Z"
+    })
+
+    # Initialize raw data for transformation
+    raw_data = {
+        "app_server_data": {},
+        "codepipeline_execution": {},
+        "ecs_service": {},
+        "ecs_tasks": [],
+        "alb_data": {},
+        "alb_metrics": {},
+        "cert_data": {},
+        "rds_data": {},
+        "codecommit_commit": {},
+        "logs_data": {"firewall_loadbalancer": {}, "sso": {}, "app": {}},
+        "latest_logs_data": {"firewall_loadbalancer": {}, "sso": {}, "app": {}},
+        "cpu_data": {},
+        "memory_data": {},
+        "cost_data": {},
+        "jira_data": {},
+        "servicenow_data": {},
+        "security_data": {},
+        "account_data": {},
+        "trusted_advisor_data": {},
+        "s3_data": {}
     }
 
-    # Step 3: Get AWS account ID
-    sts_data = run_aws_cli_command(["sts", "get-caller-identity"])
-    snapshot_data["aws"].account_id = sts_data.get("Account", "unknown")
+    # Fetch app server data if needed
+    if should_fetch_section("app_server", config, last_updated, current_time):
+        raw_data["app_server_data"] = analyze_app_server(app_name, env, app_profile, repo_name, repo_region)
+        last_updated["app_server"] = current_time
 
-    # Step 4: Query CodePipeline
-    pipeline_executions = run_aws_cli_command([
-        "codepipeline", "list-pipeline-executions",
-        "--pipeline-name", pipeline_name,
-        "--region", region
-    ])
-    executions = pipeline_executions.get("pipelineExecutionSummaries", [])
-    if not executions:
-        raise Exception(f"No executions found for pipeline {pipeline_name}")
+    # Fetch source data (CodeCommit)
+    if should_fetch_section("source", config, last_updated, current_time):
+        commits_data = codecommit_client.get_branch(
+            repositoryName=repo_name,
+            branchName="main"
+        )
+        commit_id = commits_data.get("branch", {}).get("commitId")
+        raw_data["codecommit_commit"] = codecommit_client.get_commit(
+            repositoryName=repo_name,
+            commitId=commit_id
+        ) if commit_id else {}
+        last_updated["source"] = current_time
 
-    latest_execution = next(
-        (execution for execution in executions if execution.get("status") == "Succeeded"),
-        None
-    )
-    if not latest_execution:
-        raise Exception(f"No successful executions found for pipeline {pipeline_name}")
+    # Fetch AWS infrastructure data
+    if should_fetch_section("aws_infrastructure", config, last_updated, current_time):
+        raw_data["account_data"] = sts_client.get_caller_identity()
+        last_updated["aws"] = current_time
 
-    execution_id = latest_execution["pipelineExecutionId"]
-    execution_timestamp = latest_execution.get("startTime", current_time)
-    snapshot_data["aws_infrastructure"]["codepipeline"] = CodePipelineStatus(
-        pipeline_name=pipeline_name,
-        execution_id=execution_id,
-        status=latest_execution["status"],
-        timestamp=execution_timestamp
-    )
+        # CodePipeline
+        if should_fetch_section("aws_infrastructure.codepipeline", config, last_updated, current_time):
+            pipeline_executions = codepipeline_client.list_pipeline_executions(
+                pipelineName=pipeline_name
+            )
+            latest_execution = next(
+                (execution for execution in pipeline_executions.get("pipelineExecutionSummaries", []) if execution.get("status") == "Succeeded"),
+                None
+            )
+            if latest_execution:
+                execution_id = latest_execution["pipelineExecutionId"]
+                raw_data["codepipeline_execution"] = codepipeline_client.get_pipeline_execution(
+                    pipelineName=pipeline_name,
+                    pipelineExecutionId=execution_id
+                )
 
-    # Step 5: Get pipeline state for ECS, ALB, and RDS
-    pipeline_state = run_aws_cli_command([
-        "codepipeline", "get-pipeline-state",
-        "--name", pipeline_name,
-        "--region", region
-    ])
-    stages = pipeline_state.get("stageStates", [])
+        # ECS
+        cluster_name = f"{app_name}-{env}-cluster"
+        service_name = f"{app_name}-{env}-service"
+        if should_fetch_section("aws_infrastructure.ecs", config, last_updated, current_time):
+            raw_data["ecs_service"] = ecs_client.describe_services(
+                cluster=cluster_name,
+                services=[service_name]
+            )
+            tasks_data = ecs_client.list_tasks(
+                cluster=cluster_name,
+                serviceName=service_name
+            )
+            task_arns = tasks_data.get("taskArns", [])
+            if task_arns:
+                raw_data["ecs_tasks"] = ecs_client.describe_tasks(
+                    cluster=cluster_name,
+                    tasks=task_arns
+                ).get("tasks", [])
 
-    cluster_name = f"{app_name}-{env}-cluster"
-    service_name = f"{app_name}-{env}-service"
-    alb_name = f"{app_name}-{env}-alb"
-    rds_identifier = f"{app_name}-{env}-db"
+            # CloudWatch metrics for ECS
+            end_time = datetime.utcnow()
+            start_time = end_time - timedelta(minutes=5)
+            raw_data["cpu_data"] = cloudwatch_client.get_metric_statistics(
+                Namespace="AWS/ECS",
+                MetricName="CPUUtilization",
+                Dimensions=[{"Name": "ServiceName", "Value": service_name}],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=60,
+                Statistics=["Average"]
+            )
+            raw_data["memory_data"] = cloudwatch_client.get_metric_statistics(
+                Namespace="AWS/ECS",
+                MetricName="MemoryUtilization",
+                Dimensions=[{"Name": "ServiceName", "Value": service_name}],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=60,
+                Statistics=["Average"]
+            )
 
-    for stage in stages:
-        for action in stage.get("actionStates", []):
-            if action.get("actionName") == "DeployToECS":
-                latest_execution = action.get("latestExecution", {})
-                if latest_execution.get("status") == "Succeeded":
-                    ecs_data = run_aws_cli_command([
-                        "ecs", "describe-services",
-                        "--cluster", cluster_name,
-                        "--services", service_name,
-                        "--region", region
-                    ])
-                    services = ecs_data.get("services", [])
-                    if services:
-                        task_definition = services[0].get("taskDefinition", "unknown")
-                        status = services[0].get("status", "unknown")
-                        running_count = services[0].get("runningCount", 0)
-                        desired_count = services[0].get("desiredCount", 0)
+        # ALB
+        alb_name = f"{app_name}-{env}-alb"
+        if should_fetch_section("aws_infrastructure.alb", config, last_updated, current_time):
+            raw_data["alb_data"] = elbv2_client.describe_load_balancers(Names=[alb_name])
+            alb_arn = raw_data["alb_data"].get("LoadBalancers", [{}])[0].get("LoadBalancerArn", "unknown")
+            raw_data["alb_metrics"] = cloudwatch_client.get_metric_statistics(
+                Namespace="AWS/ApplicationELB",
+                MetricName="ActiveConnectionCount",
+                Dimensions=[
+                    {
+                        "Name": "LoadBalancer",
+                        "Value": f"{alb_arn.split('/')[-3]}/{alb_arn.split('/')[-2]}/{alb_arn.split('/')[-1]}"
+                    }
+                ],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=60,
+                Statistics=["Sum"]
+            )
+            listener_data = elbv2_client.describe_listeners(LoadBalancerArn=alb_arn)
+            cert_arn = listener_data.get("Listeners", [{}])[0].get("Certificates", [{}])[0].get("CertificateArn", "unknown")
+            raw_data["cert_data"] = acm_client.describe_certificate(CertificateArn=cert_arn) if cert_arn else {}
 
-                        # Fetch running tasks for container details
-                        tasks_data = run_aws_cli_command([
-                            "ecs", "list-tasks",
-                            "--cluster", cluster_name,
-                            "--service-name", service_name,
-                            "--region", region
-                        ])
-                        task_arns = tasks_data.get("taskArns", [])
-                        containers = []
+        # RDS
+        rds_identifier = f"{app_name}-{env}-db"
+        if should_fetch_section("aws_infrastructure.rds", config, last_updated, current_time):
+            raw_data["rds_data"] = rds_client.describe_db_instances(DBInstanceIdentifier=rds_identifier)
 
-                        if task_arns:
-                            tasks_details = run_aws_cli_command([
-                                "ecs", "describe-tasks",
-                                "--cluster", cluster_name,
-                                "--tasks", *task_arns,
-                                "--region", region
-                            ])
-                            for task in tasks_details.get("tasks", []):
-                                for container in task.get("containers", []):
-                                    container_name = container.get("name", "unknown")
-                                    # Current sessions (simplified; assumes app server exposes session metrics)
-                                    # In a real scenario, you'd need to query app server metrics (e.g., JMX for Tomcat)
-                                    current_sessions = 15  # Placeholder
+        # Cost
+        if should_fetch_section("aws_infrastructure.cost", config, last_updated, current_time):
+            raw_data["cost_data"] = ce_client.get_cost_and_usage(
+                TimePeriod={"Start": "2025-05-01", "End": "2025-05-19"},
+                Granularity="MONTHLY",
+                Metrics=["UnblendedCost"],
+                GroupBy=[
+                    {"Type": "DIMENSION", "Key": "SERVICE"},
+                    {"Type": "TAG", "Key": f"AppName${app_name}"}
+                ]
+            )
 
-                                    # Container-level CPU and memory
-                                    cpu_data = run_aws_cli_command([
-                                        "cloudwatch", "get-metric-statistics",
-                                        "--namespace", "AWS/ECS",
-                                        "--metric-name", "CPUUtilization",
-                                        "--dimensions", f"Name=TaskId,Value={task['taskArn'].split('/')[-1]}",
-                                        "--start-time", str(int(time.time() - 300)),
-                                        "--end-time", str(int(time.time())),
-                                        "--period", "60",
-                                        "--statistics", "Average",
-                                        "--region", region
-                                    ])
-                                    cpu_datapoints = cpu_data.get("Datapoints", [])
-                                    cpu_percent = cpu_datapoints[-1].get("Average", 0) if cpu_datapoints else 0
+        # Trusted Advisor (simplified)
+        if should_fetch_section("aws_infrastructure.trusted_advisor", config, last_updated, current_time):
+            raw_data["trusted_advisor_data"] = {
+                "checks": [
+                    {
+                        "id": "check-001",
+                        "name": "High Utilization",
+                        "status": "warning",
+                        "description": "ECS service has high CPU usage"
+                    }
+                ]
+            }
 
-                                    memory_data = run_aws_cli_command([
-                                        "cloudwatch", "get-metric-statistics",
-                                        "--namespace", "AWS/ECS",
-                                        "--metric-name", "MemoryUtilization",
-                                        "--dimensions", f"Name=TaskId,Value={task['taskArn'].split('/')[-1]}",
-                                        "--start-time", str(int(time.time() - 300)),
-                                        "--end-time", str(int(time.time())),
-                                        "--period", "60",
-                                        "--statistics", "Average",
-                                        "--region", region
-                                    ])
-                                    memory_datapoints = memory_data.get("Datapoints", [])
-                                    memory_percent = memory_datapoints[-1].get("Average", 0) if memory_datapoints else 0
-                                    memory_mb = (memory_percent / 100) * 2048  # Assuming 2GB task memory limit
+        # S3
+        if should_fetch_section("aws_infrastructure.s3", config, last_updated, current_time):
+            buckets = s3_client.list_buckets()
+            s3_buckets = []
+            for bucket in buckets.get("Buckets", []):
+                if bucket["Name"].startswith(f"{app_name}-{env}"):
+                    s3_buckets.append({
+                        "name": bucket["Name"],
+                        "arn": f"arn:aws:s3:::{bucket['Name']}",
+                        "size_mb": 2048,  # Placeholder
+                        "last_modified": "2025-05-18T08:00:00Z"
+                    })
+            raw_data["s3_data"] = {"buckets": s3_buckets}
 
-                                    containers.append(Container(
-                                        container_name=container_name,
-                                        current_sessions=current_sessions,
-                                        cpu_percent=cpu_percent,
-                                        memory_mb=memory_mb,
-                                        status=container.get("lastStatus", "unknown")
-                                    ))
+    # Fetch logs (CloudWatch Logs)
+    if should_fetch_section("logs", config, last_updated, current_time):
+        log_sections = ["firewall_loadbalancer", "sso", "app"]
+        for section in log_sections:
+            if should_fetch_section(f"logs.{section}", config, last_updated, current_time):
+                log_group_name = f"/aws/{'alb' if section == 'firewall_loadbalancer' else 'fargate'}/{app_name}-{env}{'-sso' if section == 'sso' else ''}"
+                start_time = int((datetime.utcnow() - timedelta(hours=1)).timestamp() * 1000)
+                raw_data["logs_data"][section] = logs_client.filter_log_events(
+                    logGroupName=log_group_name,
+                    startTime=start_time,
+                    filterPattern="ERROR"
+                )
+                raw_data["latest_logs_data"][section] = logs_client.filter_log_events(
+                    logGroupName=log_group_name,
+                    startTime=start_time,
+                    limit=5
+                )
+        last_updated["logs"] = current_time
 
-                        snapshot_data["aws_infrastructure"]["ecs"] = FargateStatus(
-                            service_name=service_name,
-                            cluster_name=cluster_name,
-                            task_definition=task_definition,
-                            running_count=running_count,
-                            desired_count=desired_count,
-                            status=status,
-                            containers=containers
-                        )
-                        snapshot_data["app"].status = "up" if running_count == desired_count and status == "ACTIVE" else "down"
-                        snapshot_data["app"].health = "healthy" if running_count == desired_count else "degraded"
+    # Fetch Jira, ServiceNow, and Security
+    if should_fetch_section("jira", config, last_updated, current_time):
+        raw_data["jira_data"] = fetch_jira_tickets(app_name)
+        last_updated["jira"] = current_time
+    if should_fetch_section("servicenow", config, last_updated, current_time):
+        raw_data["servicenow_data"] = fetch_servicenow_tickets(app_name)
+        last_updated["servicenow"] = current_time
+    if should_fetch_section("security", config, last_updated, current_time):
+        raw_data["security_data"] = fetch_security_vulnerabilities(app_name, region)
+        last_updated["security"] = current_time
 
-                        # Update resource usage for metrics
-                        snapshot_data["metrics"].resource_usage.cpu_percent = cpu_percent
-                        snapshot_data["metrics"].resource_usage.memory_mb = memory_mb
-
-            if action.get("actionName") == "CreateOrUpdateALB":
-                latest_execution = action.get("latestExecution", {})
-                if latest_execution.get("status") == "Succeeded":
-                    alb_data = run_aws_cli_command([
-                        "elbv2", "describe-load-balancers",
-                        "--names", alb_name,
-                        "--region", region
-                    ])
-                    load_balancers = alb_data.get("LoadBalancers", [])
-                    if load_balancers:
-                        alb_arn = load_balancers[0].get("LoadBalancerArn")
-                        dns_name = load_balancers[0].get("DNSName", "unknown")
-                        alb_status = ALBStatus(
-                            alb_name=alb_name,
-                            alb_arn=alb_arn,
-                            state=load_balancers[0].get("State", {}).get("Code", "unknown"),
-                            active_connections=0,
-                            dns_name=dns_name
-                        )
-
-                        metric_data = run_aws_cli_command([
-                            "cloudwatch", "get-metric-statistics",
-                            "--namespace", "AWS/ApplicationELB",
-                            "--metric-name", "ActiveConnectionCount",
-                            "--dimensions", f"Name=LoadBalancer,Value={alb_arn.split('/')[-3]}/{alb_arn.split('/')[-2]}/{alb_arn.split('/')[-1]}",
-                            "--start-time", str(int(time.time() - 300)),
-                            "--end-time", str(int(time.time())),
-                            "--period", "60",
-                            "--statistics", "Sum",
-                            "--region", region
-                        ])
-                        datapoints = metric_data.get("Datapoints", [])
-                        alb_status.active_connections = int(datapoints[-1].get("Sum", 0)) if datapoints else 0
-                        snapshot_data["aws_infrastructure"]["alb"] = alb_status
-
-                        listener_data = run_aws_cli_command([
-                            "elbv2", "describe-listeners",
-                            "--load-balancer-arn", alb_arn,
-                            "--region", region
-                        ])
-                        listeners = listener_data.get("Listeners", [])
-                        if listeners:
-                            cert_arn = listeners[0].get("Certificates", [{}])[0].get("CertificateArn")
-                            if cert_arn:
-                                cert_data = run_aws_cli_command([
-                                    "acm", "describe-certificate",
-                                    "--certificate-arn", cert_arn,
-                                    "--region", region
-                                ])
-                                cert = cert_data.get("Certificate", {})
-                                snapshot_data["certificate"] = Certificate(
-                                    arn=cert_arn,
-                                    domain_name=cert.get("DomainName", "unknown"),
-                                    expires=cert.get("NotAfter", "unknown"),
-                                    status=cert.get("Status", "unknown")
-                                )
-
-            if action.get("actionName") == "CreateOrUpdateRDS":
-                latest_execution = action.get("latestExecution", {})
-                if latest_execution.get("status") == "Succeeded":
-                    rds_data = run_aws_cli_command([
-                        "rds", "describe-db-instances",
-                        "--db-instance-identifier", rds_identifier,
-                        "--region", region
-                    ])
-                    db_instances = rds_data.get("DBInstances", [])
-                    if db_instances:
-                        db_instance = db_instances[0]
-                        snapshot_data["aws_infrastructure"]["rds"] = RDSStatus(
-                            db_identifier=rds_identifier,
-                            db_arn=db_instance.get("DBInstanceArn", "unknown"),
-                            status=db_instance.get("DBInstanceStatus", "unknown"),
-                            db_type=db_instance.get("Engine", "unknown"),
-                            endpoint=db_instance.get("Endpoint", {}).get("Address", "unknown")
-                        )
-
-    # Step 6: Analyze app server details
-    snapshot_data["app_server"] = analyze_app_server(
+    # Transform and update snapshot
+    app_version = raw_data["app_server_data"].get("dependencies", [{}])[0].get("version", "unknown") if raw_data["app_server_data"].get("dependencies") else "unknown"
+    snapshot = transform_app_snapshot(
         app_name=app_name,
         env=env,
         app_profile=app_profile,
-        repo_name=app_def.codecommit_repo.repo_name,
-        region=app_def.codecommit_repo.region
-    )
-    if snapshot_data["app_server"].dependencies:
-        snapshot_data["app"].version.number = snapshot_data["app_server"].dependencies[0].version  # Simplified
-
-    # Step 7: Fetch source code details
-    repo_name = app_def.codecommit_repo.repo_name
-    repo_region = app_def.codecommit_repo.region
-    commits_data = run_aws_cli_command([
-        "codecommit", "get-branch",
-        "--repository-name", repo_name,
-        "--branch-name", "main",
-        "--region", repo_region
-    ])
-    commit_id = commits_data.get("branch", {}).get("commitId")
-    if commit_id:
-        commit_details = run_aws_cli_command([
-            "codecommit", "get-commit",
-            "--repository-name", repo_name,
-            "--commit-id", commit_id,
-            "--region", repo_region
-        ])
-        commit = commit_details.get("commit", {})
-        snapshot_data["source"].latest_commits = [
-            Commit(
-                id=commit_id,
-                message=commit.get("message", "unknown"),
-                timestamp=commit.get("author", {}).get("date", current_time),
-                branch="main"
-            )
-        ]
-
-    # Step 8: Fetch logs if ECS service is found
-    if "ecs" in snapshot_data["aws_infrastructure"]:
-        log_group_name = f"/aws/fargate/{app_name}-{env}"
-        log_data = run_aws_cli_command([
-            "logs", "filter-log-events",
-            "--log-group-name", log_group_name,
-            "--start-time", str(int((time.time() - 3600) * 1000)),
-            "--filter-pattern", "ERROR",
-            "--region", region
-        ])
-        errors = len(log_data.get("events", []))
-
-        latest_log_data = run_aws_cli_command([
-            "logs", "filter-log-events",
-            "--log-group-name", log_group_name,
-            "--start-time", str(int((time.time() - 3600) * 1000)),
-            "--limit", "5",
-            "--region", region
-        ])
-        recent_logs = [
-            LogEntry(
-                timestamp=datetime.fromtimestamp(event["timestamp"] / 1000).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                output=event["message"],
-                severity="info" if "error" not in event["message"].lower() else "error"
-            )
-            for event in latest_log_data.get("events", [])
-        ]
-        snapshot_data["logs"].app = AppLogs(
-            cloudwatch_url=f"https://console.aws.amazon.com/cloudwatch/home?region={region}#logsV2:log-groups/log-group/%252Faws%252Ffargate%252F{app_name}-{env}",
-            recent=recent_logs,
-            errors=errors
-        )
-
-    # Step 9: Fetch cost data
-    cost_data = run_aws_cli_command([
-        "ce", "get-cost-and-usage",
-        "--time-period", json.dumps({"Start": "2025-05-01", "End": "2025-05-18"}),
-        "--granularity", "MONTHLY",
-        "--metrics", "UnblendedCost",
-        "--group-by", json.dumps([
-            {"Type": "DIMENSION", "Key": "SERVICE"},
-            {"Type": "TAG", "Key": f"AppName${app_name}"}
-        ]),
-        "--region", region
-    ])
-    cost_groups = cost_data.get("ResultsByTime", [{}])[0].get("Groups", [])
-    total_cost = sum(float(group["Metrics"]["UnblendedCost"]["Amount"]) for group in cost_groups)
-    snapshot_data["cost"].current_monthly_total = total_cost
-
-    # Step 10: Fetch Jira and ServiceNow tickets
-    snapshot_data["jira"] = Jira(**fetch_jira_tickets(app_name))
-    snapshot_data["servicenow"] = ServiceNow(**fetch_servicenow_tickets(app_name))
-
-    # Step 11: Fetch security vulnerabilities
-    snapshot_data["security"].vulnerabilities = Vulnerabilities(**fetch_security_vulnerabilities(app_name, region))
-
-    # Step 12: Finalize aws_infrastructure
-    if "ecs" not in snapshot_data["aws_infrastructure"]:
-        snapshot_data["aws_infrastructure"]["ecs"] = FargateStatus(
-            service_name=service_name,
-            cluster_name=cluster_name,
-            task_definition="unknown",
-            running_count=0,
-            desired_count=0,
-            status="unknown",
-            containers=[]
-        )
-    if "alb" not in snapshot_data["aws_infrastructure"]:
-        snapshot_data["aws_infrastructure"]["alb"] = ALBStatus(
-            alb_name=alb_name,
-            alb_arn="unknown",
-            state="unknown",
-            active_connections=0,
-            dns_name="unknown"
-        )
-    if "rds" not in snapshot_data["aws_infrastructure"]:
-        snapshot_data["aws_infrastructure"]["rds"] = RDSStatus(
-            db_identifier=rds_identifier,
-            db_arn="unknown",
-            status="unknown",
-            db_type="unknown",
-            endpoint="unknown"
-        )
-
-    # Step 13: Update metrics uptime
-    snapshot_data["metrics"].uptime = Uptime(
-        percentage=99.95,
-        last_downtime="2025-05-01T03:00:00Z" if snapshot_data["app"].status != "up" else ""
+        snapshot_time=current_time,
+        app_version=app_version,
+        last_updated=last_updated,
+        app_server_data=raw_data["app_server_data"],
+        codepipeline_execution=raw_data["codepipeline_execution"],
+        ecs_service=raw_data["ecs_service"],
+        ecs_tasks=raw_data["ecs_tasks"],
+        alb_data=raw_data["alb_data"],
+        alb_metrics=raw_data["alb_metrics"],
+        cert_data=raw_data["cert_data"],
+        rds_data=raw_data["rds_data"],
+        codecommit_commit=raw_data["codecommit_commit"],
+        logs_data=raw_data["logs_data"],
+        latest_logs_data=raw_data["latest_logs_data"],
+        cpu_data=raw_data["cpu_data"],
+        memory_data=raw_data["memory_data"],
+        cost_data=raw_data["cost_data"],
+        jira_data=raw_data["jira_data"],
+        servicenow_data=raw_data["servicenow_data"],
+        security_data=raw_data["security_data"],
+        account_data=raw_data["account_data"],
+        trusted_advisor_data=raw_data["trusted_advisor_data"],
+        s3_data=raw_data["s3_data"],
+        repo_name=repo_name,
+        repo_region=repo_region
     )
 
-    return AppSnapshot(**snapshot_data)
+    # Update cached snapshot in memory
+    update_cached_snapshot(app_name, env, snapshot.dict())
+    return snapshot

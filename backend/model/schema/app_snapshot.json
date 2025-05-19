@@ -1,39 +1,68 @@
 {
   "app_snapshot": {
-    "id": "app-snap-20250518",
-    "timestamp": "2025-05-18T21:48:00Z"
+    "snapshot_id": "app-snap-20250519003700",
+    "timestamp": "2025-05-19T00:37:00Z",
+    "last_updated": {
+      "source": "2025-05-19T00:37:00Z",
+      "aws": "2025-05-19T00:37:00Z",
+      "logs": "2025-05-19T00:37:00Z",
+      "jira": "2025-05-19T00:37:00Z",
+      "servicenow": "2025-05-19T00:37:00Z",
+      "security": "2025-05-19T00:37:00Z"
+    }
   },
-  "app": {
-    "name": "{app_name}",
-    "env": "{env}",
-    "app_profile": "",
-    "deploy_profile": "",
-    "status": "up|down|unknown",
-    "health": "healthy|unhealthy|unchecked",
+  "app_definition": {
+    "app_name": "myapp",
+    "environment": "prod",
+    "app_profile": "java-tomcat",
+    "deploy_profile": "cicd-fargate-alb-rds",
+    "status": "up",
+    "health": "healthy",
     "version": {
       "number": "1.2.3",
       "timestamp": "2025-05-18T10:00:00Z"
     }
   },
-  "app_server": {
-    "type": "tomcat|jboss|unknown",
-    "version": "9.0.50"
+  "source": {
+    "project_name": "myapp-repo",
+    "branch_name": "main",
+    "git_origin_url": "https://codecommit.us-west-2.amazonaws.com/v1/repos/myapp-repo",
+    "latest_commits": [
+      {
+        "commit_id": "abc123",
+        "message": "Fix bug",
+        "timestamp": "2025-05-18T09:00:00Z",
+        "branch": "main"
+      }
+    ]
   },
-  "aws": {
-    "account_name": "",
-    "region": "us-west-2",
-    "source": {
-      "project_name": "",
-      "branch_name": "",
-      "git_origin_url": "https://codecommit.us-west-2.amazonaws.com/v1/repos/myapp-repo",
-      "latest_commits": [
-        {
-          "id": "abc123",
-          "message": "Fix bug",
-          "timestamp": "2025-05-18T09:00:00Z",
-          "branch": "main"
-        }
-      ]
+  "app_server": {
+    "server_type": "tomcat",
+    "server_version": "9.0.50",
+    "java_version": "11.0.12",
+    "dependencies": [
+      {
+        "group_id": "org.springframework.boot",
+        "artifact_id": "spring-boot-starter-web",
+        "version": "2.7.0",
+        "scope": "compile",
+        "children": [
+          {
+            "group_id": "org.springframework",
+            "artifact_id": "spring-web",
+            "version": "5.3.9",
+            "scope": "compile",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "aws_infrastructure": {
+    "account": {
+      "account_id": "123456789012",
+      "account_name": "myapp-account",
+      "region": "us-west-2"
     },
     "codepipeline": {
       "pipeline_name": "myapp-prod-pipeline",
@@ -51,14 +80,16 @@
       "containers": [
         {
           "container_name": "myapp-container",
+          "current_sessions": 15,
           "cpu_percent": 45.5,
           "memory_mb": 1024,
           "status": "RUNNING"
         },
         {
-          "container_name": "myapp-container-sso",
-          "cpu_percent": 45.5,
-          "memory_mb": 1024,
+          "container_name": "sso-container",
+          "current_sessions": 10,
+          "cpu_percent": 30.2,
+          "memory_mb": 512,
           "status": "RUNNING"
         }
       ]
@@ -69,30 +100,94 @@
       "state": "active",
       "active_connections": 10,
       "dns_name": "myapp-prod-alb-1234567890.us-west-2.elb.amazonaws.com",
-      "tags": ""
+      "certificate": {
+        "domain_name": "myapp.com",
+        "expires": "2026-05-18T12:00:00Z",
+        "status": "ISSUED",
+        "aws": {
+          "arn": "arn:aws:acm:us-west-2:123456789012:certificate/abcdef123456",
+          "tags": [
+            {
+              "key": "Environment",
+              "value": "prod"
+            }
+          ]
+        }
+      }
     },
     "rds": {
       "db_identifier": "myapp-prod-db",
       "db_arn": "arn:aws:rds:us-west-2:123456789012:db:myapp-prod-db",
       "status": "available",
       "db_type": "PostgreSQL",
+      "db_version": "13.7",
       "endpoint": "myapp-prod-db.abcdef123456.us-west-2.rds.amazonaws.com",
-      "tags": ""
+      "tags": [
+        {
+          "key": "Environment",
+          "value": "prod"
+        }
+      ]
+    },
+    "cost": {
+      "currency": "USD",
+      "current_monthly_total": 150.75
+    },
+    "trusted_advisor": {
+      "checks": [
+        {
+          "id": "check-001",
+          "name": "High Utilization",
+          "status": "warning",
+          "description": "ECS service has high CPU usage"
+        }
+      ]
+    },
+    "s3": {
+      "buckets": [
+        {
+          "name": "myapp-prod-bucket",
+          "arn": "arn:aws:s3:::myapp-prod-bucket",
+          "size_mb": 2048,
+          "last_modified": "2025-05-18T08:00:00Z"
+        }
+      ]
     }
   },
-  "certificate": {
-    "arn": "arn:aws:acm:us-west-2:123456789012:certificate/abcdef123456",
-    "domain_name": "myapp.com",
-    "expires": "2026-05-18T12:00:00Z",
-    "status": "ISSUED",
-    "tags": ""
-  },
-  "cost": {
-    "currency": "USD",
-    "current_monthly_total": 150.75
-  },
-  "trusted_advisor": {
-
+  "logs": {
+    "firewall_loadbalancer": {
+      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Falb%252Fmyapp-prod",
+      "recent": [
+        {
+          "timestamp": "2025-05-19T00:30:00Z",
+          "output": "GET /api 200 OK",
+          "severity": "info"
+        }
+      ],
+      "error_count": 1
+    },
+    "sso": {
+      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Ffargate%252Fmyapp-prod-sso",
+      "recent": [
+        {
+          "timestamp": "2025-05-19T00:30:00Z",
+          "output": "SSO login successful",
+          "severity": "info"
+        }
+      ],
+      "error_count": 0
+    },
+    "app": {
+      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Ffargate%252Fmyapp-prod",
+      "recent": [
+        {
+          "timestamp": "2025-05-19T00:30:00Z",
+          "output": "Error: Database connection failed",
+          "severity": "error"
+        }
+      ],
+      "error_count": 3
+    }
   },
   "jira": {
     "url": "https://myapp.atlassian.net",
@@ -124,30 +219,6 @@
         ]
       }
     ]
-  },
-  "logs": {
-    "app": {
-      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Ffargate%252Fmyapp-prod",
-      "recent": [
-        {
-          "timestamp": "2025-05-18T21:40:00Z",
-          "output": "Error: Database connection failed",
-          "severity": "error"
-        }
-      ],
-      "errors": 3
-    }
-  },
-  "metrics": {
-    "uptime": {
-      "percentage": 99.95,
-      "last_downtime": "2025-05-01T03:00:00Z"
-    },
-    "resource_usage": {
-      "cpu_percent": 65.5,
-      "memory_mb": 2048,
-      "disk_gb": 15.3
-    }
   },
   "security": {
     "vulnerabilities": {
