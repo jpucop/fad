@@ -1,0 +1,80 @@
+{
+  "name": "wage",
+  "short_name": "wage",
+  "long_name": "Wage Application",
+  "description": "Financial application for wage",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "wage",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "WAGE"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}

@@ -1,6 +1,11 @@
 {
   "apps": [
-    "csg, rems, ayso, wage, itf, ise"
+    "csg", 
+    "rems", 
+    "ayso", 
+    "wage", 
+    "itf", 
+    "ise"
   ],
   "defaults": {
     "app": {

@@ -1,115 +1,182 @@
+#!/usr/bin/env python3
+
 import json
 import os
-from pathlib import Path
+from copy import deepcopy
 
-def load_json(file_path):
-  with open(file_path, 'r') as f:
-    return json.load(f)
+# Define paths relative to the script's location (ucop-finapps/gen/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCHEMA_DIR = os.path.join(BASE_DIR, "../../schema")
+UCOP_DIR = os.path.join(BASE_DIR, "..")
+APPS_JSON = os.path.join(BASE_DIR, "apps.json")
+APP_SCHEMA = os.path.join(SCHEMA_DIR, "app.json")
+ENV_SCHEMA = os.path.join(SCHEMA_DIR, "environment.json")
+GROUP_JSON = os.path.join(UCOP_DIR, "group_finapps.json")
+OUTPUT_DIR = UCOP_DIR  # Write files to ucop-finapps/
 
-def save_json(data, file_path):
-  with open(file_path, 'w') as f:
-    json.dump(data, f, indent=2)
+def load_json_file(filepath):
+  """Load a JSON file and return its contents."""
+  try:
+    with open(filepath, 'r') as f:
+      return json.load(f)
+  except FileNotFoundError:
+    print(f"Error: File {filepath} not found.")
+    raise
+  except json.JSONDecodeError:
+    print(f"Error: Invalid JSON in {filepath}.")
+    raise
 
-def generate_app_json(app_name, org_group_data, app_schema, output_dir):
-  # Base app.json structure from schema
-  app_data = app_schema.copy()
+def parse_delimited_values(value):
+  """Parse [|]-delimited values from schema (e.g., [dev|qa|prod]) into a list."""
+  if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+    return value[1:-1].split('|')
+  return [value] if value else []
+
+def generate_environments(env_schema, app_defaults, app_name):
+  """Generate environment objects based on environment.json schema and app defaults."""
+  env_instances = []
+  env_values = parse_delimited_values(env_schema.get("env", ""))
+  name_values = parse_delimited_values(env_schema.get("name", ""))
+
+  # Ensure env and name lists align (use env length, pad name if needed)
+  if len(name_values) < len(env_values):
+    name_values.extend([f"{env}-env" for env in env_values[len(name_values):]])
+
+  for env, name in zip(env_values, name_values):
+    env_config = deepcopy(env_schema)
+    # Replace schema defaults with actual values
+    for key, value in env_config.items():
+      if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+        # Handle | delimited values (already processed for env/name)
+        env_config[key] = env if key == "env" else name if key == "name" else value
+      elif value:  # Use schema default if non-empty
+        env_config[key] = value
+      else:  # Empty schema default, check app defaults
+        env_config[key] = ""
+
+    # Apply app defaults for environment fields
+    for default_env in app_defaults.get("environment", []):
+      for key, value in default_env.items():
+        if key in env_config and value:
+          env_config[key] = value.replace("{env}", env)
+
+    # Set AWS account based on env (prod -> finapps-prod, others -> finapps-dev)
+    env_config["aws"]["account_name"] = "finapps-prod" if env == "prod" else "finapps-dev"
+
+    # Set deploy pipeline name
+    env_config["deploy_pipeline_name"] = f"{app_name}-{env}-pipeline"
+
+    env_instances.append(env_config)
+  return env_instances
+
+def generate_app_json(app_name, defaults, app_schema, env_schema, group_data):
+  """Generate a single app_{name}.json file based on schema and defaults."""
+  app_config = deepcopy(app_schema)
+
+  # Apply defaults from apps.json
+  app_defaults = defaults.get("app", {})
+  for key, value in app_defaults.items():
+    if key in app_config and key not in ["source", "environment"]:
+      app_config[key] = value.replace("{name}", app_name) if isinstance(value, str) else value
+    elif key == "source":
+      for src_key, src_value in value.items():
+        if src_key == "aws":
+          app_config["source"]["aws"]["account_name"] = src_value["account_name"]
+        else:
+          app_config["source"][src_key] = src_value.replace("{app.name}", app_name) if isinstance(src_value, str) else src_value
+
+  # Set basic fields with schema defaults or app defaults
+  app_config["name"] = app_name
+  app_config["short_name"] = app_config.get("short_name") or app_name
+  app_config["long_name"] = app_config.get("long_name") or f"{app_name.capitalize()} Application"
+  app_config["description"] = app_config.get("description") or f"Financial application for {app_name}"
+
+  # Generate environments
+  app_config["environments"] = generate_environments(env_schema, app_defaults, app_name)
+
+  # Handle links sections using group_web_url from group_finapps.json
+  # Only include links if explicitly defined in apps.json; otherwise, use group_web_url
+  app_defaults = defaults.get("app", {})
   
-  # Set basic app details
-  app_data['name'] = app_name
-  app_data['short_name'] = app_name.upper()
-  app_data['long_name'] = f"Financial Applications - {app_name.upper()}"
-  app_data['description'] = f"{app_name.upper()} application managed by Financial Applications group"
-  
-  # Set org and group
-  app_data['org'] = org_group_data['org']['name']
-  app_data['group'] = org_group_data['group']['name']
-  
-  # Default profiles (can be customized per app)
-  app_data['app_profile'] = 'tomcat-java'
-  app_data['deploy_profile'] = 'aws-cicd-fargate-rds'
-  
-  # Source configuration
-  app_data['source']['project_name'] = app_name
-  app_data['source']['git_origin_url'] = f"https://github.com/ucop/{app_name}.git"
-  app_data['source']['production_branch_name'] = 'main'
-  
-  # AWS account mapping
-  aws_accounts = org_group_data['group']['aws']['accounts']
-  app_data['source']['aws']['account_name'] = next(
-    acc['name'] for acc in aws_accounts if 'prod' in acc['name']
+  # Confluence
+  app_config["confluence"] = (
+    app_defaults.get("confluence", {"group_web_url": group_data.get("confluence", {}).get("web_url", "")})
+    if "confluence" in app_defaults
+    else {"group_web_url": group_data.get("confluence", {}).get("web_url", "")}
   )
-  
-  # ServiceNow assignment groups
-  assignment_groups = org_group_data['group']['service_now']['assignment_groups']
-  app_groups = [g['name'] for g in assignment_groups if app_name in g.get('apps', '').split(',') or g['apps'] == 'ALL']
-  app_data['service_now']['assignment_groups'] = app_groups
-  
-  # Environment configurations
-  environments = [
-    {
-      'env': 'dev',
-      'name': 'development',
-      'host': 'aws',
-      'app_profile': 'tomcat-java',
-      'deploy_profile': 'aws-cicd-fargate-rds',
-      'deploy_pipeline_name': f"{app_name}-dev-pipeline",
-      'git_branch': 'dev',
-      'aws': {'account_name': 'finapps-dev'}
-    },
-    {
-      'env': 'qa',
-      'name': 'staging',
-      'host': 'aws',
-      'app_profile': 'tomcat-java',
-      'deploy_profile': 'aws-cicd-fargate-rds',
-      'deploy_pipeline_name': f"{app_name}-qa-pipeline",
-      'git_branch': 'qa',
-      'aws': {'account_name': 'finapps-dev'}
-    },
-    {
-      'env': 'prod',
-      'name': 'production',
-      'host': 'aws',
-      'app_profile': 'tomcat-java',
-      'deploy_profile': 'aws-cicd-fargate-rds',
-      'deploy_pipeline_name': f"{app_name}-prod-pipeline",
-      'git_branch': 'main',
-      'aws': {'account_name': 'finapps-prod'}
+
+  # Box
+  app_config["box"] = (
+    app_defaults.get("box", {"group_web_url": group_data.get("box", {}).get("web_url", "")})
+    if "box" in app_defaults
+    else {"group_web_url": group_data.get("box", {}).get("web_url", "")}
+  )
+
+  # Jira
+  app_config["jira"] = (
+    app_defaults.get("jira", {
+      "project_keys": [app_name.upper()],
+      "group_web_url": group_data.get("jira", {}).get("web_url", "")
+    })
+    if "jira" in app_defaults
+    else {
+      "project_keys": [app_name.upper()],
+      "group_web_url": group_data.get("jira", {}).get("web_url", "")
     }
-  ]
-  app_data['environments'] = environments
-  
-  # Save the generated app.json
-  output_path = output_dir / f"{app_name}.json"
-  save_json(app_data, output_path)
-  print(f"Generated app.json for {app_name} at {output_path}")
+  )
+
+  # ServiceNow
+  app_config["service_now"] = (
+    app_defaults.get("service_now", {
+      "assignment_groups": [
+        group for group in group_data.get("service_now", {}).get("assignment_groups", [])
+        if group["apps"] == app_name or group["apps"] == "ALL" or app_name in group["apps"].split(",")
+      ],
+      "group_web_url": group_data.get("service_now", {}).get("web_url", "")
+    })
+    if "service_now" in app_defaults
+    else {
+      "assignment_groups": [
+        group for group in group_data.get("service_now", {}).get("assignment_groups", [])
+        if group["apps"] == app_name or group["apps"] == "ALL" or app_name in group["apps"].split(",")
+      ],
+      "group_web_url": group_data.get("service_now", {}).get("web_url", "")
+    }
+  )
+
+  # Datadog
+  app_config["datadog"] = (
+    app_defaults.get("datadog", {"group_web_url": group_data.get("data_dog", {}).get("web_url", "")})
+    if "datadog" in app_defaults
+    else {"group_web_url": group_data.get("data_dog", {}).get("web_url", "")}
+  )
+
+  return app_config
 
 def main():
-  # Paths
-  base_dir = Path(__file__).parent.parent
-  schema_dir = base_dir / 'schema'
-  org_group_file = base_dir / 'ucop-finapps' / 'org_group.json'
-  output_dir = base_dir / 'ucop-finapps' / 'apps'
-  
-  # Create output directory if it doesn't exist
-  output_dir.mkdir(exist_ok=True)
-  
-  # Load schema and org_group data
-  app_schema = load_json(schema_dir / 'app.json')
-  org_group_data = load_json(org_group_file)
-  
-  # Get list of apps from service_now assignment groups
-  assignment_groups = org_group_data['group']['service_now']['assignment_groups']
-  apps = set()
-  for group in assignment_groups:
-    if group['apps'] == 'ALL':
-      continue
-    apps.update(group.get('apps', '').split(','))
-  
-  # Generate app.json for each app
-  for app in apps:
-    if app:  # Skip empty app names
-      generate_app_json(app, org_group_data, app_schema, output_dir)
+  # Load input files
+  apps_data = load_json_file(APPS_JSON)
+  app_schema = load_json_file(APP_SCHEMA)
+  env_schema = load_json_file(ENV_SCHEMA)
+  group_data = load_json_file(GROUP_JSON)
 
-if __name__ == '__main__':
-  main()
+  # Get list of apps from apps.json, splitting the comma-separated string
+  app_names = []
+  for app_string in apps_data.get("apps", []):
+    app_names.extend([app.strip() for app in app_string.split(',')])
+  defaults = apps_data.get("defaults", {})
+
+  # Generate a JSON file for each app
+  for app_name in app_names:
+    app_config = generate_app_json(app_name, defaults, app_schema, env_schema, group_data)
+    output_file = os.path.join(OUTPUT_DIR, f"app_{app_name}.json")
+    with open(output_file, 'w') as f:
+      json.dump(app_config, f, indent=2)
+    print(f"Generated {output_file}")
+
+if __name__ == "__main__":
+  try:
+    main()
+  except Exception as e:
+    print(f"Error: {str(e)}")
+    exit(1)

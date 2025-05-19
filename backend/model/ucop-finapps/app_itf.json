@@ -1,0 +1,92 @@
+{
+  "name": "itf",
+  "short_name": "itf",
+  "long_name": "Itf Application",
+  "description": "Financial application for itf",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "itf",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "ITF"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "ITF Retrofit Team",
+        "apps": "itf"
+      },
+      {
+        "name": "FIS AWS Tech Support",
+        "apps": "ulo,itf"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "FIS Concur Support",
+        "apps": "itf,ulo"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
