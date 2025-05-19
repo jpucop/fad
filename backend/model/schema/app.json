@@ -15,6 +15,16 @@
       "account_name": ""
     }
   },
+  "db": {
+    "host": "aws",
+    "aws": {
+      "account_name": "",
+      "rds": {
+        "name": "",
+        "arn": ""
+      }
+    }
+  },
   "confluence": {
     "links": []
   },
