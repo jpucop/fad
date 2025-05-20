@@ -1,237 +1,134 @@
 {
-  "app_snapshot": {
-    "snapshot_id": "app-snap-20250519003700",
-    "timestamp": "2025-05-19T00:37:00Z",
-    "last_updated": {
-      "source": "2025-05-19T00:37:00Z",
-      "aws": "2025-05-19T00:37:00Z",
-      "logs": "2025-05-19T00:37:00Z",
-      "jira": "2025-05-19T00:37:00Z",
-      "servicenow": "2025-05-19T00:37:00Z",
-      "security": "2025-05-19T00:37:00Z"
-    }
-  },
-  "app_definition": {
-    "app_name": "myapp",
-    "environment": "prod",
-    "app_profile": "java-tomcat",
-    "deploy_profile": "cicd-fargate-alb-rds",
-    "status": "up",
-    "health": "healthy",
-    "version": {
-      "number": "1.2.3",
-      "timestamp": "2025-05-18T10:00:00Z"
-    }
+  "snapshot_id": "",
+  "timestamp": "",
+  "environment": "",
+  "last_updated": {
+    "source": "",
+    "aws": "",
+    "logs": ""
   },
   "source": {
-    "project_name": "myapp-repo",
-    "branch_name": "main",
-    "git_origin_url": "https://codecommit.us-west-2.amazonaws.com/v1/repos/myapp-repo",
-    "latest_commits": [
-      {
-        "commit_id": "abc123",
-        "message": "Fix bug",
-        "timestamp": "2025-05-18T09:00:00Z",
-        "branch": "main"
-      }
-    ]
+    "deployment_commit": {
+      "commit_id": "",
+      "message": "",
+      "timestamp": "",
+      "branch": ""
+    }
   },
-  "app_server": {
-    "server_type": "tomcat",
-    "server_version": "9.0.50",
-    "java_version": "11.0.12",
-    "dependencies": [
-      {
-        "group_id": "org.springframework.boot",
-        "artifact_id": "spring-boot-starter-web",
-        "version": "2.7.0",
-        "scope": "compile",
-        "children": [
+  "dbs": [
+    {
+      "aws": {
+        "db_type": "",
+        "db_version": "",
+        "endpoint": "",
+        "status": "",
+        "metrics": {
+          "active_connections": 0,
+          "read_iops": 0,
+          "write_iops": 0,
+          "last_backup": ""
+        }
+      }
+    }
+  ],
+  "infrastructure": {
+    "aws": {
+      "codepipeline": {
+        "execution_id": "",
+        "status": "",
+        "timestamp": ""
+      },
+      "ecs": {
+        "running_count": 0,
+        "desired_count": 0,
+        "status": "",
+        "containers": [
           {
-            "group_id": "org.springframework",
-            "artifact_id": "spring-web",
-            "version": "5.3.9",
-            "scope": "compile",
-            "children": []
+            "container_name": "",
+            "current_sessions": 0,
+            "cpu_percent": 0.0,
+            "memory_mb": 0,
+            "status": ""
+          }
+        ]
+      },
+      "alb": {
+        "state": "",
+        "active_connections": 0,
+        "dns_name": "",
+        "certificate": {
+          "expires": "",
+          "status": ""
+        }
+      },
+      "s3": {
+        "buckets": [
+          {
+            "size_mb": 0,
+            "last_modified": ""
+          }
+        ]
+      },
+      "trusted_advisor": {
+        "criticals": 3,
+        "warnings": 2,
+        "issues": [
+          {
+            "id": "",
+            "name": "",
+            "status": "",
+            "description": ""
           }
         ]
       }
-    ]
-  },
-  "aws_infrastructure": {
-    "account": {
-      "account_id": "123456789012",
-      "account_name": "myapp-account",
-      "region": "us-west-2"
-    },
-    "codepipeline": {
-      "pipeline_name": "myapp-prod-pipeline",
-      "execution_id": "1234-5678-9012",
-      "status": "Succeeded",
-      "timestamp": "2025-05-18T10:00:00Z"
-    },
-    "ecs": {
-      "service_name": "myapp-prod-service",
-      "cluster_name": "myapp-prod-cluster",
-      "task_definition": "myapp-prod-task:1",
-      "running_count": 2,
-      "desired_count": 2,
-      "status": "ACTIVE",
-      "containers": [
-        {
-          "container_name": "myapp-container",
-          "current_sessions": 15,
-          "cpu_percent": 45.5,
-          "memory_mb": 1024,
-          "status": "RUNNING"
-        },
-        {
-          "container_name": "sso-container",
-          "current_sessions": 10,
-          "cpu_percent": 30.2,
-          "memory_mb": 512,
-          "status": "RUNNING"
-        }
-      ]
-    },
-    "alb": {
-      "alb_name": "myapp-prod-alb",
-      "alb_arn": "arn:aws:elasticloadbalancing:us-west-2:123456789012:loadbalancer/app/myapp-prod-alb/abcdef123456",
-      "state": "active",
-      "active_connections": 10,
-      "dns_name": "myapp-prod-alb-1234567890.us-west-2.elb.amazonaws.com",
-      "certificate": {
-        "domain_name": "myapp.com",
-        "expires": "2026-05-18T12:00:00Z",
-        "status": "ISSUED",
-        "aws": {
-          "arn": "arn:aws:acm:us-west-2:123456789012:certificate/abcdef123456",
-          "tags": [
-            {
-              "key": "Environment",
-              "value": "prod"
-            }
-          ]
-        }
-      }
-    },
-    "rds": {
-      "db_identifier": "myapp-prod-db",
-      "db_arn": "arn:aws:rds:us-west-2:123456789012:db:myapp-prod-db",
-      "status": "available",
-      "db_type": "PostgreSQL",
-      "db_version": "13.7",
-      "endpoint": "myapp-prod-db.abcdef123456.us-west-2.rds.amazonaws.com",
-      "tags": [
-        {
-          "key": "Environment",
-          "value": "prod"
-        }
-      ]
-    },
-    "cost": {
-      "currency": "USD",
-      "current_monthly_total": 150.75
-    },
-    "trusted_advisor": {
-      "checks": [
-        {
-          "id": "check-001",
-          "name": "High Utilization",
-          "status": "warning",
-          "description": "ECS service has high CPU usage"
-        }
-      ]
-    },
-    "s3": {
-      "buckets": [
-        {
-          "name": "myapp-prod-bucket",
-          "arn": "arn:aws:s3:::myapp-prod-bucket",
-          "size_mb": 2048,
-          "last_modified": "2025-05-18T08:00:00Z"
-        }
-      ]
     }
   },
   "logs": {
-    "firewall_loadbalancer": {
-      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Falb%252Fmyapp-prod",
-      "recent": [
-        {
-          "timestamp": "2025-05-19T00:30:00Z",
-          "output": "GET /api 200 OK",
-          "severity": "info"
-        }
-      ],
-      "error_count": 1
-    },
-    "sso": {
-      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Ffargate%252Fmyapp-prod-sso",
-      "recent": [
-        {
-          "timestamp": "2025-05-19T00:30:00Z",
-          "output": "SSO login successful",
-          "severity": "info"
-        }
-      ],
-      "error_count": 0
-    },
     "app": {
-      "cloudwatch_url": "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/%252Faws%252Ffargate%252Fmyapp-prod",
       "recent": [
         {
-          "timestamp": "2025-05-19T00:30:00Z",
-          "output": "Error: Database connection failed",
-          "severity": "error"
+          "timestamp": "",
+          "output": "",
+          "severity": ""
         }
       ],
-      "error_count": 3
-    }
-  },
-  "jira": {
-    "url": "https://myapp.atlassian.net",
-    "tickets": {
-      "open": 5,
-      "latest": [
+      "errors": 0,
+      "warnings": 0
+    },
+    "alb": {
+      "recent": [
         {
-          "id": "JIRA-123",
-          "title": "Fix login bug",
-          "description": "Users can’t log in",
-          "status": "open",
-          "created": "2025-05-18T08:00:00Z"
+          "timestamp": "",
+          "output": "",
+          "severity": ""
         }
-      ]
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "rds": {
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
     }
   },
-  "servicenow": {
-    "open": 3,
-    "overdue": 1,
-    "tickets": [
+  "vulnerabilities": {
+    "open": 0,
+    "critical": 0,
+    "latest": [
       {
-        "id": "INC001",
-        "title": "Server down",
-        "description": "Prod server offline",
-        "created": "2025-05-17T14:00:00Z",
-        "impact": "high",
-        "approvers": [
-          "user1@myapp.com"
-        ]
+        "id": "",
+        "severity": "",
+        "description": "",
+        "reported": "",
+        "web_url_ref": ""
       }
     ]
-  },
-  "security": {
-    "vulnerabilities": {
-      "open": 3,
-      "critical": 1,
-      "latest": [
-        {
-          "id": "CVE-2025-1234",
-          "severity": "critical",
-          "description": "Buffer overflow in libX",
-          "reported": "2025-05-05T12:00:00Z"
-        }
-      ]
-    }
   }
 }

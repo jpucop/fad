@@ -12,19 +12,20 @@
     "git_origin_url": "",
     "production_branch_name": "main",
     "aws": {
-      "account_name": ""
+      "account_name": "",
+      "repo_arn": ""
     }
   },
-  "db": {
-    "host": "aws",
-    "aws": {
-      "account_name": "",
-      "rds": {
-        "name": "",
-        "arn": ""
+  "dbs": [
+    {
+      "name": "csg-dev",
+      "server_name": "",
+      "aws": {
+        "account_name": "",
+        "db_arn": ""
       }
     }
-  },
+  ],
   "confluence": {
     "links": []
   },
@@ -35,7 +36,7 @@
     "project_keys": [],
     "links": []
   },
-  "service_now": {  
+  "service_now": {
     "assignment_groups": [],
     "links": []
   },

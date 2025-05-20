@@ -193,7 +193,7 @@ def transform_app_snapshot(
             severity="info" if "error" not in event["message"].lower() else "error"
           ) for event in latest_logs_data.get("firewall_loadbalancer", {}).get("events", [])
         ],
-        error_count=len(logs_data.get("firewall_loadbalancer", {}).get("events", []))
+        errors=len(logs_data.get("firewall_loadbalancer", {}).get("events", []))
       ),
       sso=LogSection(
         cloudwatch_url=f"https://console.aws.amazon.com/cloudwatch/home?region={repo_region}#logsV2:log-groups/log-group/%252Faws%252Ffargate%252F{app_name}-{env}-sso",
@@ -204,7 +204,7 @@ def transform_app_snapshot(
             severity="info" if "error" not in event["message"].lower() else "error"
           ) for event in latest_logs_data.get("sso", {}).get("events", [])
         ],
-        error_count=len(logs_data.get("sso", {}).get("events", []))
+        errors=len(logs_data.get("sso", {}).get("events", []))
       ),
       app=LogSection(
         cloudwatch_url=f"https://console.aws.amazon.com/cloudwatch/home?region={repo_region}#logsV2:log-groups/log-group/%252Faws%252Ffargate%252F{app_name}-{env}",
@@ -215,7 +215,7 @@ def transform_app_snapshot(
             severity="info" if "error" not in event["message"].lower() else "error"
           ) for event in latest_logs_data.get("app", {}).get("events", [])
         ],
-        error_count=len(logs_data.get("app", {}).get("events", []))
+        errors=len(logs_data.get("app", {}).get("events", []))
       )
     ),
     jira=Jira(**jira_data),

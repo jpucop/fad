@@ -73,20 +73,20 @@ body {
 
 /* Watermark */
 .watermark {
+  fill: var(--color-uc-olive);
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50vw;
-  max-width: 600px;
+  width: 90vw;
   min-width: 200px;
-  opacity: 0.1;
+  max-width: 900px;
+  opacity: 0.04;
   z-index: -1;
   pointer-events: none;
 }
 
 .watermark .icon {
-  filter: grayscale(100%);
   width: 100%;
   height: auto;
   aspect-ratio: 1 / 1; /* Ensure the SVG maintains a square aspect ratio to prevent clipping */
@@ -97,9 +97,9 @@ body {
   background-color: theme('colors.white');
   border: 1px solid theme('colors.gray.300');
   border-radius: 0.5rem;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.4rem;
 }
 
 /* Header Content */
@@ -108,6 +108,7 @@ body {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  vertical-align: text-top;
 }
 
 @media (min-width: 640px) {
@@ -122,7 +123,7 @@ body {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* Reduced gap for tighter layout */
+  gap: 0.75rem;
 }
 
 /* UC Seal in Header */
@@ -143,35 +144,35 @@ body {
 
 /* Header Title */
 .header-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 0.8;
-  border-bottom: .3rem;
-  border-color: var(--color-uc-mid);
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.0;
+  border-bottom: 4px;
+  border-color: var(--color-uc-accent);
 }
 
 /* UCOP Logo in Header */
 .header-ucop-logo {
-  width: 10rem;
-  height: 6rem;
-  opacity: 0.4;
-  /* Removed filter: grayscale(100%) to restore color */
+  width: 12rem;
+  height: 4rem;
+  fill: var(--color-uc-dark);
+  opacity: 0.6;
 }
 
 /* Header Nav */
 .header-nav {
   background-color: theme('colors.white');
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 /* Header Nav Grid */
 .header-nav-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
-  font-size: 1.125rem;
-  color: var(--color-uc-dark);
+  gap: 0.7rem;
+  font-size: 0.8rem;
+  color: var(--color-uc-primary);
 }
 
 @media (min-width: 640px) {
@@ -241,7 +242,7 @@ body {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent;
+  border: 2px solid var(--color-uc-mid);
   border-bottom-color: theme('colors.gray.800');
   opacity: 0;
   visibility: hidden;
@@ -266,7 +267,7 @@ body {
 
 /* Main Content */
 .main-content {
-  padding: 1rem 1rem 1.5rem;
+  padding: 1rem 0 1rem 0;
   min-height: 100px;
   border-radius: 0.5rem;
   flex: 1;
@@ -277,7 +278,7 @@ body {
   font-size: 1rem;
   font-weight: 500;
   color: var(--color-uc-mid);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .app-grid {
@@ -305,6 +306,9 @@ body {
 }
 
 /* App Tiles */
+.app-tile {
+  border: 2px solie var(--color-uc-mid);
+}
 .app-tile .icon {
   color: var(--color-uc-primary);
   width: 0.875rem;
@@ -312,20 +316,20 @@ body {
 }
 
 .app-tile:hover {
-  border: 1px solid var(--color-uc-primary);
+  border: 1px solid var(--color-uc-accent);
 }
 
 /* Footer */
 .footer {
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
 .footer-content {
-  color: var(--color-uc-mid);
+  color: var(--color-uc-dark);
   opacity: 0.6;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.60rem;
   line-height: 1.5;
 }
 
