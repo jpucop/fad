@@ -1,55 +1,50 @@
 {
+  "description": "Defines AWS infrastructure for an application",
   "app_name": "",
   "environment": "",
-  "aws": {
-    "account_name": "",
-    "codepipeline": {
-      "name": "",
-      "arn": ""
-    },
-    "ecs": {
-      "cluster_name": "",
-      "service_name": "",
-      "task_definition": ""
-    },
-    "alb": {
-      "arn": "",
-      "name": "",
-      "dns_name": "",
-      "certificate_arn": ""
-    },
-    "rds": {
-      "instances": [
-        {
-          "arn": "",
-          "identifier": "",
-          "tags": [
-            ""
-          ]
-        }
-      ]
-    },
-    "s3": {
-      "buckets": [
-        {
-          "name": "",
-          "s3_url": "",
-          "arn": "",
-          "tags": [
-            ""
-          ]
-        }
-      ]
-    },
-    "cloudwatch": {
-      "log_groups": [
-        {
-          "name": "",
-          "type": "",
-          "arn": "",
-          "source_arn": "the source entity in aws generated the logs this log group captures."
-        }
-      ]
-    }
+  "aws_account_name": "",
+  "codepipeline": {
+    "name": "",
+    "arn": ""
+  },
+  "ecs": {
+    "cluster_name": "",
+    "service_name": "",
+    "task_definition": ""
+  },
+  "alb": {
+    "arn": "",
+    "name": "",
+    "dns_name": "",
+    "certificate_arn": ""
+  },
+  "rds": {
+    "instances": [
+      {
+        "arn": "",
+        "identifier": "",
+        "tags": [""]
+      }
+    ]
+  },
+  "s3": {
+    "buckets": [
+      {
+        "name": "",
+        "s3_url": "",
+        "arn": "",
+        "tags": [""]
+      }
+    ]
+  },
+  "cloudwatch": {
+    "log_groups": [
+      {
+        "name": "",
+        "type": "",
+        "arn": "",
+        "source_arn": ""
+      }
+    ]
   }
 }

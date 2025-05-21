@@ -1,13 +1,11 @@
-
 {
-  "env": "[dev|qa|prod]",
-  "name": "[development|staging|production]",
+  "description": "Defines an application deployment environment",
+  "env": "",
+  "name": "",
   "host": "aws",
   "app_profile": "",
   "deploy_profile": "",
   "deploy_pipeline_name": "",
-  "git_branch": "[dev|qa|main]",
-  "aws": {
-    "account_name": ""
-  }
+  "git_branch": "",
+  "aws_account_name": ""
 }

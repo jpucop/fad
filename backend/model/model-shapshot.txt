@@ -1,0 +1,1108 @@
+=== ./ucop/org_ucop.json ===
+{
+  "name": "ucop",
+  "full_name": "University of California Office of the President",
+  "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
+  "confluence": {
+    "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "web_url": "https://ucop.app.box.com"
+  },
+  "jira": {
+    "web_url": "https://ucopedu.atlassian.net/jira/"
+  },
+  "data_dog": {
+    "web_url": "https://dd.com/ucop/index.html"
+  },
+  "service_now": {
+    "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "aws": {
+    "accounts": [
+      {
+        "name": "shs-prod",
+        "account_id": "999",
+        "region": "us-west-2",
+        "description": "UCOP Infra group managed assets over groups in UCOP."
+      }
+    ]
+  }
+}
+
+=== ./ucop/finapps/group_finapps.json ===
+{
+  "name": "finapps",
+  "full_name": "Financial Applications",
+  "description": "Central hub for finances and bookeeping for UC campuses",
+  "members": [
+    {
+      "name": "JP",
+      "work_email": "jkirton@ucop.edu",
+      "title": "Web Developer",
+      "web_url": ""
+    }
+  ],
+  "aws": {
+    "accounts": [
+      {
+        "name": "finapps-dev",
+        "account_id": "999",
+        "region": "us-west-2",
+        "description": "Base FinApps AWS account holding project source repositories and all DEV and QA web app hosted environments."
+      },
+      {
+        "name": "finapps-prod",
+        "account_id": "777",
+        "region": "us-west-2",
+        "description": "Production AWS account for web apps managed by Financial Applications group."
+      },
+      {
+        "name": "fis-dev",
+        "account_id": "111",
+        "region": "us-west-2",
+        "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+      },
+      {
+        "name": "fis-prod",
+        "account_id": "555",
+        "region": "us-west-2",
+        "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+      }
+    ]
+  },
+  "confluence": {
+    "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "data_dog": {
+    "web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "service_now": {
+    "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+    "assignment_groups": [
+      {
+        "name": "AYSO",
+        "apps": "ayso"
+      },
+      {
+        "name": "CAF AWS Support",
+        "apps": ""
+      },
+      {
+        "name": "Corporate Systems Gateway (CSG)",
+        "apps": "csg"
+      },
+      {
+        "name": "FDW Tech Support",
+        "apps": "fdw"
+      },
+      {
+        "name": "ITF Retrofit Team",
+        "apps": "itf"
+      },
+      {
+        "name": "TM1 AWS Support",
+        "apps": "mf"
+      },
+      {
+        "name": "FIS AWS Tech Support",
+        "apps": "ulo,itf"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "FIS Concur Support",
+        "apps": "itf,ulo"
+      },
+      {
+        "name": "Endowment & Investment Accounting Svcs",
+        "apps": "eias"
+      },
+      {
+        "name": "TCS Support",
+        "apps": "tcs"
+      },
+      {
+        "name": "Research Enterprise Management System (REMS)",
+        "apps": "rems"
+      },
+      {
+        "name": "BUD Retrofit Team",
+        "apps": "csg"
+      },
+      {
+        "name": "ACA Web Support",
+        "apps": "aca"
+      }
+    ]
+  }
+}
+
+=== ./ucop/finapps/app_ayso.json ===
+{
+  "name": "ayso",
+  "short_name": "ayso",
+  "long_name": "Ayso Application",
+  "description": "Financial application for ayso",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "ayso",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "AYSO"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "AYSO",
+        "apps": "ayso"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_rems.json ===
+{
+  "name": "rems",
+  "short_name": "rems",
+  "long_name": "Rems Application",
+  "description": "Financial application for rems",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "rems",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "REMS"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "Research Enterprise Management System (REMS)",
+        "apps": "rems"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_ise.json ===
+{
+  "name": "ise",
+  "short_name": "ise",
+  "long_name": "Ise Application",
+  "description": "Financial application for ise",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "ise",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "ISE"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/gen/apps.json ===
+{
+  "apps": [
+    "csg", 
+    "rems", 
+    "ayso", 
+    "wage", 
+    "itf", 
+    "ise"
+  ],
+  "defaults": {
+    "app": {
+      "name": "",
+      "short_name": "{name}",
+      "long_name": "",
+      "description": "",
+      "org": "ucop",
+      "group": "finapps",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "source": {
+        "project_name": "{app.name}",
+        "git_origin_url": "",
+        "production_branch_name": "main",
+        "aws": {
+          "account_name": "finapps-dev"
+        }
+      },
+      "environment": [
+        {
+          "host": "aws",
+          "app_profile": "tomcat-java",
+          "deploy_profile": "aws-cicd-fargate-rds",
+          "git_branch": "{env}"
+        }
+      ]
+    }
+  }
+}
+=== ./ucop/finapps/app_wage.json ===
+{
+  "name": "wage",
+  "short_name": "wage",
+  "long_name": "Wage Application",
+  "description": "Financial application for wage",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "wage",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "WAGE"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_csg.json ===
+{
+  "name": "csg",
+  "short_name": "csg",
+  "long_name": "Csg Application",
+  "description": "Financial application for csg",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "csg",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "CSG"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "Corporate Systems Gateway (CSG)",
+        "apps": "csg"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "BUD Retrofit Team",
+        "apps": "csg"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_itf.json ===
+{
+  "name": "itf",
+  "short_name": "itf",
+  "long_name": "Itf Application",
+  "description": "Financial application for itf",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "itf",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "ITF"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "ITF Retrofit Team",
+        "apps": "itf"
+      },
+      {
+        "name": "FIS AWS Tech Support",
+        "apps": "ulo,itf"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "FIS Concur Support",
+        "apps": "itf,ulo"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./schema/app.json ===
+{
+  "name": "",
+  "short_name": "",
+  "long_name": "",
+  "description": "",
+  "org": "ucop",
+  "group": "",
+  "app_profile": "",
+  "deploy_profile": "",
+  "source": {
+    "project_name": "",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "",
+      "repo_arn": ""
+    }
+  },
+  "dbs": [
+    {
+      "name": "csg-dev",
+      "server_name": "",
+      "aws": {
+        "account_name": "",
+        "db_arn": ""
+      }
+    }
+  ],
+  "confluence": {
+    "links": []
+  },
+  "box": {
+    "links": []
+  },
+  "jira": {
+    "project_keys": [],
+    "links": []
+  },
+  "service_now": {
+    "assignment_groups": [],
+    "links": []
+  },
+  "datadog": {
+    "links": []
+  },
+  "environments": []
+}
+=== ./schema/member.json ===
+{
+  "name": "",
+  "work_email": "",
+  "title": "",
+  "web_url": ""
+}
+
+=== ./schema/aws_account.json ===
+{
+  "name": "",
+  "account_id": "",
+  "region": "us-west-2",
+  "description": ""
+}
+=== ./schema/app_topo.json ===
+{
+  "app_name": "",
+  "environment": "",
+  "aws": {
+    "account_name": "",
+    "codepipeline": {
+      "name": "",
+      "arn": ""
+    },
+    "ecs": {
+      "cluster_name": "",
+      "service_name": "",
+      "task_definition": ""
+    },
+    "alb": {
+      "arn": "",
+      "name": "",
+      "dns_name": "",
+      "certificate_arn": ""
+    },
+    "rds": {
+      "instances": [
+        {
+          "arn": "",
+          "identifier": "",
+          "tags": [
+            ""
+          ]
+        }
+      ]
+    },
+    "s3": {
+      "buckets": [
+        {
+          "name": "",
+          "s3_url": "",
+          "arn": "",
+          "tags": [
+            ""
+          ]
+        }
+      ]
+    },
+    "cloudwatch": {
+      "log_groups": [
+        {
+          "name": "",
+          "type": "",
+          "arn": "",
+          "source_arn": "the source entity in aws generated the logs this log group captures."
+        }
+      ]
+    }
+  }
+}
+=== ./schema/app_profiles.json ===
+{
+  "app_profiles": [
+    {
+      "name": "jboss-java",
+      "description": "JBoss EAP app server with Java EE war file app bundle.",
+      "type": "java"
+    },
+    {
+      "name": "jboss-java-sso",
+      "description": "JBoss EAP app server with Java EE war file app bundle with SSO login",
+      "type": "java"
+    },
+    {
+      "name": "tomcat-java",
+      "description": "Tomcat app server with Java 17 web app",
+      "type": "java"
+    },
+    {
+      "name": "tomcat-java-sso",
+      "description": "Tomcat app server with Java 17 web app with SSO Login",
+      "type": "java"
+    },
+    {
+      "name": "flask-sso",
+      "description": "Flask app server with Python web app and SSO login",
+      "type": "python"
+    }
+  ]
+}
+=== ./schema/deploy_profiles.json ===
+{
+  "deploy_profiles": [
+    {
+      "name": "aws-cicd-fargate",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server"
+    },
+    {
+      "name": "aws-cicd-fargate-rds",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s)"
+    },
+    {
+      "name": "aws-cicd-fargate-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server and SSO login"
+    },
+    {
+      "name": "aws-cicd-fargate-rds-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s) and SSO login"
+    },
+    {
+      "name": "aws-cicd-lambda",
+      "description": "AWS hosted, CICD deployments, Lambda functions only"
+    }
+  ]
+}
+=== ./schema/app_snapshot.json ===
+{
+  "snapshot_id": "",
+  "timestamp": "",
+  "environment": "",
+  "last_updated": {
+    "source": "",
+    "aws": "",
+    "logs": ""
+  },
+  "source": {
+    "deployment_commit": {
+      "commit_id": "",
+      "timestamp": "",
+      "branch": "",
+      "message": "",
+      "commitor": ""
+    },
+    "latest_commits": [
+      {
+        "commit_id": "",
+        "timestamp": "",
+        "branch": "",
+        "message": "",
+        "commitor": ""
+      }
+    ]
+  },
+  "dbs": [
+    {
+      "db_type": "",
+      "db_version": "",
+      "endpoint": "",
+      "status": "",
+      "aws": {
+        "account_name": "",
+        "db_arn": "",
+        "tags": [ "" ]
+      }
+    }
+  ],
+  "aws": {
+    "codepipeline": {
+      "execution_id": "",
+      "status": "",
+      "timestamp": ""
+    },
+    "ecs": {
+      "running_count": 0,
+      "desired_count": 0,
+      "status": "",
+      "containers": [
+        {
+          "container_name": "",
+          "cpu_percent": 0.0,
+          "memory_mb": 0,
+          "status": "",
+          "health": "",
+          "dockerfile": "copy of contents of dockerfile of this container istance"
+        }
+      ]
+    },
+    "alb": {
+      "arn": "",
+      "state": "",
+      "active_connections": 0,
+      "dns_name": "",
+      "certificate": {
+        "expires": "",
+        "status": ""
+      }
+    },
+    "s3": {
+      "buckets": [
+        {
+          "size_mb": 0,
+          "last_modified": "",
+          "num_files": 120000
+        }
+      ]
+    },
+    "trusted_advisor": {
+      "criticals": 3,
+      "warnings": 2,
+      "issues": [
+        {
+          "id": "",
+          "date_created": "",
+          "name": "",
+          "status": "",
+          "description": ""
+        }
+      ]
+    }
+  },
+  "logs": {
+    "app": {
+      "aws": {
+        "cloudwatch_log_group_name": "",
+        "cloudwatch_log_group_arn": "",
+        "web_url": ""
+      },
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "alb": {
+      "aws": {
+        "cloudwatch_log_group_name": "",
+        "cloudwatch_log_group_arn": "",
+        "web_url": ""
+      },
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "rds": {
+      "aws": {
+        "cloudwatch_log_group_name": "",
+        "cloudwatch_log_group_arn": "",
+        "web_url": ""
+      },
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "vulnerabilities": {
+    "open": 0,
+    "critical": 0,
+    "latest": [
+      {
+        "id": "",
+        "severity": "",
+        "description": "",
+        "reported": "",
+        "web_url": ""
+      }
+    ]
+  }
+}
+=== ./schema/group.json ===
+{
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "members": [],
+  "aws": {
+    "accounts": []
+  },
+  "confluence": {
+    "web_url": ""
+  },
+  "box": {
+    "web_url": ""
+  },
+  "jira": {
+    "web_url": ""
+  },
+  "data_dog": {
+    "web_url": ""
+  },
+  "service_now": {
+    "web_url": "",
+    "assignment_groups": []
+  }
+}
+
+=== ./schema/org.json ===
+{
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "confluence": {
+    "web_url": ""
+  },
+  "box": {
+    "web_url": ""
+  },
+  "jira": {
+    "web_url": ""
+  },
+  "data_dog": {
+    "web_url": ""
+  },
+  "service_now": {
+    "web_url": ""
+  },
+  "aws": {
+    "accounts": []
+  }
+}
+
+
+=== ./schema/link.json ===
+{
+  "name": "",
+  "description": "",
+  "url": ""
+}
+=== ./schema/environment.json ===
+
+{
+  "env": "[dev|qa|prod]",
+  "name": "[development|staging|production]",
+  "host": "aws",
+  "app_profile": "",
+  "deploy_profile": "",
+  "deploy_pipeline_name": "",
+  "git_branch": "[dev|qa|main]",
+  "aws": {
+    "account_name": ""
+  }
+}
+

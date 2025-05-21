@@ -1,36 +1,81 @@
 {
-  "apps": [
-    "csg", 
-    "rems", 
-    "ayso", 
-    "wage", 
-    "itf", 
-    "ise"
-  ],
+  "description": "Lists applications and their default configurations",
+  "apps": ["csg", "rems", "ayso", "wage", "itf", "ise"],
   "defaults": {
     "app": {
       "name": "",
       "short_name": "{name}",
-      "long_name": "",
-      "description": "",
+      "long_name": "{name} Application",
+      "description": "Financial application for {name}",
       "org": "ucop",
       "group": "finapps",
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate-rds",
       "source": {
-        "project_name": "{app.name}",
-        "git_origin_url": "",
+        "project_name": "{name}",
+        "git_origin_url": "https://github.com/ucop/{name}.git",
         "production_branch_name": "main",
-        "aws": {
-          "account_name": "finapps-dev"
-        }
+        "aws_account_name": "finapps-dev"
       },
-      "environment": [
+      "confluence": {
+        "links": [
+          {
+            "name": "FinApps Confluence",
+            "description": "Confluence space for Financial Applications",
+            "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+          }
+        ]
+      },
+      "box": {
+        "links": [
+          {
+            "name": "FinApps Box",
+            "description": "Box storage for Financial Applications",
+            "url": "https://ucop.app.box.com/FA/"
+          }
+        ]
+      },
+      "jira": {
+        "project_keys": [],
+        "links": [
+          {
+            "name": "FinApps Jira",
+            "description": "Jira instance for Financial Applications",
+            "url": "https://ucopedu.atlassian.net/jira/FA/"
+          }
+        ]
+      },
+      "service_now": {
+        "assignment_groups": [
+          {
+            "name": "FINAPPS AWS Tech Support",
+            "apps": ["ayso", "rems", "csg", "wage", "itf", "ise"]
+          }
+        ],
+        "links": [
+          {
+            "name": "FinApps ServiceNow",
+            "description": "ServiceNow dashboard for Financial Applications",
+            "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+          }
+        ]
+      },
+      "datadog": {
+        "links": [
+          {
+            "name": "FinApps DataDog",
+            "description": "DataDog monitoring for Financial Applications",
+            "url": "https://dd.com/ucop/finapps/index.html"
+          }
+        ]
+      },
+      "environments": [
         {
           "host": "aws",
           "app_profile": "tomcat-java",
           "deploy_profile": "aws-cicd-fargate-rds",
-          "git_branch": "{env}"
+          "git_branch": "{env}",
+          "aws_account_name": "finapps-dev"
         }
       ]
     }

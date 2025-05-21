@@ -1,6 +1,10 @@
 {
+  "schema_description": "Defines a team member",
+  
   "name": "",
   "work_email": "",
   "title": "",
-  "web_url": ""
+  "web_url": "",
+  "role": "",
+  "teams": []
 }

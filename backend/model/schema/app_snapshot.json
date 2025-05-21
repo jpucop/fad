@@ -1,134 +1,14 @@
 {
+  "schema_description": "Captures runtime details of an application",
+
   "snapshot_id": "",
   "timestamp": "",
+  
+  "app_name": "",
   "environment": "",
-  "last_updated": {
-    "source": "",
-    "aws": "",
-    "logs": ""
-  },
-  "source": {
-    "deployment_commit": {
-      "commit_id": "",
-      "message": "",
-      "timestamp": "",
-      "branch": ""
-    }
-  },
-  "dbs": [
-    {
-      "aws": {
-        "db_type": "",
-        "db_version": "",
-        "endpoint": "",
-        "status": "",
-        "metrics": {
-          "active_connections": 0,
-          "read_iops": 0,
-          "write_iops": 0,
-          "last_backup": ""
-        }
-      }
-    }
-  ],
-  "infrastructure": {
-    "aws": {
-      "codepipeline": {
-        "execution_id": "",
-        "status": "",
-        "timestamp": ""
-      },
-      "ecs": {
-        "running_count": 0,
-        "desired_count": 0,
-        "status": "",
-        "containers": [
-          {
-            "container_name": "",
-            "current_sessions": 0,
-            "cpu_percent": 0.0,
-            "memory_mb": 0,
-            "status": ""
-          }
-        ]
-      },
-      "alb": {
-        "state": "",
-        "active_connections": 0,
-        "dns_name": "",
-        "certificate": {
-          "expires": "",
-          "status": ""
-        }
-      },
-      "s3": {
-        "buckets": [
-          {
-            "size_mb": 0,
-            "last_modified": ""
-          }
-        ]
-      },
-      "trusted_advisor": {
-        "criticals": 3,
-        "warnings": 2,
-        "issues": [
-          {
-            "id": "",
-            "name": "",
-            "status": "",
-            "description": ""
-          }
-        ]
-      }
-    }
-  },
-  "logs": {
-    "app": {
-      "recent": [
-        {
-          "timestamp": "",
-          "output": "",
-          "severity": ""
-        }
-      ],
-      "errors": 0,
-      "warnings": 0
-    },
-    "alb": {
-      "recent": [
-        {
-          "timestamp": "",
-          "output": "",
-          "severity": ""
-        }
-      ],
-      "errors": 0,
-      "warnings": 0
-    },
-    "rds": {
-      "recent": [
-        {
-          "timestamp": "",
-          "output": "",
-          "severity": ""
-        }
-      ],
-      "errors": 0,
-      "warnings": 0
-    }
-  },
-  "vulnerabilities": {
-    "open": 0,
-    "critical": 0,
-    "latest": [
-      {
-        "id": "",
-        "severity": "",
-        "description": "",
-        "reported": "",
-        "web_url_ref": ""
-      }
-    ]
-  }
+  
+  "source": {},
+  "aws": {},
+  "logs": {},
+  "vulnerabilities": {}
 }

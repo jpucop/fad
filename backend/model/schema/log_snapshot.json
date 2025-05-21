@@ -1,0 +1,44 @@
+{
+  "app": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  },
+  "alb": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  },
+  "rds": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  }
+}

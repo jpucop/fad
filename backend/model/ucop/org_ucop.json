@@ -1,29 +1,57 @@
 {
   "name": "ucop",
   "full_name": "University of California Office of the President",
-  "description": "Office of the President.  The central campus of The University of California in Oakland, California.",
+  "description": "Office of the President. The central campus of The University of California in Oakland, California.",
+  "aws_accounts": [
+    {
+      "name": "shs-prod",
+      "account_id": "999999999999",
+      "region": "us-west-2",
+      "description": "UCOP Infra group managed assets over groups in UCOP."
+    }
+  ],
   "confluence": {
-    "web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+    "links": [
+      {
+        "name": "UCOP Confluence",
+        "description": "Confluence space for UCOP",
+        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+      }
+    ]
   },
   "box": {
-    "web_url": "https://ucop.app.box.com"
+    "links": [
+      {
+        "name": "UCOP Box",
+        "description": "Box storage for UCOP",
+        "url": "https://ucop.app.box.com"
+      }
+    ]
   },
   "jira": {
-    "web_url": "https://ucopedu.atlassian.net/jira/"
+    "links": [
+      {
+        "name": "UCOP Jira",
+        "description": "Jira instance for UCOP",
+        "url": "https://ucopedu.atlassian.net/jira/"
+      }
+    ]
   },
   "data_dog": {
-    "web_url": "https://dd.com/ucop/index.html"
+    "links": [
+      {
+        "name": "UCOP DataDog",
+        "description": "DataDog monitoring for UCOP",
+        "url": "https://dd.com/ucop/index.html"
+      }
+    ]
   },
   "service_now": {
-    "web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
-  },
-  "aws": {
-    "accounts": [
+    "links": [
       {
-        "name": "shs-prod",
-        "account_id": "999",
-        "region": "us-west-2",
-        "description": "UCOP Infra group managed assets over groups in UCOP."
+        "name": "UCOP ServiceNow",
+        "description": "ServiceNow dashboard for UCOP",
+        "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
       }
     ]
   }

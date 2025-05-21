@@ -4,25 +4,37 @@ Financial Applications UCOP group aggregate dashboard widget.
 
 ## backend
 
-```sh
-resetenv.sh
-```
+### scripts for handy
 
 ```sh
-tree -I "venv|.git|.gitignore|.gitmodules"
-```
 
-```sh
+concat_json_files() {
+  local output_file="$1"
+  local search_dir="${2:-.}"  # Default to current directory if not specified
+  
+  # Clear output file if it exists, or create new
+  : > "$output_file"
+  
+  # Find all .json files and process them
+  find "$search_dir" -type f -name "*.json" | while read -r json_file; do
+    # Append filename as header
+    echo "=== $json_file ===" >> "$output_file"
+    # Append file contents
+    cat "$json_file" >> "$output_file"
+    # Add newline separator
+    echo "" >> "$output_file"
+  done
+}
+
+# deps by pip
 pip freeze > requirements.txt
-```
-
-### requirements\[-test\].txt
-
-```sh
 pip-compile requirements.in
 pip-compile requirements-test.in
 
-pip-sync
+ptree() { 
+  tree -I "venv|.git|.gitignore|.gitmodules"
+}
+
 ```
 
 ### pydantic - generate models for app
@@ -32,11 +44,9 @@ models/init/ 1st level sub-dirs are to be the org and group business wise isolat
 
 ## frontend
 
-use npm and vite to optimze js/css files since tailwind and svgs and largeness comes with it
-we only take what is needed and gzip it basically 
-
 ## AWS Tags
 
+**UCOP FinApps Group:**
 - ucop:group FinApps
 - ucop:application fad
 - ucop:environment dev
