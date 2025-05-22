@@ -1,8 +1,6 @@
 {
-  "schema_description": "Captures runtime details of an application",
-
   "snapshot_id": "",
-  "timestamp": "",
+  "snapshot_timestamp": "",  
   
   "app_name": "",
   "environment": "",

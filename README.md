@@ -9,18 +9,36 @@ Financial Applications UCOP group aggregate dashboard widget.
 ```sh
 
 concat_json_files() {
-  local output_file="$1"
+  local output_file="model_snapshot.txt"
   local search_dir="${2:-.}"  # Default to current directory if not specified
   
   # Clear output file if it exists, or create new
   : > "$output_file"
   
   # Find all .json files and process them
-  find "$search_dir" -type f -name "*.json" | while read -r json_file; do
+  find "$search_dir" -type f -name "*.json" | while read -r mfile; do
     # Append filename as header
-    echo "=== $json_file ===" >> "$output_file"
+    echo "=== $mfile ===" >> "$output_file"
     # Append file contents
-    cat "$json_file" >> "$output_file"
+    cat "$mfile" >> "$output_file"
+    # Add newline separator
+    echo "" >> "$output_file"
+  done
+}
+
+concat_py_files() {
+  local output_file="model_scripts.txt"
+  local search_dir="${2:-.}"  # Default to current directory if not specified
+  
+  # Clear output file if it exists, or create new
+  : > "$output_file"
+  
+  # Find all target files and process them
+  find "$search_dir" -type f -name "*.py" | while read -r mfile; do
+    # Append filename as header
+    echo "=== $mfile ===" >> "$output_file"
+    # Append file contents
+    cat "$mfile" >> "$output_file"
     # Add newline separator
     echo "" >> "$output_file"
   done
