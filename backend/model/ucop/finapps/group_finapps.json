@@ -39,49 +39,29 @@
     }
   ],
   "confluence": {
-    "links": [
-      {
-        "name": "FinApps Confluence",
-        "description": "Confluence space for Financial Applications",
-        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
-      }
-    ]
+    "name": "FinApps Confluence",
+    "description": "Confluence space for Financial Applications",
+    "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
   },
   "box": {
-    "links": [
-      {
-        "name": "FinApps Box",
-        "description": "Box storage for Financial Applications",
-        "url": "https://ucop.app.box.com/FA/"
-      }
-    ]
+    "name": "FinApps Box",
+    "description": "Box storage for Financial Applications",
+    "url": "https://ucop.app.box.com/FA/"
   },
   "jira": {
-    "links": [
-      {
-        "name": "FinApps Jira",
-        "description": "Jira instance for Financial Applications",
-        "url": "https://ucopedu.atlassian.net/jira/FA/"
-      }
-    ]
+    "name": "FinApps Jira",
+    "description": "Jira instance for Financial Applications",
+    "url": "https://ucopedu.atlassian.net/jira/FA/"
   },
   "data_dog": {
-    "links": [
-      {
-        "name": "FinApps DataDog",
-        "description": "DataDog monitoring for Financial Applications",
-        "url": "https://dd.com/ucop/finapps/index.html"
-      }
-    ]
+    "name": "FinApps DataDog",
+    "description": "DataDog monitoring for Financial Applications",
+    "url": "https://dd.com/ucop/finapps/index.html"
   },
   "service_now": {
-    "links": [
-      {
-        "name": "FinApps ServiceNow",
-        "description": "ServiceNow dashboard for Financial Applications",
-        "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
-      }
-    ],
+    "name": "FinApps ServiceNow",
+    "description": "ServiceNow dashboard for Financial Applications",
+    "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
     "assignment_groups": [
       {
         "name": "AYSO",

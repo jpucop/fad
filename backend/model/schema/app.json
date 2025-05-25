@@ -1,24 +1,27 @@
 {
   "name": "",
+  
   "short_name": "",
   "long_name": "",
   "description": "",
+  
   "org": "ucop",
   "group": "",
+  
   "app_profile": "",
   "deploy_profile": "",
+  
   "source": {
     "project_name": "",
     "git_origin_url": "",
     "production_branch_name": "main",
     "aws": {
-      "account_name": "",
-      "repo_arn": ""
+      "account_name": ""
     }
   },
   "dbs": [
     {
-      "name": "csg-dev",
+      "name": "",
       "server_name": "",
       "aws": {
         "account_name": "",

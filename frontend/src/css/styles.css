@@ -1,7 +1,7 @@
 @import "tailwindcss" source("../../src");
 
 @theme {
-  --color-uc-dark: oklch(0.35 0.02 145);     /* Approx #464B44 */
+  --color-uc-dark: rgb(57, 59, 49);
   --color-uc-light: oklch(0.97 0.01 120);    /* Approx #F5F6F5 */
   --color-uc-mid: oklch(0.65 0.02 120);      /* Approx #A0A0A0 */
   --color-uc-primary: oklch(0.4 0.15 240);   /* UC navy blue, approx #003087 */
@@ -37,7 +37,7 @@
 /* General Icon Styling */
 .icon {
   display: inline-block;
-  vertical-align: middle;
+vertical-align: middle;
   width: 1.25rem; /* Default size */
   height: 1.25rem;
 }
@@ -144,8 +144,8 @@ body {
 
 /* Header Title */
 .header-title {
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 1.3rem;
+  font-weight: 300;
   line-height: 1.0;
   border-bottom: 4px;
   border-color: var(--color-uc-accent);
@@ -172,7 +172,7 @@ body {
   grid-template-columns: 1fr;
   gap: 0.7rem;
   font-size: 0.8rem;
-  color: var(--color-uc-primary);
+  color: var(--color-uc-dark);
 }
 
 @media (min-width: 640px) {

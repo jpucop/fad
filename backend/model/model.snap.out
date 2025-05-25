@@ -1,0 +1,1590 @@
+
+=== ./ucop/org_ucop.json ===
+{
+  "name": "ucop",
+  "full_name": "University of California Office of the President",
+  "description": "Office of the President. The central campus of The University of California in Oakland, California.",
+  "aws_accounts": [
+    {
+      "name": "shs-prod",
+      "account_id": "999999999999",
+      "region": "us-west-2",
+      "description": "UCOP Infra group managed assets over groups in UCOP."
+    }
+  ],
+  "confluence": {
+    "links": [
+      {
+        "name": "UCOP Confluence",
+        "description": "Confluence space for UCOP",
+        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+      }
+    ]
+  },
+  "box": {
+    "links": [
+      {
+        "name": "UCOP Box",
+        "description": "Box storage for UCOP",
+        "url": "https://ucop.app.box.com"
+      }
+    ]
+  },
+  "jira": {
+    "links": [
+      {
+        "name": "UCOP Jira",
+        "description": "Jira instance for UCOP",
+        "url": "https://ucopedu.atlassian.net/jira/"
+      }
+    ]
+  },
+  "data_dog": {
+    "links": [
+      {
+        "name": "UCOP DataDog",
+        "description": "DataDog monitoring for UCOP",
+        "url": "https://dd.com/ucop/index.html"
+      }
+    ]
+  },
+  "service_now": {
+    "links": [
+      {
+        "name": "UCOP ServiceNow",
+        "description": "ServiceNow dashboard for UCOP",
+        "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+      }
+    ]
+  }
+}
+=== ./ucop/finapps/group_finapps.json ===
+{
+  "name": "finapps",
+  "full_name": "Financial Applications",
+  "description": "Central hub for finances and bookkeeping for UC campuses",
+  "members": [
+    {
+      "name": "JP",
+      "work_email": "jkirton@ucop.edu",
+      "title": "Web Developer",
+      "web_url": "",
+      "role": "developer",
+      "teams": ["finapps"]
+    }
+  ],
+  "aws_accounts": [
+    {
+      "name": "finapps-dev",
+      "account_id": "999999999999",
+      "region": "us-west-2",
+      "description": "Base FinApps AWS account holding project source repositories and all DEV and QA web app hosted environments."
+    },
+    {
+      "name": "finapps-prod",
+      "account_id": "777777777777",
+      "region": "us-west-2",
+      "description": "Production AWS account for web apps managed by Financial Applications group."
+    },
+    {
+      "name": "fis-dev",
+      "account_id": "111111111111",
+      "region": "us-west-2",
+      "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+    },
+    {
+      "name": "fis-prod",
+      "account_id": "555555555555",
+      "region": "us-west-2",
+      "description": "FinApps AWS account managing financial operations and sub-set of web apps for UC campus wide financial bookkeeping."
+    }
+  ],
+  "confluence": {
+    "name": "FinApps Confluence",
+    "description": "Confluence space for Financial Applications",
+    "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "name": "FinApps Box",
+    "description": "Box storage for Financial Applications",
+    "url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "name": "FinApps Jira",
+    "description": "Jira instance for Financial Applications",
+    "url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "data_dog": {
+    "name": "FinApps DataDog",
+    "description": "DataDog monitoring for Financial Applications",
+    "url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "service_now": {
+    "name": "FinApps ServiceNow",
+    "description": "ServiceNow dashboard for Financial Applications",
+    "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+    "assignment_groups": [
+      {
+        "name": "AYSO",
+        "apps": ["ayso"]
+      },
+      {
+        "name": "CAF AWS Support",
+        "apps": []
+      },
+      {
+        "name": "Corporate Systems Gateway (CSG)",
+        "apps": ["csg"]
+      },
+      {
+        "name": "FDW Tech Support",
+        "apps": ["fdw"]
+      },
+      {
+        "name": "ITF Retrofit Team",
+        "apps": ["itf"]
+      },
+      {
+        "name": "TM1 AWS Support",
+        "apps": ["mf"]
+      },
+      {
+        "name": "FIS AWS Tech Support",
+        "apps": ["ulo", "itf"]
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": ["ayso", "rems", "csg", "wage", "itf", "ise"]
+      },
+      {
+        "name": "FIS Concur Support",
+        "apps": ["itf", "ulo"]
+      },
+      {
+        "name": "Endowment & Investment Accounting Svcs",
+        "apps": ["eias"]
+      },
+      {
+        "name": "TCS Support",
+        "apps": ["tcs"]
+      },
+      {
+        "name": "Research Enterprise Management System (REMS)",
+        "apps": ["rems"]
+      },
+      {
+        "name": "BUD Retrofit Team",
+        "apps": ["csg"]
+      },
+      {
+        "name": "ACA Web Support",
+        "apps": ["aca"]
+      }
+    ]
+  }
+}
+=== ./ucop/finapps/app_ayso.json ===
+{
+  "name": "ayso",
+  "short_name": "ayso",
+  "long_name": "Ayso Application",
+  "description": "Financial application for ayso",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "ayso",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "AYSO"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "AYSO",
+        "apps": "ayso"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ayso-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_rems.json ===
+{
+  "name": "rems",
+  "short_name": "rems",
+  "long_name": "Rems Application",
+  "description": "Financial application for rems",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "rems",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "REMS"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "Research Enterprise Management System (REMS)",
+        "apps": "rems"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_ise.json ===
+{
+  "name": "ise",
+  "short_name": "ise",
+  "long_name": "Ise Application",
+  "description": "Financial application for ise",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "ise",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "ISE"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "ise-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/gen/apps.json ===
+{
+  "description": "Lists applications and their default configurations",
+  "apps": ["csg", "rems", "ayso", "wage", "itf", "ise"],
+  "defaults": {
+    "app": {
+      "short_name": "{name}",
+      "long_name": "{name} Application",
+      "description": "{name} application managed by Financial Applications Group at UCOP",
+      "org": "ucop",
+      "group": "finapps",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "source": {
+        "project_name": "{name}",
+        "git_origin_url": "https://github.com/ucop/{name}.git",
+        "production_branch_name": "main",
+        "aws_account_name": "finapps-dev"
+      },
+      "confluence": {
+      },
+      "box": {
+      },
+      "jira": {
+        "project_keys": []
+      },
+      "service_now": {
+      },
+      "datadog": {
+      },
+      "environments": [
+        {
+          "host": "aws",
+          "app_profile": "tomcat-java",
+          "deploy_profile": "aws-cicd-fargate-rds",
+          "git_branch": "{env}",
+          "aws_account_name": "finapps-dev"
+        }
+      ]
+    }
+  }
+}
+=== ./ucop/finapps/app_wage.json ===
+{
+  "name": "wage",
+  "short_name": "wage",
+  "long_name": "Wage Application",
+  "description": "Financial application for wage",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "wage",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "WAGE"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_csg.json ===
+{
+  "name": "csg",
+  "short_name": "csg",
+  "long_name": "Csg Application",
+  "description": "Financial application for csg",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "csg",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "CSG"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "Corporate Systems Gateway (CSG)",
+        "apps": "csg"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "BUD Retrofit Team",
+        "apps": "csg"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./ucop/finapps/app_itf.json ===
+{
+  "name": "itf",
+  "short_name": "itf",
+  "long_name": "Itf Application",
+  "description": "Financial application for itf",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "itf",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "ITF"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "assignment_groups": [
+      {
+        "name": "ITF Retrofit Team",
+        "apps": "itf"
+      },
+      {
+        "name": "FIS AWS Tech Support",
+        "apps": "ulo,itf"
+      },
+      {
+        "name": "FINAPPS AWS Tech Support",
+        "apps": "ALL"
+      },
+      {
+        "name": "FIS Concur Support",
+        "apps": "itf,ulo"
+      }
+    ],
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "itf-prod-pipeline",
+      "git_branch": "prod",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
+=== ./schema/app_snapshoot_source.json ===
+{
+  "schema_description": "Captures source code and commit details for an application snapshot",
+  
+  "deployment_commit": {
+    "commit_id": "",
+    "timestamp": "",
+    "branch": "",
+    "message": "",
+    "commitor": ""
+  },
+  "latest_commits": [
+    {
+      "commit_id": "",
+      "timestamp": "",
+      "branch": "",
+      "message": "",
+      "commitor": ""
+    }
+  ]
+}
+=== ./schema/app.json ===
+{
+  "name": "",
+  
+  "short_name": "",
+  "long_name": "",
+  "description": "",
+  
+  "org": "ucop",
+  "group": "",
+  
+  "app_profile": "",
+  "deploy_profile": "",
+  
+  "source": {
+    "project_name": "",
+    "git_origin_url": "",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": ""
+    }
+  },
+  "dbs": [
+    {
+      "name": "",
+      "server_name": "",
+      "aws": {
+        "account_name": "",
+        "db_arn": ""
+      }
+    }
+  ],
+  "confluence": {
+    "links": []
+  },
+  "box": {
+    "links": []
+  },
+  "jira": {
+    "project_keys": [],
+    "links": []
+  },
+  "service_now": {
+    "assignment_groups": [],
+    "links": []
+  },
+  "datadog": {
+    "links": []
+  },
+  "environments": []
+}
+=== ./schema/member.json ===
+{
+  "schema_description": "Defines a team member",
+  
+  "name": "",
+  "work_email": "",
+  "title": "",
+  "web_url": "",
+  "role": "",
+  "teams": []
+}
+=== ./schema/app_snapshot_log.json ===
+{
+  "app": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  },
+  "alb": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  },
+  "rds": {
+    "cloudwatch_log_group_name": "",
+    "cloudwatch_log_group_arn": "",
+    "web_url": "",
+    "recent": [
+      {
+        "timestamp": "",
+        "output": "",
+        "severity": ""
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  }
+}
+=== ./schema/aws_account.json ===
+{
+  "name": "",
+  "account_id": "",
+  "region": "us-west-2",
+  "description": ""
+}
+=== ./schema/app_topo.json ===
+{
+  "app_name": "string",
+  "environment": "string",
+  "deploy_profile": "string",
+  "created": "timestamp",
+  "source": {
+    "git_branch_name": "string",
+    "git_commit": "string",
+    "git_origin_url": "string",
+    "project_name": "string"
+  },
+  "aws": {
+    "account_name": "string",
+    "account_id": "string",
+    "codepipeline": {
+      "name": "string",
+      "arn": "string",
+      "last_deployment_timestamp": "string"
+    },
+    "ecs": {
+      "cluster_name": "string",
+      "service_name": "string",
+      "task_definition_arn": "string",
+      "status": "string",
+      "running_count": "integer",
+      "health": "string",
+      "version": "string",
+      "containers": [
+        {
+          "name": "string",
+          "image": "string",
+          "log_group_name": "string"
+        }
+      ],
+      "cw_log_groups": [
+        {
+          "name": "string",
+          "arn": "string"
+        }
+      ]
+    },
+    "alb": {
+      "arn": "string",
+      "name": "string",
+      "dns_name": "string",
+      "certificate_arn": "string",
+      "protocol": "string",
+      "port": "integer",
+      "status": "string",
+      "health": "string",
+      "cw_log_groups": [
+        {
+          "name": "string",
+          "arn": "string"
+        }
+      ]
+    },
+    "rds": {
+      "instances": [
+        {
+          "arn": "string",
+          "identifier": "string",
+          "endpoint": "string",
+          "status": "string",
+          "tags": ["string"],
+          "cw_log_groups": [
+            {
+              "name": "string",
+              "arn": "string"
+            }
+          ]
+        }
+      ]
+    },
+    "s3": {
+      "buckets": [
+        {
+          "name": "string",
+          "s3_url": "string",
+          "arn": "string",
+          "tags": ["string"]
+        }
+      ]
+    }
+  }
+}
+=== ./schema/app_profiles.json ===
+{
+  "app_profiles": [
+    {
+      "name": "jboss-java",
+      "description": "JBoss EAP app server with Java EE war file app bundle.",
+      "type": "java"
+    },
+    {
+      "name": "jboss-java-sso",
+      "description": "JBoss EAP app server with Java EE war file app bundle with SSO login",
+      "type": "java"
+    },
+    {
+      "name": "tomcat-java",
+      "description": "Tomcat app server with Java 17 web app",
+      "type": "java"
+    },
+    {
+      "name": "tomcat-java-sso",
+      "description": "Tomcat app server with Java 17 web app with SSO Login",
+      "type": "java"
+    },
+    {
+      "name": "flask-sso",
+      "description": "Flask app server with Python web app and SSO login",
+      "type": "python"
+    }
+  ]
+}
+=== ./schema/deploy_profiles.json ===
+{
+  "deploy_profiles": [
+    {
+      "name": "aws-cicd-fargate",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server"
+    },
+    {
+      "name": "aws-cicd-fargate-rds",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s)"
+    },
+    {
+      "name": "aws-cicd-fargate-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server and SSO login"
+    },
+    {
+      "name": "aws-cicd-fargate-rds-sso",
+      "description": "AWS hosted, CICD deployments, Fargate hosted docker containerized web app server, backend RDS database(s) and SSO login"
+    },
+    {
+      "name": "aws-cicd-lambda",
+      "description": "AWS hosted, CICD deployments, Lambda functions only"
+    }
+  ]
+}
+=== ./schema/app_snapshot.json ===
+{
+  "snapshot_id": "",
+  "snapshot_timestamp": "",  
+  
+  "app_name": "",
+  "environment": "",
+  
+  "source": {},
+  "aws": {},
+  "logs": {},
+  "vulnerabilities": {}
+}
+=== ./schema/app_snapshot_aws.json ===
+{
+  "description": "Captures AWS infrastructure details for an application snapshot",
+  "account_name": "",
+  "codepipeline": {
+    "execution_id": "",
+    "status": "",
+    "timestamp": ""
+  },
+  "ecs": {
+    "running_count": 0,
+    "desired_count": 0,
+    "status": "",
+    "containers": [
+      {
+        "container_name": "",
+        "cpu_percent": 0.0,
+        "memory_mb": 0,
+        "status": "",
+        "health": "",
+        "dockerfile": ""
+      }
+    ]
+  },
+  "alb": {
+    "arn": "",
+    "state": "",
+    "active_connections": 0,
+    "dns_name": "",
+    "certificate": {
+      "expires": "",
+      "status": ""
+    }
+  },
+  "s3": {
+    "buckets": [
+      {
+        "size_mb": 0,
+        "last_modified": "",
+        "num_files": 0
+      }
+    ]
+  },
+  "trusted_advisor": {
+    "criticals": 0,
+    "warnings": 0,
+    "issues": [
+      {
+        "id": "",
+        "date_created": "",
+        "name": "",
+        "status": "",
+        "description": ""
+      }
+    ]
+  }
+}
+=== ./schema/app_snapshot_vulnerability.json ===
+{
+  "description": "Captures vulnerability details for an application snapshot",
+  "open": 0,
+  "critical": 0,
+  "latest": [
+    {
+      "id": "",
+      "severity": "",
+      "description": "",
+      "reported": "",
+      "web_url": ""
+    }
+  ]
+}
+=== ./schema/group.json ===
+{
+  "schema_description": "Defines a group within an organization, including members and service integrations",
+  
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "members": [],
+  "aws_accounts": [],
+  "confluence": {
+    "links": []
+  },
+  "box": {
+    "links": []
+  },
+  "jira": {
+    "links": []
+  },
+  "data_dog": {
+    "links": []
+  },
+  "service_now": {
+    "links": [],
+    "assignment_groups": []
+  }
+}
+=== ./schema/org.json ===
+{
+  "schema_description": "Defines an organization, including metadata and service integrations",
+  
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "confluence": {
+    "links": []
+  },
+  "box": {
+    "links": []
+  },
+  "jira": {
+    "links": []
+  },
+  "data_dog": {
+    "links": []
+  },
+  "service_now": {
+    "links": []
+  },
+  "aws_accounts": []
+}
+=== ./schema/link.json ===
+{
+  "name": "",
+  "description": "",
+  "url": ""
+}
+=== ./schema/environment.json ===
+{
+  "description": "Defines an application deployment environment",
+  "env": "",
+  "name": "",
+  "host": "aws",
+  "app_profile": "",
+  "deploy_profile": "",
+  "deploy_pipeline_name": "",
+  "git_branch": "",
+  "aws_account_name": ""
+}
+=== ./ucop/finapps/webify.py ===
+import json
+import re
+from pathlib import Path
+from typing import Dict, List, Optional
+
+def load_json(file_path: Path) -> dict:
+  with open(file_path, 'r') as f:
+    return json.load(f)
+
+def save_file(content: str, file_path: Path):
+  file_path.parent.mkdir(parents=True, exist_ok=True)
+  with open(file_path, 'w') as f:
+    f.write(content)
+
+def snake_to_pascal(snake_str: str) -> str:
+  """Convert snake_case to PascalCase."""
+  return ''.join(word.capitalize() for word in snake_str.split('_'))
+
+def json_schema_to_pydantic(schema: dict, model_name: str, indent: int = 4) -> str:
+  """Convert a JSON Schema to a Pydantic model class."""
+  lines = [f"from pydantic import BaseModel\n"]
+  imports = set()
+  
+  # Check for complex types requiring imports
+  for prop_schema in schema.get('properties', {}).values():
+    if prop_schema.get('type') == 'array':
+      imports.add('from typing import List')
+    if prop_schema.get('type') == 'object' or 'properties' in prop_schema:
+      imports.add('from typing import Optional')
+    if prop_schema.get('type') == 'string' and 'enum' in prop_schema:
+      imports.add('from enum import Enum')
+  
+  lines.extend(sorted(imports))
+  lines.append("\n")
+
+  # Generate enums for string fields with enum constraints
+  for prop_name, prop_schema in schema.get('properties', {}).items():
+    if prop_schema.get('type') == 'string' and 'enum' in prop_schema:
+      enum_name = snake_to_pascal(f"{prop_name}_enum")
+      lines.append(f"class {enum_name}(str, Enum):\n")
+      for value in prop_schema['enum']:
+        safe_value = re.sub(r'[^a-zA-Z0-9_]', '_', value.replace('|', '_'))
+        lines.append(f"  {safe_value} = \"{value}\"\n")
+      lines.append("\n")
+
+  lines.append(f"class {model_name}(BaseModel):\n")
+  
+  for prop_name, prop_schema in schema.get('properties', {}).items():
+    prop_type = prop_schema.get('type', 'string')
+    python_type = 'str'
+    
+    # Map JSON Schema types to Python/Pydantic types
+    if prop_type == 'string':
+      if 'enum' in prop_schema:
+        python_type = snake_to_pascal(f"{prop_name}_enum")
+      else:
+        python_type = 'str'
+    elif prop_type == 'integer':
+      python_type = 'int'
+    elif prop_type == 'number':
+      python_type = 'float'
+    elif prop_type == 'boolean':
+      python_type = 'bool'
+    elif prop_type == 'array':
+      item_schema = prop_schema.get('items', {})
+      item_type = item_schema.get('type', 'string')
+      if item_type == 'string':
+        item_python_type = 'str'
+      elif item_type == 'integer':
+        item_python_type = 'int'
+      elif item_type == 'number':
+        item_python_type = 'float'
+      elif item_type == 'boolean':
+        item_python_type = 'bool'
+      elif item_type == 'object':
+        nested_model_name = snake_to_pascal(f"{prop_name}")
+        lines.append(json_schema_to_pydantic(item_schema, nested_model_name))
+        item_python_type = nested_model_name
+      python_type = f"List[{item_python_type}]"
+    elif prop_type == 'object':
+      nested_model_name = snake_to_pascal(f"{prop_name}")
+      lines.append(json_schema_to_pydantic(prop_schema, nested_model_name))
+      python_type = nested_model_name
+    
+    # Handle required fields
+    required = prop_name in schema.get('required', [])
+    if not required:
+      python_type = f"Optional[{python_type}]"
+    
+    lines.append(f"{' ' * indent}{prop_name}: {python_type}\n")
+  
+  return ''.join(lines)
+
+def generate_init_file(models_dir: Path, data_dir: Path):
+  """Generate __init__.py to export models and provide data loading."""
+  model_files = [f.stem for f in models_dir.glob('*.py') if f.name != '__init__.py']
+  data_files = [f.stem for f in data_dir.glob('*.json')]
+  
+  init_content = ["from pathlib import Path\n"]
+  init_content.append("from . import (\n")
+  init_content.extend(f"  {model},\n" for model in model_files)
+  init_content.append(")\n\n")
+  
+  init_content.append("# Data loading\n")
+  init_content.append("DATA_DIR = Path(__file__).parent / 'data'\n")
+  init_content.append("def load_data(file_name: str) -> dict:\n")
+  init_content.append("  with open(DATA_DIR / f'{file_name}.json') as f:\n")
+  init_content.append("    return json.load(f)\n\n")
+  
+  init_content.append("# Available data files\n")
+  init_content.append("DATA_FILES = {\n")
+  for data_file in data_files:
+    key = data_file.replace('app_', '').replace('_', '-')
+    init_content.append(f"  '{key}': '{data_file}',\n")
+  init_content.append("}\n")
+  
+  save_file(''.join(init_content), models_dir / '__init__.py')
+  print(f"Generated {models_dir / '__init__.py'}")
+
+def main():
+  # Paths
+  base_dir = Path(__file__).parent.parent.parent
+  schema_dir = base_dir / 'model' / 'schema'
+  ucop_dir = base_dir / 'model' / 'ucop-finapps'
+  output_models_dir = base_dir / 'app' / 'models'
+  output_data_dir = base_dir / 'app' / 'data'
+  
+  # Create output directories
+  output_models_dir.mkdir(parents=True, exist_ok=True)
+  output_data_dir.mkdir(parents=True, exist_ok=True)
+  
+  # Process schema files
+  for schema_file in schema_dir.glob('*.json'):
+    schema_name = schema_file.stem
+    schema_data = load_json(schema_file)
+    model_name = snake_to_pascal(schema_name)
+    
+    # Generate Pydantic model
+    pydantic_model = json_schema_to_pydantic(schema_data, model_name)
+    model_path = output_models_dir / f"{schema_name}.py"
+    save_file(pydantic_model, model_path)
+    print(f"Generated Pydantic model for {schema_name} at {model_path}")
+  
+  # Copy app, org, and group JSON files
+  for json_file in ucop_dir.glob('*.json'):
+    if json_file.name.startswith('app_') or json_file.name in ['org_ucop.json', 'group_finapps.json']:
+      dest_path = output_data_dir / json_file.name
+      json_data = load_json(json_file)
+      save_file(json.dumps(json_data, indent=2), dest_path)
+      print(f"Copied {json_file.name} to {dest_path}")
+  
+  # Generate __init__.py for models
+  generate_init_file(output_models_dir, output_data_dir)
+
+if __name__ == '__main__':
+  main()
+=== ./ucop/finapps/gen/apps.py ===
+#!/usr/bin/env python3
+
+import json
+import os
+from copy import deepcopy
+
+# Define paths relative to the script's location (ucop/finapps/gen/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCHEMA_DIR = os.path.join(BASE_DIR, "../../schema")
+UCOP_DIR = os.path.join(BASE_DIR, "..")
+APPS_JSON = os.path.join(BASE_DIR, "apps.json")
+APP_SCHEMA = os.path.join(SCHEMA_DIR, "app.json")
+ENV_SCHEMA = os.path.join(SCHEMA_DIR, "environment.json")
+GROUP_JSON = os.path.join(UCOP_DIR, "group_finapps.json")
+OUTPUT_DIR = UCOP_DIR
+
+def load_json_file(filepath):
+    """Load a JSON file and return its contents."""
+    try:
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Error: File {filepath} not found.")
+        raise
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON in {filepath}.")
+        raise
+
+def parse_delimited_values(value):
+    """Parse [|]-delimited values from schema (e.g., [dev|qa|prod]) into a list."""
+    if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+        return value[1:-1].split('|')
+    return [value] if value else []
+
+def generate_environments(env_schema, app_defaults, app_name):
+    """Generate environment objects based on environment.json schema and app defaults."""
+    env_instances = []
+    env_values = parse_delimited_values(env_schema.get("env", ""))
+    name_values = parse_delimited_values(env_schema.get("name", ""))
+
+    if len(name_values) < len(env_values):
+        name_values.extend([f"{env}-env" for env in env_values[len(name_values):]])
+
+    for env, name in zip(env_values, name_values):
+        env_config = deepcopy(env_schema)
+        for key, value in env_config.items():
+            if isinstance(value, str) and value.startswith('[') and value.endswith(']'):
+                env_config[key] = env if key == "env" else name if key == "name" else value
+            elif value:
+                env_config[key] = value
+            else:
+                env_config[key] = ""
+
+        for default_env in app_defaults.get("environments", []):
+            for key, value in default_env.items():
+                if key in env_config and value:
+                    env_config[key] = value.replace("{env}", env)
+
+        env_config["aws_account_name"] = "finapps-prod" if env == "prod" else "finapps-dev"
+        env_config["deploy_pipeline_name"] = f"{app_name}-{env}-pipeline"
+
+        env_instances.append(env_config)
+    return env_instances
+
+def generate_app_json(app_name, defaults, app_schema, env_schema, group_data):
+    """Generate a single app_{name}.json file based on schema and defaults."""
+    app_config = deepcopy(app_schema)
+    app_defaults = defaults.get("app", {})
+
+    # Apply defaults
+    for key, value in app_defaults.items():
+        if key in app_config and key not in ["source", "environments", "confluence", "box", "jira", "service_now", "datadog"]:
+            app_config[key] = value.replace("{name}", app_name) if isinstance(value, str) else value
+        elif key == "source":
+            for src_key, src_value in value.items():
+                if src_key == "aws_account_name":
+                    app_config["source"]["aws_account_name"] = src_value
+                else:
+                    app_config["source"][src_key] = src_value.replace("{name}", app_name) if isinstance(src_value, str) else src_value
+
+    # Set basic fields
+    app_config["name"] = app_name
+    app_config["short_name"] = app_config.get("short_name") or app_name
+    app_config["long_name"] = app_config.get("long_name") or f"{app_name.capitalize()} Application"
+    app_config["description"] = app_config.get("description") or f"Financial application for {app_name}"
+
+    # Generate environments
+    app_config["environments"] = generate_environments(env_schema, app_defaults, app_name)
+
+    # Apply service links and assignment groups from defaults or group data
+    app_config["confluence"] = deepcopy(app_defaults.get("confluence", {
+        "links": group_data.get("confluence", {}).get("links", [])
+    }))
+    app_config["box"] = deepcopy(app_defaults.get("box", {
+        "links": group_data.get("box", {}).get("links", [])
+    }))
+    app_config["jira"] = deepcopy(app_defaults.get("jira", {
+        "project_keys": [app_name.upper()],
+        "links": group_data.get("jira", {}).get("links", [])
+    }))
+    app_config["service_now"] = {
+        "links": app_defaults.get("service_now", {}).get("links", group_data.get("service_now", {}).get("links", [])),
+        "assignment_groups": [
+            group for group in app_defaults.get("service_now", {}).get("assignment_groups", group_data.get("service_now", {}).get("assignment_groups", []))
+            if group.get("apps") and (app_name in group["apps"] or group["apps"] == ["ALL"])
+        ]
+    }
+    app_config["datadog"] = deepcopy(app_defaults.get("datadog", {
+        "links": group_data.get("data_dog", {}).get("links", [])
+    }))
+
+    return app_config
+
+def main():
+    apps_data = load_json_file(APPS_JSON)
+    app_schema = load_json_file(APP_SCHEMA)
+    env_schema = load_json_file(ENV_SCHEMA)
+    group_data = load_json_file(GROUP_JSON)
+
+    app_names = apps_data.get("apps", [])
+    defaults = apps_data.get("defaults", {})
+
+    for app_name in app_names:
+        app_config = generate_app_json(app_name, defaults, app_schema, env_schema, group_data)
+        output_file = os.path.join(OUTPUT_DIR, f"app_{app_name}.json")
+        with open(output_file, 'w') as f:
+            json.dump(app_config, f, indent=2)
+        print(f"Generated {output_file}")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        exit(1)
+=== ./ucop/finapps/validate.py ===
+#!/usr/bin/env python3
+
+import json
+import os
+import logging
+import glob
+from typing import Any, Dict, List
+
+# Configure logging
+logging.basicConfig(
+  level=logging.INFO,
+  format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+# Define paths relative to the script's location (ucop-finapps/)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCHEMA_DIR = os.path.join(BASE_DIR, "../schema")
+APP_SCHEMA = os.path.join(SCHEMA_DIR, "app.json")
+APP_FILES_GLOB = os.path.join(BASE_DIR, "app_*.json")
+
+def load_json_file(filepath: str) -> Dict:
+  """Load a JSON file and return its contents."""
+  try:
+    with open(filepath, 'r') as f:
+      return json.load(f)
+  except FileNotFoundError:
+    logger.error(f"File {filepath} not found.")
+    raise
+  except json.JSONDecodeError:
+    logger.error(f"Invalid JSON in {filepath}.")
+    raise
+
+def get_expected_type(schema_value: Any) -> str:
+  """Determine the expected type from a schema value."""
+  if isinstance(schema_value, dict):
+    return "object"
+  if isinstance(schema_value, list):
+    return "array"
+  if isinstance(schema_value, str):
+    return "string"
+  if isinstance(schema_value, bool):
+    return "boolean"
+  if isinstance(schema_value, (int, float)):
+    return "number"
+  return "null"
+
+def validate_properties(data: Dict, schema: Dict, path: str, file_name: str) -> List[str]:
+  """Recursively validate properties in data against schema, returning discrepancies."""
+  discrepancies = []
+
+  # Check for missing or type-mismatched properties
+  for key, schema_value in schema.items():
+    current_path = f"{path}.{key}" if path else key
+    expected_type = get_expected_type(schema_value)
+
+    if key not in data:
+      discrepancies.append(f"{file_name}: Missing property '{current_path}' (expected {expected_type})")
+      continue
+
+    data_value = data[key]
+    actual_type = get_expected_type(data_value)
+
+    # Type mismatch check
+    if actual_type != expected_type:
+      discrepancies.append(
+        f"{file_name}: Type mismatch for '{current_path}' (expected {expected_type}, found {actual_type})"
+      )
+      continue
+
+    # Recursive check for objects and arrays
+    if expected_type == "object":
+      discrepancies.extend(validate_properties(data_value, schema_value, current_path, file_name))
+    elif expected_type == "array" and schema_value and isinstance(schema_value[0], dict):
+      for i, item in enumerate(data_value):
+        discrepancies.extend(validate_properties(item, schema_value[0], f"{current_path}[{i}]", file_name))
+
+  # Check for unexpected properties
+  for key in data:
+    if key not in schema:
+      current_path = f"{path}.{key}" if path else key
+      discrepancies.append(f"{file_name}: Unexpected property '{current_path}'")
+
+  return discrepancies
+
+def main():
+  """Validate all app_*.json files against schema/app.json."""
+  try:
+    # Load schema
+    app_schema = load_json_file(APP_SCHEMA)
+
+    # Find all app_*.json files
+    app_files = glob.glob(APP_FILES_GLOB)
+    if not app_files:
+      logger.warning("No app_*.json files found in %s", BASE_DIR)
+      return
+
+    # Validate each file
+    all_valid = True
+    for app_file in app_files:
+      file_name = os.path.basename(app_file)
+      logger.info("Validating %s...", file_name)
+      app_data = load_json_file(app_file)
+
+      # Validate properties
+      discrepancies = validate_properties(app_data, app_schema, "", file_name)
+      if discrepancies:
+        all_valid = False
+        for discrepancy in discrepancies:
+          logger.error(discrepancy)
+      else:
+        logger.info("%s: Valid", file_name)
+
+    # Summary
+    if all_valid:
+      logger.info("All app files are valid!")
+    else:
+      logger.error("Validation failed for one or more app files.")
+
+  except Exception as e:
+    logger.error("Error: %s", str(e))
+    exit(1)
+
+if __name__ == "__main__":
+  main()

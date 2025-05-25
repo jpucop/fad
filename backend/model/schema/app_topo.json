@@ -1,55 +1,84 @@
 {
-  "app_name": "",
-  "environment": "",
-  "deploy_profile": "",
+  "app_name": "string",
+  "environment": "string",
+  "deploy_profile": "string",
   "created": "timestamp",
-  
+  "source": {
+    "git_branch_name": "string",
+    "git_commit": "string",
+    "git_origin_url": "string",
+    "project_name": "string"
+  },
   "aws": {
-    "account_name": "",
-    
+    "account_name": "string",
+    "account_id": "string",
     "codepipeline": {
-      "name": "",
-      "arn": ""
+      "name": "string",
+      "arn": "string",
+      "last_deployment_timestamp": "string"
     },
     "ecs": {
-      "cluster_name": "",
-      "service_name": "",
-      "cw_log_groups": []
+      "cluster_name": "string",
+      "service_name": "string",
+      "task_definition_arn": "string",
+      "status": "string",
+      "running_count": "integer",
+      "health": "string",
+      "version": "string",
+      "containers": [
+        {
+          "name": "string",
+          "image": "string",
+          "log_group_name": "string"
+        }
+      ],
+      "cw_log_groups": [
+        {
+          "name": "string",
+          "arn": "string"
+        }
+      ]
     },
     "alb": {
-      "arn": "",
-      "name": "",
-      "dns_name": "",
-      "certificate_arn": "",
-      "cw_log_groups": []
+      "arn": "string",
+      "name": "string",
+      "dns_name": "string",
+      "certificate_arn": "string",
+      "protocol": "string",
+      "port": "integer",
+      "status": "string",
+      "health": "string",
+      "cw_log_groups": [
+        {
+          "name": "string",
+          "arn": "string"
+        }
+      ]
     },
     "rds": {
       "instances": [
         {
-          "arn": "",
-          "identifier": "",
-          "tags": [""],
-          "cw_log_groups": []
+          "arn": "string",
+          "identifier": "string",
+          "endpoint": "string",
+          "status": "string",
+          "tags": ["string"],
+          "cw_log_groups": [
+            {
+              "name": "string",
+              "arn": "string"
+            }
+          ]
         }
       ]
     },
     "s3": {
       "buckets": [
         {
-          "name": "",
-          "s3_url": "",
-          "arn": "",
-          "tags": [""]
-        }
-      ]
-    },
-    "cloudwatch": {
-      "log_groups": [
-        {
-          "name": "",
-          "type": "",
-          "arn": "",
-          "source_arn": ""
+          "name": "string",
+          "s3_url": "string",
+          "arn": "string",
+          "tags": ["string"]
         }
       ]
     }
