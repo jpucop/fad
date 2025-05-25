@@ -1,23 +1,39 @@
 {
-  "schema_description": "Defines an organization, including metadata and service integrations",
-  
+  "_schema_description": "Defines an organization with service integrations",
   "name": "",
   "full_name": "",
   "description": "",
+  "aws_accounts": [
+    {
+      "name": "",
+      "account_id": "",
+      "region": "us-west-2",
+      "description": ""
+    }
+  ],
   "confluence": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "box": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "jira": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "data_dog": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "service_now": {
-    "links": []
-  },
-  "aws_accounts": []
+    "name": "",
+    "description": "",
+    "url": ""
+  }
 }

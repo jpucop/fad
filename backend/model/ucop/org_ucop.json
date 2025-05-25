@@ -11,48 +11,28 @@
     }
   ],
   "confluence": {
-    "links": [
-      {
-        "name": "UCOP Confluence",
-        "description": "Confluence space for UCOP",
-        "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
-      }
-    ]
+    "name": "UCOP Confluence",
+    "description": "Confluence space for UCOP",
+    "url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
   },
   "box": {
-    "links": [
-      {
-        "name": "UCOP Box",
-        "description": "Box storage for UCOP",
-        "url": "https://ucop.app.box.com"
-      }
-    ]
+    "name": "UCOP Box",
+    "description": "Box storage for UCOP",
+    "url": "https://ucop.app.box.com"
   },
   "jira": {
-    "links": [
-      {
-        "name": "UCOP Jira",
-        "description": "Jira instance for UCOP",
-        "url": "https://ucopedu.atlassian.net/jira/"
-      }
-    ]
+    "name": "UCOP Jira",
+    "description": "Jira instance for UCOP",
+    "url": "https://ucopedu.atlassian.net/jira/"
   },
   "data_dog": {
-    "links": [
-      {
-        "name": "UCOP DataDog",
-        "description": "DataDog monitoring for UCOP",
-        "url": "https://dd.com/ucop/index.html"
-      }
-    ]
+    "name": "UCOP DataDog",
+    "description": "DataDog monitoring for UCOP",
+    "url": "https://dd.com/ucop/index.html"
   },
   "service_now": {
-    "links": [
-      {
-        "name": "UCOP ServiceNow",
-        "description": "ServiceNow dashboard for UCOP",
-        "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
-      }
-    ]
+    "name": "UCOP ServiceNow",
+    "description": "ServiceNow dashboard for UCOP",
+    "url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do"
   }
 }

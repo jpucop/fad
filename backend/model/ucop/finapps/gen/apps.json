@@ -1,39 +1,59 @@
 {
-  "description": "Lists applications and their default configurations",
+  "_schema_description": "Lists applications and their default configurations",
+  
   "apps": ["csg", "rems", "ayso", "wage", "itf", "ise"],
   "defaults": {
     "app": {
+      "name": "",
       "short_name": "{name}",
       "long_name": "{name} Application",
-      "description": "{name} application managed by Financial Applications Group at UCOP",
+      "description": "Financial application for {name}",
       "org": "ucop",
       "group": "finapps",
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate-rds",
       "source": {
         "project_name": "{name}",
-        "git_origin_url": "https://github.com/ucop/{name}.git",
+        "git_origin_url": "",
         "production_branch_name": "main",
-        "aws_account_name": "finapps-dev"
+        "aws": {
+          "account_name": "finapps-dev"
+        }
       },
       "confluence": {
+        "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
       },
       "box": {
+        "group_web_url": "https://ucop.app.box.com/FA/"
       },
       "jira": {
-        "project_keys": []
+        "project_keys": ["{name}"],
+        "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
       },
       "service_now": {
+        "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+        "assignment_groups": [
+          {
+            "name": "FINAPPS AWS Tech Support",
+            "apps": ["ALL"]
+          }
+        ]
       },
       "datadog": {
+        "group_web_url": "https://dd.com/ucop/finapps/index.html"
       },
       "environments": [
         {
+          "env": "[dev|qa|prod]",
+          "name": "[development|staging|production]",
           "host": "aws",
           "app_profile": "tomcat-java",
           "deploy_profile": "aws-cicd-fargate-rds",
+          "deploy_pipeline_name": "{name}-{env}-pipeline",
           "git_branch": "{env}",
-          "aws_account_name": "finapps-dev"
+          "aws": {
+            "account_name": "finapps-{env}"
+          }
         }
       ]
     }

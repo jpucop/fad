@@ -1,12 +1,170 @@
 {
+  "_schema_description": "Captures runtime snapshot details for an application",
   "snapshot_id": "",
-  "snapshot_timestamp": "",  
-  
+  "snapshot_timestamp": "",
   "app_name": "",
   "environment": "",
-  
-  "source": {},
-  "aws": {},
-  "logs": {},
-  "vulnerabilities": {}
+  "source": {
+    "deployment_commit": {
+      "commit_id": "",
+      "timestamp": "",
+      "branch": "",
+      "message": "",
+      "commitor": ""
+    },
+    "latest_commits": [
+      {
+        "commit_id": "",
+        "timestamp": "",
+        "branch": "",
+        "message": "",
+        "commitor": ""
+      }
+    ]
+  },
+  "aws": {
+    "account_name": "",
+    "codepipeline": {
+      "execution_id": "",
+      "status": "",
+      "timestamp": ""
+    },
+    "ecs": {
+      "running_count": 0,
+      "desired_count": 0,
+      "status": "",
+      "containers": [
+        {
+          "container_name": "",
+          "cpu_percent": 0.0,
+          "memory_mb": 0,
+          "status": "",
+          "health": "",
+          "dockerfile": ""
+        }
+      ],
+      "cw_log_groups": [
+        {
+          "name": "",
+          "arn": ""
+        }
+      ]
+    },
+    "alb": {
+      "arn": "",
+      "state": "",
+      "active_connections": 0,
+      "dns_name": "",
+      "certificate": {
+        "expires": "",
+        "status": ""
+      },
+      "cw_log_groups": [
+        {
+          "name": "",
+          "arn": ""
+        }
+      ]
+    },
+    "rds": {
+      "instances": [
+        {
+          "arn": "",
+          "identifier": "",
+          "endpoint": "",
+          "status": "",
+          "tags": [],
+          "cw_log_groups": [
+            {
+              "name": "",
+              "arn": ""
+            }
+          ]
+        }
+      ]
+    },
+    "s3": {
+      "buckets": [
+        {
+          "name": "",
+          "s3_url": "",
+          "arn": "",
+          "size_mb": 0,
+          "last_modified": "",
+          "num_files": 0,
+          "tags": []
+        }
+      ]
+    },
+    "trusted_advisor": {
+      "criticals": 0,
+      "warnings": 0,
+      "issues": [
+        {
+          "id": "",
+          "date_created": "",
+          "name": "",
+          "status": "",
+          "description": ""
+        }
+      ]
+    }
+  },
+  "logs": {
+    "app": {
+      "cloudwatch_log_group_name": "",
+      "cloudwatch_log_group_arn": "",
+      "web_url": "",
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "alb": {
+      "cloudwatch_log_group_name": "",
+      "cloudwatch_log_group_arn": "",
+      "web_url": "",
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "rds": {
+      "cloudwatch_log_group_name": "",
+      "cloudwatch_log_group_arn": "",
+      "web_url": "",
+      "recent": [
+        {
+          "timestamp": "",
+          "output": "",
+          "severity": ""
+        }
+      ],
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "vulnerabilities": {
+    "open": 0,
+    "critical": 0,
+    "latest": [
+      {
+        "id": "",
+        "severity": "",
+        "description": "",
+        "reported": "",
+        "web_url": ""
+      }
+    ]
+  }
 }

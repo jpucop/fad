@@ -1,25 +1,55 @@
 {
-  "schema_description": "Defines a group within an organization, including members and service integrations",
-  
+  "_schema_description": "Defines a group within an organization",
   "name": "",
   "full_name": "",
   "description": "",
-  "members": [],
-  "aws_accounts": [],
+  "members": [
+    {
+      "name": "",
+      "work_email": "",
+      "title": "",
+      "web_url": "",
+      "role": "",
+      "teams": []
+    }
+  ],
+  "aws_accounts": [
+    {
+      "name": "",
+      "account_id": "",
+      "region": "us-west-2",
+      "description": ""
+    }
+  ],
   "confluence": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "box": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "jira": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "data_dog": {
-    "links": []
+    "name": "",
+    "description": "",
+    "url": ""
   },
   "service_now": {
-    "links": [],
-    "assignment_groups": []
+    "name": "",
+    "description": "",
+    "url": "",
+    "assignment_groups": [
+      {
+        "name": "",
+        "apps": []
+      }
+    ]
   }
 }

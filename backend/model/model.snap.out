@@ -741,7 +741,7 @@
 }
 === ./schema/app_snapshoot_source.json ===
 {
-  "schema_description": "Captures source code and commit details for an application snapshot",
+  "_schema_description": "Captures source code and commit details for an application snapshot",
   
   "deployment_commit": {
     "commit_id": "",
@@ -813,7 +813,7 @@
 }
 === ./schema/member.json ===
 {
-  "schema_description": "Defines a team member",
+  "_schema_description": "Defines a team member",
   
   "name": "",
   "work_email": "",
@@ -1103,7 +1103,7 @@
 }
 === ./schema/group.json ===
 {
-  "schema_description": "Defines a group within an organization, including members and service integrations",
+  "_schema_description": "Defines a group within an organization, including members and service integrations",
   
   "name": "",
   "full_name": "",
@@ -1129,7 +1129,7 @@
 }
 === ./schema/org.json ===
 {
-  "schema_description": "Defines an organization, including metadata and service integrations",
+  "_schema_description": "Defines an organization, including metadata and service integrations",
   
   "name": "",
   "full_name": "",

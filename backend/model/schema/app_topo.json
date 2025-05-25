@@ -1,84 +1,44 @@
 {
-  "app_name": "string",
-  "environment": "string",
-  "deploy_profile": "string",
-  "created": "timestamp",
+  "_schema_description": "Defines AWS topology references for an application",
+  "app_name": "",
+  "environment": "",
+  "deploy_profile": "",
+  "created": "",
   "source": {
-    "git_branch_name": "string",
-    "git_commit": "string",
-    "git_origin_url": "string",
-    "project_name": "string"
+    "git_branch_name": "",
+    "git_origin_url": "",
+    "project_name": ""
   },
   "aws": {
-    "account_name": "string",
-    "account_id": "string",
+    "account_name": "",
+    "account_id": "",
     "codepipeline": {
-      "name": "string",
-      "arn": "string",
-      "last_deployment_timestamp": "string"
+      "name": "",
+      "arn": ""
     },
     "ecs": {
-      "cluster_name": "string",
-      "service_name": "string",
-      "task_definition_arn": "string",
-      "status": "string",
-      "running_count": "integer",
-      "health": "string",
-      "version": "string",
-      "containers": [
-        {
-          "name": "string",
-          "image": "string",
-          "log_group_name": "string"
-        }
-      ],
-      "cw_log_groups": [
-        {
-          "name": "string",
-          "arn": "string"
-        }
-      ]
+      "cluster_name": "",
+      "service_name": "",
+      "task_definition_arn": ""
     },
     "alb": {
-      "arn": "string",
-      "name": "string",
-      "dns_name": "string",
-      "certificate_arn": "string",
-      "protocol": "string",
-      "port": "integer",
-      "status": "string",
-      "health": "string",
-      "cw_log_groups": [
-        {
-          "name": "string",
-          "arn": "string"
-        }
-      ]
+      "arn": "",
+      "name": "",
+      "dns_name": ""
     },
     "rds": {
       "instances": [
         {
-          "arn": "string",
-          "identifier": "string",
-          "endpoint": "string",
-          "status": "string",
-          "tags": ["string"],
-          "cw_log_groups": [
-            {
-              "name": "string",
-              "arn": "string"
-            }
-          ]
+          "arn": "",
+          "identifier": ""
         }
       ]
     },
     "s3": {
       "buckets": [
         {
-          "name": "string",
-          "s3_url": "string",
-          "arn": "string",
-          "tags": ["string"]
+          "name": "",
+          "arn": ""
         }
       ]
     }

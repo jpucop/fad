@@ -1,16 +1,13 @@
 {
+  "_schema_description": "Defines an application with its environments and service integrations",
   "name": "",
-  
   "short_name": "",
   "long_name": "",
   "description": "",
-  
   "org": "ucop",
   "group": "",
-  
   "app_profile": "",
   "deploy_profile": "",
-  
   "source": {
     "project_name": "",
     "git_origin_url": "",
@@ -30,21 +27,39 @@
     }
   ],
   "confluence": {
-    "links": []
+    "group_web_url": ""
   },
   "box": {
-    "links": []
+    "group_web_url": ""
   },
   "jira": {
     "project_keys": [],
-    "links": []
+    "group_web_url": ""
   },
   "service_now": {
-    "assignment_groups": [],
-    "links": []
+    "group_web_url": "",
+    "assignment_groups": [
+      {
+        "name": "",
+        "apps": []
+      }
+    ]
   },
   "datadog": {
-    "links": []
+    "group_web_url": ""
   },
-  "environments": []
+  "environments": [
+    {
+      "env": "",
+      "name": "",
+      "host": "aws",
+      "app_profile": "",
+      "deploy_profile": "",
+      "deploy_pipeline_name": "",
+      "git_branch": "",
+      "aws": {
+        "account_name": ""
+      }
+    }
+  ]
 }
