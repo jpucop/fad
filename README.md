@@ -8,6 +8,27 @@ Financial Applications UCOP group aggregate dashboard widget.
 
 ```sh
 
+catsnap() {
+  local search_dir="${1:-.}"  # Default to current directory if not specified
+  local parent_dir_name=$(basename "$(realpath "$search_dir")")  # Get basename of the directory
+  local output_file="concat-${parent_dir_name}.txt"  # Output file named concat-<dirname>.txt
+  
+  # Clear output file if it exists, or create new
+  : > "$output_file"
+  
+  # Find all files with specified extensions, excluding node_modules, dist, and package-lock.json
+  find "$search_dir" -type f \
+    \( -name "*.json" -o -name "*.js" -o -name "*.py" -o -name "*.html" -o -name "*.css" \) \
+    ! -path "*/node_modules/*" ! -path "*/dist/*" ! -name "package-lock.json" | while read -r mfile; do
+    # Append filename as header
+    echo "=== $mfile ===" >> "$output_file"
+    # Append file contents
+    cat "$mfile" >> "$output_file"
+    # Add newline separator
+    echo "" >> "$output_file"
+  done
+}
+
 concat_json_files() {
   local output_file="model_snapshot.txt"
   local search_dir="${2:-.}"  # Default to current directory if not specified
@@ -50,7 +71,7 @@ pip-compile requirements.in
 pip-compile requirements-test.in
 
 ptree() { 
-  tree -I "venv|.git|.gitignore|.gitmodules"
+  tree -I "venv|.git|.gitignore|.gitmodules|node_modules|package-lock.json"
 }
 
 ```

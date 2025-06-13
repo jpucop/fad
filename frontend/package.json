@@ -5,15 +5,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "clean:node": "rimraf node_modules package-lock.json",
-    "clean:dist": "rimraf dist",
-    "copy:static": "node ./scripts/copy-static.js",
-    "build:css": "node ./scripts/build-css.js",
-    "build:icons": "node ./scripts/build-icons.js",
-    "inject:icons": "node ./scripts/inject-icons.js",
-    "build:js": "node ./scripts/build-js.js",
-    "build": "npm run copy:static && npm run build:css && npm run build:icons && npm run inject:icons && npm run build:js",
-    "bld": "npm run copy:static && npm run build:css && npm run build:js",
+    "clean": "rimraf node_modules package-lock.json dist",
+    "lclean": "node ./scripts/lclean.js",
+    "sprite": "node ./scripts/sprite.js",
+    "build": "node ./scripts/build.js",
     "dev": "npx serve ./dist"
   },
   "devDependencies": {
@@ -23,11 +18,11 @@
     "@tailwindcss/cli": "4.1.7",
     "alpinejs": "3.14.9",
     "autoprefixer": "10.4.21",
-    "esbuild": "^0.25.4",
+    "esbuild": "0.25.4",
     "postcss": "8.5.3",
     "rimraf": "6.0.1",
     "serve": "14.2.4",
-    "svgo": "^3.3.2",
+    "svgo": "3.3.2",
     "tailwindcss": "4.1.7"
   }
 }
