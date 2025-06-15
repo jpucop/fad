@@ -5,62 +5,57 @@ import { SVG, cleanupSVG, parseColors } from '@iconify/tools';
 import { getIconData } from '@iconify/utils';
 import { execSync } from 'child_process';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const imgPath = path.join(__dirname, '../src/img');
-const indexHtmlPath = path.join(__dirname, '../src/index.html');
-const spritePath = path.join(__dirname, '../src/icons.svg');
-const distSpritePath = path.join(__dirname, '../dist/icons/icons.svg');
-
-console.log(`🛠️ Building sprite: ${spritePath}`);
-
-// Validate paths
-function validatePaths() {
-  if (!fs.existsSync(imgPath)) {
-    fs.mkdirSync(imgPath, { recursive: true });
+class Config {
+  constructor() {
+    this.dirname = path.dirname(fileURLToPath(import.meta.url));
+    this.srcPath = path.join(this.dirname, '../src');
+    this.distPath = path.join(this.dirname, '../dist');
+    this.imgPath = path.join(this.srcPath, 'img');
+    this.indexHtmlPath = path.join(this.srcPath, 'index.html');
+    this.spritePath = path.join(this.srcPath, 'sprite.svg');
+    this.distSpritePath = path.join(this.distPath, 'sprite.svg');
   }
-  if (!fs.existsSync(path.dirname(distSpritePath))) {
-    fs.mkdirSync(path.dirname(distSpritePath), { recursive: true });
-  }
-  if (!fs.existsSync(indexHtmlPath)) {
-    throw new Error(`index.html not found at ${indexHtmlPath}`);
+
+  validate() {
+    if (!fs.existsSync(this.imgPath)) fs.mkdirSync(this.imgPath, { recursive: true });
+    if (!fs.existsSync(this.distPath)) fs.mkdirSync(this.distPath, { recursive: true });
+    if (!fs.existsSync(this.indexHtmlPath)) throw new Error('index.html not found: ' + this.indexHtmlPath);
   }
 }
 
-// Check if rebuild is needed
-function needsRebuild() {
+function needsRebuild(config) {
   try {
     const diff = execSync('git diff --name-only HEAD', { encoding: 'utf8' });
     if (diff.includes('src/img/') || diff.includes('src/index.html')) {
       console.log('📌 Changes detected in img/ or index.html');
       return true;
     }
-    if (!fs.existsSync(spritePath)) {
+    if (!fs.existsSync(config.spritePath)) {
       console.log('📌 No sprite found');
       return true;
     }
-    const spriteMtime = fs.statSync(spritePath).mtimeMs;
-    if (fs.statSync(indexHtmlPath).mtimeMs > spriteMtime) {
+    const spriteMtime = fs.statSync(config.spritePath).mtimeMs;
+    if (fs.statSync(config.indexHtmlPath).mtimeMs > spriteMtime) {
       console.log('📌 index.html is newer');
       return true;
     }
-    const files = fs.readdirSync(imgPath).filter(f => f.endsWith('.svg'));
+    const files = fs.readdirSync(config.imgPath).filter(f => f.endsWith('.svg'));
     for (const file of files) {
-      if (fs.statSync(path.join(imgPath, file)).mtimeMs > spriteMtime) {
-        console.log(`📌 ${file} is newer`);
+      if (fs.statSync(path.join(config.imgPath, file)).mtimeMs > spriteMtime) {
+        console.log('📌 ' + file + ' is newer');
         return true;
       }
     }
     console.log('ℹ️ No changes, copying sprite');
     return false;
   } catch (err) {
-    console.warn(`⚠️ Git diff failed, rebuilding: ${err.message}`);
+    console.warn('⚠️ Git diff failed, rebuilding: ' + err.message);
     return true;
   }
 }
 
-// Get Iconify icons from index.html
-function getIconifyIcons() {
-  const html = fs.readFileSync(indexHtmlPath, 'utf8');
+function getIconifyIcons(config) {
+  const html = fs.readFileSync(config.indexHtmlPath, 'utf8');
   const regex = /i-([a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*)/g;
   const icons = new Set();
   let match;
@@ -70,93 +65,98 @@ function getIconifyIcons() {
   return [...icons];
 }
 
-// Process local SVG
-async function processLocalSvg(file) {
+async function processLocalSvg(file, config) {
   try {
-    const svgContent = fs.readFileSync(path.join(imgPath, file), 'utf8');
+    const svgContent = fs.readFileSync(path.join(config.imgPath, file), 'utf8');
     const svg = new SVG(svgContent);
     cleanupSVG(svg);
     parseColors(svg, { defaultColor: 'currentColor' });
-    const name = `l-${path.basename(file, '.svg')}`;
+    const name = 'l-' + path.basename(file, '.svg');
     return { id: name, content: svg.toMinifiedString() };
   } catch (err) {
-    console.error(`❌ Error processing ${file}: ${err.message}`);
+    console.error('❌ Error processing ' + file + ': ' + err.message);
     return null;
   }
 }
 
-// Process Iconify icon
-async function processIconifyIcon(name) {
+async function processIconifyIcon(name, collection) {
   try {
-    const [prefix, icon] = name.split('-', 2);
-    const iconData = getIconData(prefix, icon);
+    const iconName = name.replace(/^mdi-/, '');
+    console.log('🔍 Processing Iconify icon: ' + name + ' (key: ' + iconName + ')');
+    const iconData = getIconData(collection, iconName);
     if (!iconData) {
-      throw new Error(`Icon ${name} not found`);
+      throw new Error('Icon ' + iconName + ' not found in mdi collection');
     }
-    const svg = new SVG(iconData);
+    const svgContent = `<svg viewBox="0 0 ${iconData.width || 24} ${iconData.height || 24}">${iconData.body}</svg>`;
+    const svg = new SVG(svgContent);
     cleanupSVG(svg);
     parseColors(svg, { defaultColor: 'currentColor' });
-    return { id: `i-${name}`, content: svg.toMinifiedString() };
+    return { id: 'i-' + name, content: svg.toMinifiedString() };
   } catch (err) {
-    console.error(`❌ Error processing ${name}: ${err.message}`);
+    console.error('❌ Error processing ' + name + ': ' + err.message);
     return null;
   }
 }
 
-// Generate sprite
-async function generateSprite() {
-  const localIcons = fs.readdirSync(imgPath).filter(f => f.endsWith('.svg'));
-  const iconifyIcons = getIconifyIcons();
-  console.log(`📋 ${localIcons.length} local SVGs: ${localIcons.join(', ')}`);
-  console.log(`📋 ${iconifyIcons.length} Iconify icons: ${iconifyIcons.join(', ')}`);
+async function generateSprite(config) {
+  const iconifyJsonPath = path.join(config.dirname, '../node_modules/@iconify-json/mdi/icons.json');
+  if (!fs.existsSync(iconifyJsonPath)) {
+    throw new Error('Iconify JSON file not found: ' + iconifyJsonPath);
+  }
+  const mdiIcons = JSON.parse(fs.readFileSync(iconifyJsonPath, 'utf8'));
+  console.log('📄 Loaded mdiIcons with ' + Object.keys(mdiIcons.icons).length + ' icons');
+
+  const localIcons = fs.readdirSync(config.imgPath).filter(f => f.endsWith('.svg'));
+  const iconifyIcons = getIconifyIcons(config);
+  console.log('📋 ' + localIcons.length + ' local SVGs: ' + localIcons.join(', '));
+  console.log('📋 ' + iconifyIcons.length + ' Iconify icons: ' + iconifyIcons.join(', '));
 
   const symbols = [];
   const usedIds = new Set();
 
   for (const file of localIcons) {
-    const result = await processLocalSvg(file);
+    const result = await processLocalSvg(file, config);
     if (result && !usedIds.has(result.id)) {
-      symbols.push(`<symbol id="${result.id}" ${result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '')}</symbol>`);
+      symbols.push('<symbol id="' + result.id + '" ' + result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '') + '</symbol>');
       usedIds.add(result.id);
     }
   }
 
   for (const name of iconifyIcons) {
-    const result = await processIconifyIcon(name);
+    const result = await processIconifyIcon(name, mdiIcons);
     if (result && !usedIds.has(result.id)) {
-      symbols.push(`<symbol id="${result.id}" ${result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '')}</symbol>`);
+      symbols.push('<symbol id="' + result.id + '" ' + result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '') + '</symbol>');
       usedIds.add(result.id);
     }
   }
 
-  const spriteContent = symbols.length ? `<svg style="display:none">${symbols.join('')}</svg>` : '<svg></svg>';
-  fs.writeFileSync(spritePath, spriteContent, 'utf8');
-  fs.writeFileSync(distSpritePath, spriteContent, 'utf8');
-  console.log(`✅ Sprite generated: ${spritePath} and ${distSpritePath}`);
+  const spriteContent = symbols.length ? '<svg style="display:none">' + symbols.join('') + '</svg>' : '<svg></svg>';
+  fs.writeFileSync(config.spritePath, spriteContent, 'utf8');
+  fs.writeFileSync(config.distSpritePath, spriteContent, 'utf8');
+  console.log('✅ Sprite generated: ' + config.spritePath + ', ' + config.distSpritePath);
 }
 
-// Copy existing sprite
-function copySprite() {
-  if (fs.existsSync(spritePath)) {
-    fs.copyFileSync(spritePath, distSpritePath);
-    console.log(`✅ Copied sprite to ${distSpritePath}`);
+function copySprite(config) {
+  if (fs.existsSync(config.spritePath)) {
+    fs.copyFileSync(config.spritePath, config.distSpritePath);
+    console.log('✅ Copied sprite to ' + config.distSpritePath);
   } else {
-    console.warn(`⚠️ No sprite at ${spritePath}, run 'npm run sprite'`);
+    console.warn('⚠️ No sprite at ' + config.spritePath + ', run "npm run sprite"');
   }
 }
 
-// Main
 async function buildSprite() {
   try {
-    validatePaths();
-    if (needsRebuild()) {
-      await generateSprite();
+    const config = new Config();
+    config.validate();
+    if (needsRebuild(config)) {
+      await generateSprite(config);
     } else {
-      copySprite();
+      copySprite(config);
     }
     console.log('✅ Sprite build completed');
   } catch (err) {
-    console.error(`❌ Sprite build failed: ${err.message}`);
+    console.error('❌ Sprite build failed: ' + err.message);
     process.exit(1);
   }
 }

@@ -1,4 +1,4 @@
-@import "tailwindcss" source("../../src");
+@import "tailwindcss";
 
 @theme {
   --color-uc-dark: rgb(57, 59, 49);

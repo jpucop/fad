@@ -79,5 +79,3 @@ async function cleanSvgs() {
     process.exit(1);
   }
 }
-
-cleanSvgs();
