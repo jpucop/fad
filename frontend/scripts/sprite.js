@@ -1,162 +1,258 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { SVG, cleanupSVG, parseColors } from '@iconify/tools';
-import { getIconData } from '@iconify/utils';
-import { execSync } from 'child_process';
+import { iconToSVG, getIconData } from '@iconify/utils';
+import { cleanupSVG, parseColors, runSVGO, SVG } from '@iconify/tools';
+import { optimize } from 'svgo';
+import { CONFIG } from './config.js';
 
-class Config {
-  constructor() {
-    this.dirname = path.dirname(fileURLToPath(import.meta.url));
-    this.srcPath = path.join(this.dirname, '../src');
-    this.distPath = path.join(this.dirname, '../dist');
-    this.imgPath = path.join(this.srcPath, 'img');
-    this.indexHtmlPath = path.join(this.srcPath, 'index.html');
-    this.spritePath = path.join(this.srcPath, 'sprite.svg');
-    this.distSpritePath = path.join(this.distPath, 'sprite.svg');
+// SVGO configuration for optimizing local SVGs
+const svgoConfig = {
+  plugins: [
+    { name: 'removeDimensions' },
+    { name: 'removeAttrs', params: { attrs: ['fill'] } },
+    { name: 'convertTransform' },
+    { name: 'cleanupNumericValues', params: { floatPrecision: 0 } },
+    { name: 'removeUselessStrokeAndFill' },
+    { name: 'mergePaths' },
+    { name: 'removeXMLNS' },
+  ],
+};
+
+// Derived paths
+const srcPath = path.join(CONFIG.paths.dirname, CONFIG.paths.srcDir);
+const spritePath = path.join(srcPath, CONFIG.src.sprite);
+const imgPath = path.join(srcPath, 'img');
+const indexHtmlPath = path.join(srcPath, 'index.html');
+const iconifyPath = path.join(CONFIG.paths.dirname, '../node_modules/@iconify-json');
+
+// Validate config paths
+function validateConfig() {
+  if (!fs.existsSync(indexHtmlPath)) {
+    throw new Error(`❌ index.html not found: ${indexHtmlPath}`);
   }
-
-  validate() {
-    if (!fs.existsSync(this.imgPath)) fs.mkdirSync(this.imgPath, { recursive: true });
-    if (!fs.existsSync(this.distPath)) fs.mkdirSync(this.distPath, { recursive: true });
-    if (!fs.existsSync(this.indexHtmlPath)) throw new Error('index.html not found: ' + this.indexHtmlPath);
+  if (!fs.existsSync(iconifyPath)) {
+    throw new Error(`❌ Iconify packages not found: ${iconifyPath}`);
+  }
+  if (!fs.existsSync(imgPath)) {
+    fs.mkdirSync(imgPath, { recursive: true });
+    console.log(`✅ Created img directory: ${imgPath}`);
   }
 }
 
-function needsRebuild(config) {
-  try {
-    const diff = execSync('git diff --name-only HEAD', { encoding: 'utf8' });
-    if (diff.includes('src/img/') || diff.includes('src/index.html')) {
-      console.log('📌 Changes detected in img/ or index.html');
-      return true;
-    }
-    if (!fs.existsSync(config.spritePath)) {
-      console.log('📌 No sprite found');
-      return true;
-    }
-    const spriteMtime = fs.statSync(config.spritePath).mtimeMs;
-    if (fs.statSync(config.indexHtmlPath).mtimeMs > spriteMtime) {
-      console.log('📌 index.html is newer');
-      return true;
-    }
-    const files = fs.readdirSync(config.imgPath).filter(f => f.endsWith('.svg'));
-    for (const file of files) {
-      if (fs.statSync(path.join(config.imgPath, file)).mtimeMs > spriteMtime) {
-        console.log('📌 ' + file + ' is newer');
-        return true;
+// Extract icon refs from HTML
+function extractIconRefs(html) {
+  const matches = new Set();
+  const spans = html.match(CONFIG.iconConfig.spanRegex) || [];
+  for (const span of spans) {
+    const classMatch = span.match(/class="([^"]*)"/);
+    if (classMatch) {
+      const classes = classMatch[1].split(/\s+/);
+      const iconClass = classes.find(cls => CONFIG.iconConfig.validateRegex.test(cls));
+      if (iconClass && classes.includes('icon')) {
+        matches.add(iconClass);
       }
     }
-    console.log('ℹ️ No changes, copying sprite');
-    return false;
-  } catch (err) {
-    console.warn('⚠️ Git diff failed, rebuilding: ' + err.message);
-    return true;
   }
+  const refs = Array.from(matches);
+  const localRefs = refs.filter(ref => ref.startsWith('l-'));
+  const iconifyRefs = refs.filter(ref => ref.startsWith('i-'));
+  console.log(`✅ Found ${refs.length} icon refs:`);
+  console.log(`  - Iconify (${iconifyRefs.length}): ${iconifyRefs.join(', ') || 'none'}`);
+  console.log(`  - Local (${localRefs.length}): ${localRefs.join(', ') || 'none'}`);
+  return refs;
 }
 
-function getIconifyIcons(config) {
-  const html = fs.readFileSync(config.indexHtmlPath, 'utf8');
-  const regex = /i-([a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*)/g;
-  const icons = new Set();
+// Load Iconify icon set
+function loadIconSet(packageName) {
+  const iconSetPath = path.join(iconifyPath, `${packageName}/icons.json`);
+  if (!fs.existsSync(iconSetPath)) {
+    throw new Error(`❌ Iconify package not found: ${iconSetPath}`);
+  }
+  const raw = fs.readFileSync(iconSetPath, 'utf8');
+  const json = JSON.parse(raw);
+  if (!json.icons) {
+    throw new Error(`❌ Invalid icon set in ${packageName}`);
+  }
+  return json;
+}
+
+// Calculate viewBox from SVG paths
+function calculateViewBox(svgContent) {
+  const pathRegex = /d="([^"]+)"/g;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
   let match;
-  while ((match = regex.exec(html))) {
-    icons.add(match[1]);
-  }
-  return [...icons];
-}
-
-async function processLocalSvg(file, config) {
-  try {
-    const svgContent = fs.readFileSync(path.join(config.imgPath, file), 'utf8');
-    const svg = new SVG(svgContent);
-    cleanupSVG(svg);
-    parseColors(svg, { defaultColor: 'currentColor' });
-    const name = 'l-' + path.basename(file, '.svg');
-    return { id: name, content: svg.toMinifiedString() };
-  } catch (err) {
-    console.error('❌ Error processing ' + file + ': ' + err.message);
-    return null;
-  }
-}
-
-async function processIconifyIcon(name, collection) {
-  try {
-    const iconName = name.replace(/^mdi-/, '');
-    console.log('🔍 Processing Iconify icon: ' + name + ' (key: ' + iconName + ')');
-    const iconData = getIconData(collection, iconName);
-    if (!iconData) {
-      throw new Error('Icon ' + iconName + ' not found in mdi collection');
+  while ((match = pathRegex.exec(svgContent)) !== null) {
+    const d = match[1];
+    const coords = d.match(/[\d.-]+/g)?.map(Number) || [];
+    for (let i = 0; i < coords.length; i += 2) {
+      const x = coords[i];
+      const y = coords[i + 1];
+      if (!isNaN(x) && !isNaN(y)) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
     }
-    const svgContent = `<svg viewBox="0 0 ${iconData.width || 24} ${iconData.height || 24}">${iconData.body}</svg>`;
-    const svg = new SVG(svgContent);
-    cleanupSVG(svg);
-    parseColors(svg, { defaultColor: 'currentColor' });
-    return { id: 'i-' + name, content: svg.toMinifiedString() };
-  } catch (err) {
-    console.error('❌ Error processing ' + name + ': ' + err.message);
-    return null;
+  }
+
+  if (minX === Infinity || minY === Infinity || maxX === -Infinity || maxY === -Infinity) {
+    return '0 0 24 24';
+  }
+
+  const padding = 10;
+  const width = maxX - minX;
+  const height = maxY - minY;
+  return `${minX - padding} ${minY - padding} ${width + 2 * padding} ${height + 2 * padding}`;
+}
+
+// Process Iconify icon
+function processIconifyIcon(iconSet, name, ref) {
+  console.log(`✅ Processing Iconify icon: ${ref}`);
+  const iconData = getIconData(iconSet, name);
+  if (!iconData) {
+    throw new Error(`❌ Icon not found: ${name}`);
+  }
+
+  const svgObj = iconToSVG(iconData, {
+    height: '1em',
+    width: 'auto',
+  });
+
+  const viewBox = svgObj.attributes.viewBox || '0 0 24 24';
+  let body = svgObj.body;
+
+  const svg = new SVG(`<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`);
+  cleanupSVG(svg);
+  parseColors(svg, {
+    defaultColor: 'currentColor',
+    callback: (attr, colorStr, color) => !color || color === 'none' ? colorStr : 'currentColor',
+  });
+  runSVGO(svg);
+
+  body = svg.getBody();
+
+  const symbol = `<symbol id="${ref}" viewBox="${viewBox}">${body}</symbol>`;
+  return symbol;
+}
+
+// Process local SVG
+function processLocalSVG(name, ref) {
+  console.log(`✅ Processing local icon: ${ref}`);
+  const svgPath = path.join(imgPath, `${name}.svg`);
+  if (!fs.existsSync(svgPath)) {
+    throw new Error(`❌ Local icon file not found: ${svgPath}`);
+  }
+  let svg = fs.readFileSync(svgPath, 'utf8');
+
+  svg = svg.replace(/<\?xml[^?]*\?>\s*/, '');
+  const optimizedSvg = optimize(svg, svgoConfig).data;
+
+  const viewBoxMatch = optimizedSvg.match(/viewBox="([^"]+)"/);
+  let viewBox = viewBoxMatch ? viewBoxMatch[1] : calculateViewBox(optimizedSvg);
+
+  const content = optimizedSvg
+    .replace(/^<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .trim();
+
+  if (!content) {
+    throw new Error(`❌ No valid SVG content found in ${svgPath}`);
+  }
+
+  const symbol = `<symbol id="${ref}" viewBox="${viewBox}">${content}</symbol>`;
+  return symbol;
+}
+
+export function validateSprite() {
+  validateConfig();
+
+  // Get icon classes from index.html (authoritative source)
+  const html = fs.readFileSync(indexHtmlPath, 'utf8');
+  const iconClasses = extractIconRefs(html);
+
+  // Get symbol IDs from sprite.svg
+  let symbolIds = new Set();
+  if (fs.existsSync(spritePath)) {
+    const spriteContent = fs.readFileSync(spritePath, 'utf8');
+    let match;
+    while ((match = CONFIG.iconConfig.symbolRegex.exec(spriteContent))) {
+      symbolIds.add(match[1]);
+    }
+  }
+  console.log(`✅ Found ${symbolIds.size} symbols in sprite.svg: ${[...symbolIds].join(', ') || 'none'}`);
+
+  // Check for missing and unused icons
+  const missingIcons = iconClasses.filter(id => !symbolIds.has(id));
+  const unusedIcons = [...symbolIds].filter(id => !iconClasses.includes(id));
+
+  if (missingIcons.length || unusedIcons.length || !fs.existsSync(spritePath)) {
+    console.log(`⚠️ Sprite validation failed: ${missingIcons.length} missing, ${unusedIcons.length} unused`);
+    if (missingIcons.length) console.log(`⚠️ Missing icons: ${missingIcons.join(', ')}`);
+    if (unusedIcons.length) console.log(`⚠️ Unused icons: ${unusedIcons.join(', ')}`);
+    console.log('✅ Rebuilding sprite.svg...');
+    generateSprite(iconClasses);
+  } else {
+    console.log('✅ Sprite validation passed');
   }
 }
 
-async function generateSprite(config) {
-  const iconifyJsonPath = path.join(config.dirname, '../node_modules/@iconify-json/mdi/icons.json');
-  if (!fs.existsSync(iconifyJsonPath)) {
-    throw new Error('Iconify JSON file not found: ' + iconifyJsonPath);
-  }
-  const mdiIcons = JSON.parse(fs.readFileSync(iconifyJsonPath, 'utf8'));
-  console.log('📄 Loaded mdiIcons with ' + Object.keys(mdiIcons.icons).length + ' icons');
-
-  const localIcons = fs.readdirSync(config.imgPath).filter(f => f.endsWith('.svg'));
-  const iconifyIcons = getIconifyIcons(config);
-  console.log('📋 ' + localIcons.length + ' local SVGs: ' + localIcons.join(', '));
-  console.log('📋 ' + iconifyIcons.length + ' Iconify icons: ' + iconifyIcons.join(', '));
-
+async function generateSprite(requiredIcons) {
   const symbols = [];
   const usedIds = new Set();
 
-  for (const file of localIcons) {
-    const result = await processLocalSvg(file, config);
-    if (result && !usedIds.has(result.id)) {
-      symbols.push('<symbol id="' + result.id + '" ' + result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '') + '</symbol>');
-      usedIds.add(result.id);
+  for (const ref of requiredIcons) {
+    try {
+      if (ref.startsWith('i-')) {
+        const match = ref.match(/^i-([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+        if (!match) {
+          console.warn(`⚠️ Invalid Iconify ref: ${ref}`);
+          continue;
+        }
+        const [, pkg, name] = match;
+        const iconSet = loadIconSet(pkg);
+        const symbol = processIconifyIcon(iconSet, name, ref);
+        if (!usedIds.has(ref)) {
+          symbols.push(symbol);
+          usedIds.add(ref);
+          console.log(`✅ Added Iconify symbol to sprite: ${ref}`);
+        }
+      } else if (ref.startsWith('l-')) {
+        const name = ref.slice(2);
+        const symbol = processLocalSVG(name, ref);
+        if (!usedIds.has(ref)) {
+          symbols.push(symbol);
+          usedIds.add(ref);
+          console.log(`✅ Added local symbol to sprite: ${ref}`);
+        }
+      } else {
+        console.warn(`⚠️ Unknown icon ref format: ${ref}`);
+      }
+    } catch (err) {
+      console.error(`❌ Error processing ${ref}: ${err.message}`);
+      continue;
     }
   }
 
-  for (const name of iconifyIcons) {
-    const result = await processIconifyIcon(name, mdiIcons);
-    if (result && !usedIds.has(result.id)) {
-      symbols.push('<symbol id="' + result.id + '" ' + result.content.replace(/^<svg/, '').replace(/<\/svg>$/, '') + '</symbol>');
-      usedIds.add(result.id);
-    }
-  }
-
-  const spriteContent = symbols.length ? '<svg style="display:none">' + symbols.join('') + '</svg>' : '<svg></svg>';
-  fs.writeFileSync(config.spritePath, spriteContent, 'utf8');
-  fs.writeFileSync(config.distSpritePath, spriteContent, 'utf8');
-  console.log('✅ Sprite generated: ' + config.spritePath + ', ' + config.distSpritePath);
-}
-
-function copySprite(config) {
-  if (fs.existsSync(config.spritePath)) {
-    fs.copyFileSync(config.spritePath, config.distSpritePath);
-    console.log('✅ Copied sprite to ' + config.distSpritePath);
+  if (symbols.length > 0) {
+    const spriteContent = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n${symbols.join('\n')}\n</svg>`;
+    fs.mkdirSync(path.dirname(spritePath), { recursive: true });
+    fs.writeFileSync(spritePath, spriteContent, 'utf8');
+    console.log(`✅ Sprite generated: ${spritePath} (${symbols.length} symbols)`);
   } else {
-    console.warn('⚠️ No sprite at ' + config.spritePath + ', run "npm run sprite"');
+    console.warn(`⚠️ No symbols generated for sprite`);
+    fs.writeFileSync(spritePath, '<svg></svg>', 'utf8');
+    console.log(`✅ Empty sprite generated: ${spritePath}`);
   }
 }
 
-async function buildSprite() {
+function buildSprite() {
   try {
-    const config = new Config();
-    config.validate();
-    if (needsRebuild(config)) {
-      await generateSprite(config);
-    } else {
-      copySprite(config);
-    }
+    validateSprite();
     console.log('✅ Sprite build completed');
   } catch (err) {
-    console.error('❌ Sprite build failed: ' + err.message);
+    console.error(`❌ Sprite build failed: ${err.message}`);
     process.exit(1);
   }
 }
