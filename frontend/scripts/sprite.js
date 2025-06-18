@@ -1,12 +1,12 @@
+import { cleanupSVG, parseColors, runSVGO, SVG } from '@iconify/tools';
+import { getIconData, iconToSVG } from '@iconify/utils';
 import fs from 'fs';
 import path from 'path';
-import { iconToSVG, getIconData } from '@iconify/utils';
-import { cleanupSVG, parseColors, runSVGO, SVG } from '@iconify/tools';
 import { optimize } from 'svgo';
 import { CONFIG } from './config.js';
 
-// SVGO configuration for optimizing local SVGs
-const svgoConfig = {
+// SVGO configuration for optimizing local SVGs during sprite generation
+const svgoSpriteConfig = {
   plugins: [
     { name: 'removeDimensions' },
     { name: 'removeAttrs', params: { attrs: ['fill'] } },
@@ -18,17 +18,25 @@ const svgoConfig = {
   ],
 };
 
+// SVGO configuration for cleaning local SVGs
+const svgoCleanConfig = {
+  plugins: [
+    'preset-default',
+    { name: 'removeViewBox', active: false },
+    { name: 'cleanupNumericValues', params: { floatPrecision: 3 } },
+  ],
+};
+
 // Derived paths
-const srcPath = path.join(CONFIG.paths.dirname, CONFIG.paths.srcDir);
-const spritePath = path.join(srcPath, CONFIG.src.sprite);
-const imgPath = path.join(srcPath, 'img');
-const indexHtmlPath = path.join(srcPath, 'index.html');
-const iconifyPath = path.join(CONFIG.paths.dirname, '../node_modules/@iconify-json');
+const spritePath = path.join(CONFIG.paths.src, CONFIG.src.sprite);
+const imgPath = path.join(CONFIG.paths.src, 'img');
+const iconifyPath = path.join(CONFIG.paths.base, '../node_modules/@iconify-json');
 
 // Validate config paths
 function validateConfig() {
-  if (!fs.existsSync(indexHtmlPath)) {
-    throw new Error(`❌ index.html not found: ${indexHtmlPath}`);
+  const indexHtml = CONFIG.src.html.find(file => file === 'index.html');
+  if (!indexHtml || !fs.existsSync(path.join(CONFIG.paths.src, indexHtml))) {
+    throw new Error(`❌ index.html not found`);
   }
   if (!fs.existsSync(iconifyPath)) {
     throw new Error(`❌ Iconify packages not found: ${iconifyPath}`);
@@ -39,24 +47,29 @@ function validateConfig() {
   }
 }
 
-// Extract icon refs from HTML
-function extractIconRefs(html) {
+// Extract icon refs from all HTML files
+function extractIconRefs() {
   const matches = new Set();
-  const spans = html.match(CONFIG.iconConfig.spanRegex) || [];
-  for (const span of spans) {
-    const classMatch = span.match(/class="([^"]*)"/);
-    if (classMatch) {
-      const classes = classMatch[1].split(/\s+/);
-      const iconClass = classes.find(cls => CONFIG.iconConfig.validateRegex.test(cls));
-      if (iconClass && classes.includes('icon')) {
-        matches.add(iconClass);
+  for (const htmlFile of CONFIG.src.html) {
+    const htmlPath = path.join(CONFIG.paths.src, htmlFile);
+    if (!fs.existsSync(htmlPath)) continue;
+    const html = fs.readFileSync(htmlPath, 'utf8');
+    const spans = html.match(CONFIG.iconConfig.spanRegex) || [];
+    for (const span of spans) {
+      const classMatch = span.match(/class="([^"]*)"/);
+      if (classMatch) {
+        const classes = classMatch[1].split(/\s+/);
+        const iconClass = classes.find(cls => CONFIG.iconConfig.validateRegex.test(cls));
+        if (iconClass && classes.includes('icon')) {
+          matches.add(iconClass);
+        }
       }
     }
   }
   const refs = Array.from(matches);
   const localRefs = refs.filter(ref => ref.startsWith('l-'));
   const iconifyRefs = refs.filter(ref => ref.startsWith('i-'));
-  console.log(`✅ Found ${refs.length} icon refs:`);
+  console.log(`✅ Found ${refs.length} icon refs across ${CONFIG.src.html.length} HTML files:`);
   console.log(`  - Iconify (${iconifyRefs.length}): ${iconifyRefs.join(', ') || 'none'}`);
   console.log(`  - Local (${localRefs.length}): ${localRefs.join(', ') || 'none'}`);
   return refs;
@@ -147,7 +160,7 @@ function processLocalSVG(name, ref) {
   let svg = fs.readFileSync(svgPath, 'utf8');
 
   svg = svg.replace(/<\?xml[^?]*\?>\s*/, '');
-  const optimizedSvg = optimize(svg, svgoConfig).data;
+  const optimizedSvg = optimize(svg, svgoSpriteConfig).data;
 
   const viewBoxMatch = optimizedSvg.match(/viewBox="([^"]+)"/);
   let viewBox = viewBoxMatch ? viewBoxMatch[1] : calculateViewBox(optimizedSvg);
@@ -165,12 +178,64 @@ function processLocalSVG(name, ref) {
   return symbol;
 }
 
+// Clean local SVGs
+export async function cleanLocalSvgs() {
+  try {
+    if (!fs.existsSync(imgPath)) {
+      console.warn(`⚠️ Directory not found: ${imgPath}, creating it`);
+      fs.mkdirSync(imgPath, { recursive: true });
+      console.log('ℹ️ No img directory, nothing to clean');
+      return;
+    }
+
+    const files = fs.readdirSync(imgPath).filter(f => f.endsWith('.svg'));
+    if (files.length === 0) {
+      console.log('ℹ️ No SVGs found in src/img/');
+      return;
+    }
+
+    console.log(`📋 Found ${files.length} SVGs: ${files.join(', ')}`);
+    for (const file of files) {
+      const filePath = path.join(imgPath, file);
+      try {
+        console.log(`🔄 Processing: ${path.basename(filePath)}`);
+        let svgContent = fs.readFileSync(filePath, 'utf8')
+          .replace(/<\?xml[^?]*\?>\s*/, '')
+          .replace(/<!DOCTYPE[^>]*>\s*/, '');
+
+        // Iconify cleanup
+        const svg = new SVG(svgContent);
+        cleanupSVG(svg);
+        parseColors(svg, {
+          defaultColor: 'currentColor',
+          callback: (attr, colorStr, color) => color && color !== 'none' ? 'currentColor' : colorStr,
+        });
+
+        // SVGO optimization
+        const svgoResult = optimize(svg.toMinifiedString(), svgoCleanConfig);
+        if (!svgoResult.data.includes('<svg')) {
+          throw new Error('Invalid SVG after SVGO');
+        }
+
+        fs.writeFileSync(filePath, svgoResult.data, 'utf8');
+        console.log(`✅ Cleaned and optimized: ${path.basename(filePath)}`);
+      } catch (err) {
+        console.error(`❌ Error cleaning ${path.basename(filePath)}: ${err.message}`);
+      }
+    }
+
+    console.log('✅ All SVGs cleaned');
+  } catch (err) {
+    console.error(`❌ Cleaning failed: ${err.message}`);
+    throw err;
+  }
+}
+
 export function validateSprite() {
   validateConfig();
 
-  // Get icon classes from index.html (authoritative source)
-  const html = fs.readFileSync(indexHtmlPath, 'utf8');
-  const iconClasses = extractIconRefs(html);
+  // Get icon classes from all HTML files
+  const iconClasses = extractIconRefs();
 
   // Get symbol IDs from sprite.svg
   let symbolIds = new Set();
@@ -183,14 +248,14 @@ export function validateSprite() {
   }
   console.log(`✅ Found ${symbolIds.size} symbols in sprite.svg: ${[...symbolIds].join(', ') || 'none'}`);
 
-  // Check for missing and unused icons
+  // Warn about missing and unused icons
   const missingIcons = iconClasses.filter(id => !symbolIds.has(id));
   const unusedIcons = [...symbolIds].filter(id => !iconClasses.includes(id));
 
   if (missingIcons.length || unusedIcons.length || !fs.existsSync(spritePath)) {
-    console.log(`⚠️ Sprite validation failed: ${missingIcons.length} missing, ${unusedIcons.length} unused`);
-    if (missingIcons.length) console.log(`⚠️ Missing icons: ${missingIcons.join(', ')}`);
-    if (unusedIcons.length) console.log(`⚠️ Unused icons: ${unusedIcons.join(', ')}`);
+    console.warn(`⚠️ Sprite issues: ${missingIcons.length} missing, ${unusedIcons.length} unused`);
+    if (missingIcons.length) console.warn(`⚠️ Missing icons: ${missingIcons.join(', ')}`);
+    if (unusedIcons.length) console.warn(`⚠️ Unused icons: ${unusedIcons.join(', ')}`);
     console.log('✅ Rebuilding sprite.svg...');
     generateSprite(iconClasses);
   } else {

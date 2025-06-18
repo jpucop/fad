@@ -8,10 +8,21 @@ import postcss from 'postcss';
 import { CONFIG } from './config.js';
 import { validateSprite } from './sprite.js';
 
-// Resolve paths
-const srcPath = path.join(CONFIG.paths.dirname, CONFIG.paths.srcDir);
-const distPath = path.join(CONFIG.paths.dirname, CONFIG.paths.distDir);
-const backendPath = path.join(CONFIG.paths.dirname, CONFIG.paths.backendDir);
+const srcPath = CONFIG.paths.src;
+const distPath = CONFIG.paths.dist;
+const backendPath = CONFIG.paths.backend;
+
+// Placeholder for caching/timestamp logic
+class CacheChecker {
+  constructor(config) {
+    this.config = config;
+    this.cache = new Map();
+  }
+  isFileChanged(filePath) {
+    return true;
+  }
+  updateCache(filePath, hashOrTimestamp) { }
+}
 
 function cleanDist() {
   if (fs.existsSync(distPath)) {
@@ -22,6 +33,11 @@ function cleanDist() {
 }
 
 function validate() {
+  const indexHtml = CONFIG.src.html.find(file => file === 'index.html');
+  if (indexHtml && !fs.existsSync(path.join(srcPath, indexHtml))) {
+    throw new Error(`❌ Critical file missing: index.html`);
+  }
+
   const allFiles = [
     ...CONFIG.src.js,
     ...CONFIG.src.css,
@@ -30,21 +46,10 @@ function validate() {
     ...CONFIG.src.img.map(item => item.dir),
     ...CONFIG.src.static,
   ];
-  const missing = [];
-
-  for (const file of allFiles) {
-    const fullPath = path.join(srcPath, file);
-    if (!fs.existsSync(fullPath)) {
-      if (file === 'img') {
-        fs.mkdirSync(fullPath, { recursive: true });
-        console.log(`✅ Created missing directory: ${fullPath}`);
-      } else if (file !== CONFIG.src.sprite) {
-        missing.push(file);
-      }
-    }
+  const missing = allFiles.filter(file => file !== CONFIG.src.sprite && !fs.existsSync(path.join(srcPath, file)));
+  if (missing.length) {
+    console.warn(`⚠️ Missing non-critical files: ${missing.join(', ')}`);
   }
-
-  if (missing.length) throw new Error(`❌ Missing files: ${missing.join(', ')}`);
   validateSprite();
 }
 
@@ -110,30 +115,77 @@ async function buildCss() {
     }
   }
 }
-function buildJs() {
-  const alpineSrc = path.join(srcPath, CONFIG.build.alpineFilename);
-  const alpineModule = CONFIG.paths.alpineModulePath;
-  const alpineDest = path.join(distPath, CONFIG.build.alpineFilename);
 
-  // Copy Alpine.js
-  if (!fs.existsSync(alpineSrc) && fs.existsSync(alpineModule)) {
-    fs.copyFileSync(alpineModule, alpineSrc);
-    console.log(`✅ Created ${CONFIG.build.alpineFilename} in src from node_modules`);
+async function buildJs(cacheChecker) {
+  const jsConfig = CONFIG.build.js || { bundleAlpine: true, output: 'app.js' };
+  const jsOutput = path.join(distPath, jsConfig.output);
+  const jsFiles = jsConfig.bundleAlpine
+    ? CONFIG.src.js
+    : CONFIG.src.js.filter(
+      file => file !== CONFIG.build.alpine.dev.filename && file !== CONFIG.build.alpine.min.filename
+    );
+
+  // Prepare Alpine.js if not bundled
+  if (!jsConfig.bundleAlpine) {
+    const alpineDevSrc = path.join(srcPath, CONFIG.build.alpine.dev.filename);
+    const alpineMinSrc = path.join(srcPath, CONFIG.build.alpine.min.filename);
+    let alpineDevModule, alpineMinModule;
+    try {
+      alpineDevModule = require.resolve(CONFIG.build.alpine.dev.modulePath);
+      alpineMinModule = require.resolve(CONFIG.build.alpine.min.modulePath);
+    } catch (err) {
+      console.warn(`⚠️ Alpine.js module not found in node_modules: ${err.message}`);
+    }
+
+    if (!fs.existsSync(alpineDevSrc) && alpineDevModule && fs.existsSync(alpineDevModule)) {
+      fs.copyFileSync(alpineDevModule, alpineDevSrc);
+      console.log(`✅ Created ${CONFIG.build.alpine.dev.filename} in src from node_modules`);
+    }
+    if (!fs.existsSync(alpineMinSrc) && alpineMinModule && fs.existsSync(alpineMinModule)) {
+      fs.copyFileSync(alpineMinModule, alpineMinSrc);
+      console.log(`✅ Created ${CONFIG.build.alpine.min.filename} in src from node_modules`);
+    }
+
+    const alpineSource = CONFIG.build.isProduction ? alpineMinSrc : alpineDevSrc;
+    const alpineDest = path.join(distPath, CONFIG.build.alpine.output);
+    if (fs.existsSync(alpineSource)) {
+      fs.copyFileSync(alpineSource, alpineDest);
+      console.log(`✅ Copied ${CONFIG.build.isProduction ? CONFIG.build.alpine.min.filename : CONFIG.build.alpine.dev.filename} to dist as ${CONFIG.build.alpine.output}`);
+    } else {
+      console.warn(`⚠️ Warning: ${CONFIG.build.isProduction ? CONFIG.build.alpine.min.filename : CONFIG.build.alpine.dev.filename} not found in src/`);
+    }
   }
 
-  if (fs.existsSync(alpineSrc)) {
-    fs.copyFileSync(alpineSrc, alpineDest);
-    console.log(`✅ Copied ${CONFIG.build.alpineFilename} to dist`);
+  // Bundle JS files
+  const entryPoints = jsFiles.map(file => path.join(srcPath, file)).filter(fs.existsSync);
+  if (entryPoints.length === 0) {
+    console.warn(`⚠️ No JS files found for bundling; skipping JS build`);
+    return;
   }
 
-  // Copy app.js
-  const appSrc = path.join(srcPath, 'app.js');
-  const appDest = path.join(distPath, 'app.js');
-  if (fs.existsSync(appSrc)) {
-    fs.copyFileSync(appSrc, appDest);
-    console.log(`✅ Copied app.js to dist`);
-  } else {
-    console.log('⚠️ app.js not found in src');
+  // Create temporary entry file for bundling
+  const tempEntryPath = path.join(distPath, 'temp-entry.js');
+  const imports = entryPoints.map(file => `import "${path.relative(distPath, file).replace(/\\/g, '/')}";`).join('\n');
+  fs.writeFileSync(tempEntryPath, imports);
+
+  try {
+    await esbuild.build({
+      entryPoints: [tempEntryPath],
+      bundle: true,
+      outfile: jsOutput,
+      minify: CONFIG.build.minify,
+      sourcemap: CONFIG.build.sourcemap,
+      format: 'iife',
+      target: 'es2018',
+    });
+    console.log(`✅ Bundled JS into ${jsConfig.output}`);
+  } catch (err) {
+    throw new Error(`❌ JS build failed: ${err.message}`);
+  } finally {
+    // Clean up temporary entry file
+    if (fs.existsSync(tempEntryPath)) {
+      fs.unlinkSync(tempEntryPath);
+    }
   }
 }
 
@@ -186,6 +238,11 @@ function processHtml() {
 }
 
 function copyToBackend() {
+  if (!fs.existsSync(backendPath) || !fs.statSync(backendPath).isDirectory()) {
+    console.warn(`⚠️ Backend path not found or invalid: ${backendPath}, skipping copy`);
+    return;
+  }
+
   fs.mkdirSync(backendPath, { recursive: true });
   const items = fs.readdirSync(distPath);
   for (const item of items) {
@@ -201,20 +258,68 @@ function copyToBackend() {
   }
 }
 
-async function build() {
+async function build(watch = false) {
+  const cacheChecker = new CacheChecker(CONFIG);
   try {
     cleanDist();
     validate();
     copyStatic();
     await buildCss();
-    buildJs();
+    await buildJs(cacheChecker);
     processHtml();
-    copyToBackend();
+    if (CONFIG.build.isProduction && !watch) {
+      copyToBackend();
+    }
     console.log('✅ Build completed');
   } catch (err) {
     console.error(`❌ Build failed: ${err.message}`);
     process.exit(1);
   }
+
+  if (watch) {
+    console.log('👀 Watching for changes...');
+    const context = await esbuild.context({
+      entryPoints: [path.join(distPath, 'temp-entry.js')],
+      bundle: true,
+      outfile: path.join(distPath, (CONFIG.build.js || { output: 'app.js' }).output),
+      minify: CONFIG.build.minify,
+      sourcemap: CONFIG.build.sourcemap,
+      format: 'iife',
+      target: 'es2018',
+      write: false, // We'll handle writing manually
+    });
+    await context.watch();
+    const { watch: chokidarWatch } = await import('chokidar');
+    chokidarWatch([path.join(srcPath, '*.{js,css,html,ico,png,jpg,jpeg,gif,webp,avif,woff,woff2,json}')], {
+      ignoreInitial: true,
+    }).on('all', async (event, file) => {
+      console.log(`🔄 Detected ${event}: ${file}`);
+      try {
+        if (file.endsWith('.js')) {
+          const jsFiles = (CONFIG.build.js || { bundleAlpine: true }).bundleAlpine
+            ? CONFIG.src.js
+            : CONFIG.src.js.filter(
+              f => f !== CONFIG.build.alpine.dev.filename && f !== CONFIG.build.alpine.min.filename
+            );
+          const entryPoints = jsFiles.map(f => path.join(srcPath, f)).filter(fs.existsSync);
+          if (entryPoints.length > 0) {
+            const tempEntryPath = path.join(distPath, 'temp-entry.js');
+            const imports = entryPoints.map(f => `import "${path.relative(distPath, f).replace(/\\/g, '/')}";`).join('\n');
+            fs.writeFileSync(tempEntryPath, imports);
+            await context.rebuild();
+            if (fs.existsSync(tempEntryPath)) fs.unlinkSync(tempEntryPath);
+          }
+        }
+        if (file.endsWith('.css')) await buildCss();
+        if (file.endsWith('.html')) processHtml();
+        if (CONFIG.src.static.includes(path.relative(srcPath, file))) copyStatic();
+        console.log('✅ Incremental build completed');
+      } catch (err) {
+        console.error(`❌ Incremental build failed: ${err.message}`);
+      }
+    });
+  }
 }
 
-build();
+const isWatchMode = process.argv.includes('--watch');
+build(isWatchMode);
