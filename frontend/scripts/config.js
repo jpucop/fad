@@ -14,7 +14,7 @@ const srcFiles = {
   js: globSync(resolvePath('../src/*.js')).map(file => path.relative(resolvePath('../src'), file)),
   css: globSync(resolvePath('../src/*.css')).map(file => path.relative(resolvePath('../src'), file)),
   html: globSync(resolvePath('../src/*.html')).map(file => path.relative(resolvePath('../src'), file)),
-  static: globSync(resolvePath('../src/*.{ico,png,jpg,jpeg,gif,webp,avif,woff,woff2,json}')).map(file => path.relative(resolvePath('../src'), file)),
+  static: globSync(resolvePath('../src/*.{ico,png,jpg,jpeg,gif}')).map(file => path.relative(resolvePath('../src'), file)),
   sprite: 'sprite.svg',
   img: [
     {

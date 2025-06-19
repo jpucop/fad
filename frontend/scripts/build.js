@@ -12,18 +12,6 @@ const srcPath = CONFIG.paths.src;
 const distPath = CONFIG.paths.dist;
 const backendPath = CONFIG.paths.backend;
 
-// Placeholder for caching/timestamp logic
-class CacheChecker {
-  constructor(config) {
-    this.config = config;
-    this.cache = new Map();
-  }
-  isFileChanged(filePath) {
-    return true;
-  }
-  updateCache(filePath, hashOrTimestamp) { }
-}
-
 function cleanDist() {
   if (fs.existsSync(distPath)) {
     fs.rmSync(distPath, { recursive: true, force: true });
@@ -37,20 +25,6 @@ function validate() {
   if (indexHtml && !fs.existsSync(path.join(srcPath, indexHtml))) {
     throw new Error(`❌ Critical file missing: index.html`);
   }
-
-  const allFiles = [
-    ...CONFIG.src.js,
-    ...CONFIG.src.css,
-    ...CONFIG.src.html,
-    CONFIG.src.sprite,
-    ...CONFIG.src.img.map(item => item.dir),
-    ...CONFIG.src.static,
-  ];
-  const missing = allFiles.filter(file => file !== CONFIG.src.sprite && !fs.existsSync(path.join(srcPath, file)));
-  if (missing.length) {
-    console.warn(`⚠️ Missing non-critical files: ${missing.join(', ')}`);
-  }
-  validateSprite();
 }
 
 function copyPath(src, dest, filterFn = null) {
@@ -71,6 +45,13 @@ function copyPath(src, dest, filterFn = null) {
 }
 
 function copyStatic() {
+  // Generate sprite.svg if missing
+  const spriteSrc = path.join(srcPath, CONFIG.src.sprite);
+  if (!fs.existsSync(spriteSrc)) {
+    console.log(`⚠️ sprite.svg missing in src/, generating...`);
+    validateSprite(); // Generates src/sprite.svg
+  }
+
   const items = [CONFIG.src.sprite, ...CONFIG.src.img, ...CONFIG.src.static];
   for (const item of items) {
     const file = typeof item === 'string' ? item : item.dir;
@@ -83,10 +64,7 @@ function copyStatic() {
 
 async function buildCss() {
   const tailwindConfig = {
-    content: [
-      ...CONFIG.src.html.map(file => path.join(srcPath, file)),
-      ...CONFIG.src.js.map(file => path.join(srcPath, file)),
-    ],
+    content: [...CONFIG.src.html, ...CONFIG.src.js].map(file => path.join(srcPath, file)),
     darkMode: 'class',
     theme: { extend: {} },
     plugins: [],
@@ -116,7 +94,7 @@ async function buildCss() {
   }
 }
 
-async function buildJs(cacheChecker) {
+async function buildJs() {
   const jsConfig = CONFIG.build.js || { bundleAlpine: true, output: 'app.js' };
   const jsOutput = path.join(distPath, jsConfig.output);
   const jsFiles = jsConfig.bundleAlpine
@@ -187,7 +165,6 @@ function replaceIconSpans(html) {
   let updatedHtml = html;
   let replacements = 0;
 
-  // Match entire <span> tag including content and closing tag
   const spanRegex = /<span\s+([^>]*)class\s*=\s*['"]([^'"]*icon[^'"]*)['"]([^>]*)>(.*?)<\/span>/gi;
   const matches = [...html.matchAll(spanRegex)];
   console.log(`✅ Found ${matches.length} icon spans`);
@@ -197,24 +174,17 @@ function replaceIconSpans(html) {
     const classes = classValue.trim().split(/\s+/);
     if (!classes.includes('icon')) continue;
 
-    // Find icon class (l- or i- prefixed)
     const iconClass = classes.find(cls => CONFIG.iconConfig.validateRegex.test(cls));
     if (!iconClass) continue;
 
-    // Combine preAttrs and postAttrs, excluding class
     const attrs = `${preAttrs || ''} ${postAttrs || ''}`
       .trim()
       .split(/\s+/)
       .filter(attr => attr && !attr.startsWith('class='))
       .join(' ');
 
-    // Keep all classes on <span>
     const spanClasses = classes.join(' ');
-
-    // Construct SVG tag with icon-inner class
     const svgTag = `<svg class="icon-inner" aria-hidden="true"><use href="/sprite.svg#${iconClass}"></use></svg>`;
-
-    // Keep <span> with original classes and attributes, wrap SVG inside
     const replacement = `<span class="${spanClasses}" ${attrs}>${svgTag}</span>`;
 
     updatedHtml = updatedHtml.replace(fullMatch, replacement);
@@ -259,15 +229,14 @@ function copyToBackend() {
 }
 
 async function build(watch = false) {
-  const cacheChecker = new CacheChecker(CONFIG);
   try {
-    cleanDist();
     validate();
+    cleanDist();
     copyStatic();
     await buildCss();
-    await buildJs(cacheChecker);
+    await buildJs();
     processHtml();
-    if (CONFIG.build.isProduction && !watch) {
+    if (isDeploy) {
       copyToBackend();
     }
     console.log('✅ Build completed');
@@ -322,4 +291,5 @@ async function build(watch = false) {
 }
 
 const isWatchMode = process.argv.includes('--watch');
+const isDeploy = process.argv.includes('--deploy');
 build(isWatchMode);
