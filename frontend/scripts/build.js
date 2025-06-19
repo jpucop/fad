@@ -129,19 +129,14 @@ async function buildJs(cacheChecker) {
   if (!jsConfig.bundleAlpine) {
     const alpineDevSrc = path.join(srcPath, CONFIG.build.alpine.dev.filename);
     const alpineMinSrc = path.join(srcPath, CONFIG.build.alpine.min.filename);
-    let alpineDevModule, alpineMinModule;
-    try {
-      alpineDevModule = require.resolve(CONFIG.build.alpine.dev.modulePath);
-      alpineMinModule = require.resolve(CONFIG.build.alpine.min.modulePath);
-    } catch (err) {
-      console.warn(`⚠️ Alpine.js module not found in node_modules: ${err.message}`);
-    }
+    const alpineDevModule = path.join(CONFIG.paths.base, '../node_modules', CONFIG.build.alpine.dev.modulePath);
+    const alpineMinModule = path.join(CONFIG.paths.base, '../node_modules', CONFIG.build.alpine.min.modulePath);
 
-    if (!fs.existsSync(alpineDevSrc) && alpineDevModule && fs.existsSync(alpineDevModule)) {
+    if (!fs.existsSync(alpineDevSrc) && fs.existsSync(alpineDevModule)) {
       fs.copyFileSync(alpineDevModule, alpineDevSrc);
       console.log(`✅ Created ${CONFIG.build.alpine.dev.filename} in src from node_modules`);
     }
-    if (!fs.existsSync(alpineMinSrc) && alpineMinModule && fs.existsSync(alpineMinModule)) {
+    if (!fs.existsSync(alpineMinSrc) && fs.existsSync(alpineMinModule)) {
       fs.copyFileSync(alpineMinModule, alpineMinSrc);
       console.log(`✅ Created ${CONFIG.build.alpine.min.filename} in src from node_modules`);
     }
@@ -182,7 +177,6 @@ async function buildJs(cacheChecker) {
   } catch (err) {
     throw new Error(`❌ JS build failed: ${err.message}`);
   } finally {
-    // Clean up temporary entry file
     if (fs.existsSync(tempEntryPath)) {
       fs.unlinkSync(tempEntryPath);
     }
@@ -193,31 +187,37 @@ function replaceIconSpans(html) {
   let updatedHtml = html;
   let replacements = 0;
 
-  const matches = html.match(CONFIG.iconConfig.spanRegex) || [];
+  // Match entire <span> tag including content and closing tag
+  const spanRegex = /<span\s+([^>]*)class\s*=\s*['"]([^'"]*icon[^'"]*)['"]([^>]*)>(.*?)<\/span>/gi;
+  const matches = [...html.matchAll(spanRegex)];
   console.log(`✅ Found ${matches.length} icon spans`);
 
-  for (const span of matches) {
-    const classAttr = span.match(/class="([^"]*)"/);
-    if (!classAttr) continue;
-
-    const classes = classAttr[1].split(/\s+/);
+  for (const match of matches) {
+    const [fullMatch, preAttrs, classValue, postAttrs, content] = match;
+    const classes = classValue.trim().split(/\s+/);
     if (!classes.includes('icon')) continue;
 
+    // Find icon class (l- or i- prefixed)
     const iconClass = classes.find(cls => CONFIG.iconConfig.validateRegex.test(cls));
     if (!iconClass) continue;
 
-    const attrsMatch = span.match(/<span\s+([^>]*)>/);
-    if (!attrsMatch) continue;
-
-    const attrs = attrsMatch[1]
+    // Combine preAttrs and postAttrs, excluding class
+    const attrs = `${preAttrs || ''} ${postAttrs || ''}`
+      .trim()
       .split(/\s+/)
-      .filter(attr => !attr.startsWith('class='))
+      .filter(attr => attr && !attr.startsWith('class='))
       .join(' ');
 
-    const newClasses = ['icon', ...classes.filter(c => c !== 'icon' && c !== iconClass)].join(' ');
-    const replacement = `<svg class="${newClasses}" ${attrs} aria-hidden="true"><use href="/sprite.svg#${iconClass}"></use></svg>`;
+    // Keep all classes on <span>
+    const spanClasses = classes.join(' ');
 
-    updatedHtml = updatedHtml.replace(span, replacement);
+    // Construct SVG tag with icon-inner class
+    const svgTag = `<svg class="icon-inner" aria-hidden="true"><use href="/sprite.svg#${iconClass}"></use></svg>`;
+
+    // Keep <span> with original classes and attributes, wrap SVG inside
+    const replacement = `<span class="${spanClasses}" ${attrs}>${svgTag}</span>`;
+
+    updatedHtml = updatedHtml.replace(fullMatch, replacement);
     replacements++;
   }
 
@@ -286,7 +286,7 @@ async function build(watch = false) {
       sourcemap: CONFIG.build.sourcemap,
       format: 'iife',
       target: 'es2018',
-      write: false, // We'll handle writing manually
+      write: false,
     });
     await context.watch();
     const { watch: chokidarWatch } = await import('chokidar');
