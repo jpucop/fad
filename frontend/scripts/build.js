@@ -228,17 +228,20 @@ function copyToBackend() {
   }
 }
 
-async function build(watch = false) {
+async function build(watch = false, deploy = false) {
+  console.log(`building .. watch: ${watch}, deploy: ${deploy}`);
   try {
+    if (deploy) {
+      copyToBackend();
+      return;
+    }
+
     validate();
     cleanDist();
     copyStatic();
     await buildCss();
     await buildJs();
     processHtml();
-    if (isDeploy) {
-      copyToBackend();
-    }
     console.log('✅ Build completed');
   } catch (err) {
     console.error(`❌ Build failed: ${err.message}`);
@@ -292,4 +295,5 @@ async function build(watch = false) {
 
 const isWatchMode = process.argv.includes('--watch');
 const isDeploy = process.argv.includes('--deploy');
-build(isWatchMode);
+await build(isWatchMode, isDeploy);
+console.log('done');

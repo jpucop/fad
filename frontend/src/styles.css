@@ -37,7 +37,7 @@
 /* General Icon Styling */
 .icon {
   display: inline-block;
-vertical-align: middle;
+  vertical-align: middle;
   width: 1.25rem; /* Default size */
   height: 1.25rem;
 }
@@ -307,7 +307,7 @@ body {
 
 /* App Tiles */
 .app-tile {
-  border: 2px solie var(--color-uc-mid);
+  border: 1px solid var(--color-uc-mid);
 }
 .app-tile .icon {
   color: var(--color-uc-primary);
@@ -339,13 +339,41 @@ body {
   height: 0.875rem;
 }
 
-/* Environment Labels */
-.dev { color: oklch(0.42 0.1365 278.18); }
-.dev .icon { color: oklch(0.55 0.15 20); }
-.qa { color: oklch(0.65 0.15 90); }
-.qa .icon { color: oklch(0.65 0.15 90); }
-.prod { color: oklch(0.55 0.10 145); }
-.prod .icon { color: oklch(0.55 0.10 145); }
+/* Updated Environment Colors (Progressive Blue-Green) */
+.dev { color: oklch(0.65 0.10 180); } /* Lighter, lower chroma */
+.dev .icon { color: oklch(0.65 0.10 180); }
+.qa { color: oklch(0.55 0.15 180); }  /* Moderate chroma, balanced */
+.qa .icon { color: oklch(0.55 0.15 180); }
+.prod { color: oklch(0.50 0.20 180); } /* Higher chroma, slightly darker */
+.prod .icon { color: oklch(0.50 0.20 180); }
+
+/* Environment Icon Colors (Traffic Light for Status) */
+.dev .i-mdi-alert-circle { color: #ef4444; }      /* Red for failed */
+.qa .i-mdi-progress-clock { color: #f59e0b; }     /* Yellow for updating */
+.prod .i-mdi-check-circle-outline { color: #22c55e; } /* Green for healthy */
+
+/* Apply Environment Styles to App Tile Content */
+.app-tile .dev,
+.app-tile .qa,
+.app-tile .prod {
+  color: inherit; /* Inherits from .dev, .qa, .prod */
+}
+
+.app-tile .dev .icon,
+.app-tile .qa .icon,
+.app-tile .prod .icon {
+  color: inherit; /* Inherits icon color from .dev, .qa, .prod unless overridden by status */
+}
+
+/* App Tile Border by Environment */
+.app-tile.border-dev { border-color: oklch(0.65 0.10 180); }
+.app-tile.border-qa { border-color: oklch(0.55 0.15 180); }
+.app-tile.border-prod { border-color: oklch(0.50 0.20 180); }
+
+/* Grayify Property Values */
+.app-tile .text-gray-600 {
+  color: #6b7280; /* Tailwind's gray-600 */
+}
 
 /* Button Component */
 @layer components {
