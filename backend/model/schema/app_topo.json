@@ -1,5 +1,4 @@
 {
-  "_schema_description": "Defines AWS topology references for an application",
   "app_name": "",
   "environment": "",
   "deploy_profile": "",

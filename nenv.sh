@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Ensure the script is sourced, not executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

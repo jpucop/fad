@@ -25,3 +25,4 @@ urllib3==2.3.0
 uvicorn==0.34.0  # Don't use [standard] to avoid uvloop
 watchfiles==1.0.4
 websockets==15.0.1
+cachetools

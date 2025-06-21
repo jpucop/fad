@@ -1,5 +1,4 @@
 {
-  "_schema_description": "Captures runtime snapshot details for an application",
   "snapshot_id": "",
   "snapshot_timestamp": "",
   "app_name": "",

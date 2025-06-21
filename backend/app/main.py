@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request, logger
 from contextlib import asynccontextmanager
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 from cachetools import TTLCache
 from datetime import datetime
@@ -9,6 +11,7 @@ from typing import Dict, Optional
 from models import Org, Group, App, DashboardData, AppTopo, AppSnapshot
 from model.ucop.finapps.webify import regenerate
 from .fetchers.aws_pipeline_app_fetcher import AWSPipelineFetcher  # Updated import
+from app.routes import router  # Import the router from routes.py
 
 # Caches
 dashboard_data = None  # Input model data (org, group, apps)
@@ -23,6 +26,14 @@ async def lifespan(app: FastAPI):
   dashboard_data = None
 
 app = FastAPI(lifespan=lifespan)
+
+# Mount the static files directory
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Include the API router
+app.include_router(router)
+
+# -------------------------------------
 
 def get_dashboard_data():
   if dashboard_data is None:
@@ -49,6 +60,17 @@ async def reload_data():
   except (ValidationError, FileNotFoundError, json.JSONDecodeError) as e:
     logger.error(f"Error reloading data: {e}")
     raise HTTPException(status_code=500, detail=f"Error reloading data: {str(e)}")
+
+@app.get("/{full_path:path}")
+async def catch_all(request: Request, full_path: str):
+  # Exclude API routes
+  if full_path.startswith("api/"):
+    raise HTTPException(status_code=404, detail="Not found")
+  return FileResponse("app/static/index.html")
+
+@app.get("/")
+async def serve_index():
+  return FileResponse("app/static/index.html")
 
 @app.get("/dashboard")
 async def get_dashboard(data: DashboardData = Depends(get_dashboard_data)):

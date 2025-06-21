@@ -1,130 +1,106 @@
 #!/usr/bin/env python3
 
 import json
-import os
-from copy import deepcopy
 import logging
+from pathlib import Path
+from typing import Dict, List
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Define paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SCHEMA_DIR = os.path.join(BASE_DIR, "../../../schema")
-UCOP_DIR = os.path.join(BASE_DIR, "..")
-APPS_JSON = os.path.join(BASE_DIR, "apps.json")
-APP_SCHEMA = os.path.join(SCHEMA_DIR, "app.json")
-GROUP_JSON = os.path.join(UCOP_DIR, "group_finapps.json")
-ORG_JSON = os.path.join(UCOP_DIR, "org_ucop.json")
-OUTPUT_DIR = UCOP_DIR
+# Paths
+BASE_DIR = Path(__file__).parent.parent.parent.parent.parent  # /Users/gonre/dev/fad/backend
+UCOP_DIR = BASE_DIR / "model" / "ucop" / "finapps"
+SCHEMA_DIR = BASE_DIR / "model" / "schema"
+APPS_JSON = UCOP_DIR / "gen" / "apps.json"
+GROUP_JSON = UCOP_DIR / "group_finapps.json"
 
-def load_json_file(filepath):
-  """Load a JSON file and return its contents."""
-  try:
-    with open(filepath, "r") as f:
-      return json.load(f)
-  except FileNotFoundError:
-    logger.error(f"File {filepath} not found.")
-    raise
-  except json.JSONDecodeError:
-    logger.error(f"Invalid JSON in {filepath}.")
-    raise
+def load_json(file_path: Path) -> Dict:
+    """Load a JSON file."""
+    logger.debug(f"Loading {file_path}")
+    if not file_path.exists():
+        logger.error(f"File {file_path} does not exist.")
+        raise FileNotFoundError(f"File {file_path} does not exist.")
+    with open(file_path, "r") as f:
+        return json.load(f)
 
-def parse_delimited_values(value):
-  """Parse [|]-delimited values from schema (e.g., [dev|qa|prod])."""
-  if isinstance(value, str) and value.startswith("[") and value.endswith("]"):
-    return value[1:-1].split("|")
-  return [value] if value else []
+def save_json(data: Dict, file_path: Path):
+    """Save a JSON file."""
+    logger.debug(f"Saving {file_path}")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=2)
+    logger.info(f"Generated {file_path}")
 
-def generate_environments(env_schema, app_defaults, app_name):
-  """Generate environment objects based on schema and app defaults."""
-  env_instances = []
-  env_values = parse_delimited_values(env_schema.get("env", ""))
-  name_values = parse_delimited_values(env_schema.get("name", ""))
+def generate_environments(app_name: str, defaults: List[Dict]) -> List[Dict]:
+    """Generate environment configurations."""
+    environments = []
+    for env in defaults:
+        env_copy = env.copy()
+        env_copy["pipeline_name"] = env_copy["pipeline_name"].replace("[app]", app_name)
+        env_copy["pipeline_url"] = env_copy["pipeline_url"]
+        environments.append(env_copy)
+    return environments
 
-  if len(name_values) < len(env_values):
-    name_values.extend([f"{env}-env" for env in env_values[len(name_values):]])
+def generate_app_json(app_name: str, defaults: Dict) -> Dict:
+    """Generate JSON configuration for an app."""
+    group_data = load_json(GROUP_JSON)
 
-  for env, name in zip(env_values, name_values):
-    env_config = deepcopy(env_schema)
-    for key, value in env_config.items():
-      if isinstance(value, str) and value.startswith("[") and value.endswith("]"):
-        env_config[key] = env if key == "env" else name if key == "name" else value
-      elif value:
-        env_config[key] = value
-      else:
-        env_config[key] = ""
+    app_json = {
+        "name": app_name,
+        "short_name": app_name,
+        "long_name": f"{app_name.upper()} Application",
+        "description": f"{app_name.upper()} Application",
+        "app_profile": defaults["app_profile"],
+        "deploy_profile": defaults["deploy_profile"],
+        "source": {
+            "repo": defaults["source"]["repo"].replace("[app]", app_name),
+            "path": defaults["source"]["path"],
+            "branch": defaults["source"]["branch"]
+        },
+        "environments": generate_environments(app_name, defaults["environments"]),
+        "dbs": [],  # Empty array for databases
+        "confluence": {
+            "space_key": app_name.upper()
+        },
+        "jira": {
+            "project_key": app_name.upper()
+        },
+        "service_now": {
+            "configuration_item": f"{app_name.upper()}_CI",
+            "assignment_groups": [
+                {
+                    "name": group_data["service_now"]["assignment_groups"][0]["name"],
+                    "apps": group_data["service_now"]["assignment_groups"][0]["apps"]  # Array
+                },
+                {
+                    "name": group_data["service_now"]["assignment_groups"][1]["name"],
+                    "apps": group_data["service_now"]["assignment_groups"][1]["apps"]  # Array
+                }
+            ]
+        }
+    }
 
-    for default_env in app_defaults.get("environments", []):
-      for key, value in default_env.items():
-        if key in env_config and value:
-          env_config[key] = value.replace("{env}", env).replace("{name}", app_name)
-
-    env_config["aws"]["account_name"] = "finapps-prod" if env == "prod" else "finapps-dev"
-    env_config["deploy_pipeline_name"] = f"{app_name}-{env}-pipeline"
-
-    env_instances.append(env_config)
-  return env_instances
-
-def generate_app_json(app_name, defaults, app_schema, group_data):
-  """Generate a single app_{name}.json file based on schema and defaults."""
-  app_config = deepcopy(app_schema)
-  app_defaults = defaults.get("app", {})
-
-  for key, value in app_defaults.items():
-    if key in app_config and key not in ["source", "environments", "confluence", "box", "jira", "service_now", "datadog"]:
-      app_config[key] = value.replace("{name}", app_name) if isinstance(value, str) else value
-    elif key == "source":
-      for src_key, src_value in value.items():
-        if src_key == "aws":
-          app_config["source"]["aws"] = src_value
-        else:
-          app_config["source"][src_key] = src_value.replace("{name}", app_name) if isinstance(src_value, str) else src_value
-
-  app_config["name"] = app_name
-  app_config["short_name"] = app_config.get("short_name") or app_name
-  app_config["long_name"] = app_config.get("long_name") or f"{app_name.capitalize()} Application"
-  app_config["description"] = app_config.get("description") or f"Financial application for {app_name}"
-
-  app_config["environments"] = generate_environments(app_schema["environments"][0], app_defaults, app_name)
-
-  app_config["confluence"] = deepcopy(app_defaults.get("confluence", {"group_web_url": group_data.get("confluence", {}).get("url", "")}))
-  app_config["box"] = deepcopy(app_defaults.get("box", {"group_web_url": group_data.get("box", {}).get("url", "")}))
-  app_config["jira"] = deepcopy(app_defaults.get("jira", {
-    "project_keys": [app_name.upper()],
-    "group_web_url": group_data.get("jira", {}).get("url", "")
-  }))
-  app_config["service_now"] = {
-    "group_web_url": app_defaults.get("service_now", {}).get("group_web_url", group_data.get("service_now", {}).get("url", "")),
-    "assignment_groups": [
-      group for group in app_defaults.get("service_now", {}).get("assignment_groups", group_data.get("service_now", {}).get("assignment_groups", []))
-      if group.get("apps") and (app_name in group["apps"] or "ALL" in group["apps"])
-    ]
-  }
-  app_config["datadog"] = deepcopy(app_defaults.get("datadog", {"group_web_url": group_data.get("data_dog", {}).get("url", "")}))
-
-  return app_config
+    return app_json
 
 def regenerate():
-  """Generate app_*.json files from gen/apps.json."""
-  apps_data = load_json_file(APPS_JSON)
-  app_schema = load_json_file(APP_SCHEMA)
-  group_data = load_json_file(GROUP_JSON)
+    """Regenerate app JSON files."""
+    apps_data = load_json(APPS_JSON)
+    apps = apps_data["apps"]
+    defaults = apps_data["defaults"]
 
-  app_names = apps_data.get("apps", [])
-  defaults = apps_data.get("defaults", {})
-
-  for app_name in app_names:
-    app_config = generate_app_json(app_name, defaults, app_schema, group_data)
-    output_file = os.path.join(OUTPUT_DIR, f"app_{app_name}.json")
-    with open(output_file, "w") as f:
-      json.dump(app_config, f, indent=2)
-    logger.info(f"Generated {output_file}")
+    for app_name in apps:
+        app_json = generate_app_json(app_name, defaults)
+        save_json(app_json, UCOP_DIR / f"app_{app_name}.json")
 
 if __name__ == "__main__":
-  try:
-    regenerate()
-  except Exception as e:
-    logger.error(f"Error: {str(e)}")
-    exit(1)
+    try:
+        logger.info(f"BASE_DIR: {BASE_DIR}")
+        logger.info(f"UCOP_DIR: {UCOP_DIR}")
+        logger.info(f"APPS_JSON: {APPS_JSON}")
+        logger.debug(f"Checking {APPS_JSON} -> {'exists' if APPS_JSON.exists() else 'missing'}")
+        regenerate()
+    except Exception as e:
+        logger.error(f"Error: {str(e)}")
+        raise

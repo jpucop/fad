@@ -1,7 +1,5 @@
 {
-  "_schema_description": "Lists applications and their default configurations",
-  
-  "apps": ["csg", "rems", "ayso", "wage", "itf", "ise"],
+  "apps": ["csg", "rems", "wage", "itf"],
   "defaults": {
     "app": {
       "name": "",
