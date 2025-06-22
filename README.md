@@ -8,7 +8,7 @@ Financial Applications UCOP group aggregate dashboard widget.
 
 ```sh
 
-catsnap() {
+psnap() {
   local search_dir="${1:-.}"  # Default to current directory if not specified
   local parent_dir_name=$(basename "$(realpath "$search_dir")")  # Get basename of the directory
   local output_file="concat-${parent_dir_name}.txt"  # Output file named concat-<dirname>.txt
