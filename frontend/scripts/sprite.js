@@ -34,9 +34,19 @@ const iconifyPath = path.join(CONFIG.paths.base, '../node_modules/@iconify-json'
 
 // Validate config paths
 function validateConfig() {
-  const indexHtml = CONFIG.src.html.find(file => file === 'index.html');
-  if (!indexHtml || !fs.existsSync(path.join(CONFIG.paths.src, indexHtml))) {
-    throw new Error(`❌ index.html not found`);
+  const htmlFiles = CONFIG.src.html;
+  console.log('Checking HTML files in validateConfig:', htmlFiles);
+  if (!htmlFiles.length) {
+    throw new Error(`❌ No HTML files found in ${CONFIG.paths.src}`);
+  }
+  const indexHtml = htmlFiles.find(file => file.toLowerCase() === 'index.html');
+  if (!indexHtml) {
+    throw new Error(`❌ index.html not found in ${CONFIG.paths.src}. Available HTML files: ${htmlFiles.join(', ')}`);
+  }
+  const indexHtmlPath = path.join(CONFIG.paths.src, indexHtml);
+  console.log('Resolved index.html path:', indexHtmlPath);
+  if (!fs.existsSync(indexHtmlPath)) {
+    throw new Error(`❌ index.html not found at ${indexHtmlPath}. Available HTML files: ${htmlFiles.join(', ')}`);
   }
   if (!fs.existsSync(iconifyPath)) {
     throw new Error(`❌ Iconify packages not found: ${iconifyPath}`);

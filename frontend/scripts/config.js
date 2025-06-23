@@ -1,20 +1,32 @@
 import { globSync } from 'glob';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const BUILD_ENV = process.env.env === 'prod' ? 'prod' : 'dev';
 const isProduction = BUILD_ENV === 'prod';
 const baseDir = path.dirname(fileURLToPath(import.meta.url));
+console.log('baseDir:', baseDir);
 
 // Helper to resolve paths relative to baseDir
 const resolvePath = (relativePath) => path.resolve(baseDir, relativePath);
 
-// Dynamically discover source files using glob patterns (top-level only)
+// Log resolved src path
+const srcPath = resolvePath('../src');
+console.log('Resolved src path:', srcPath);
+
+// Detect Windows platform
+const isWindows = process.platform === 'win32';
+console.log('Running on Windows:', isWindows);
+
+// Dynamically discover source files
 const srcFiles = {
-  js: globSync(resolvePath('../src/*.js')).map(file => path.relative(resolvePath('../src'), file)),
-  css: globSync(resolvePath('../src/*.css')).map(file => path.relative(resolvePath('../src'), file)),
-  html: globSync(resolvePath('../src/*.html')).map(file => path.relative(resolvePath('../src'), file)),
-  static: globSync(resolvePath('../src/*.{ico,png,jpg,jpeg,gif}')).map(file => path.relative(resolvePath('../src'), file)),
+  js: globSync(path.join(srcPath, '*.js').replace(/\\/g, '/')).map(file => path.basename(file)),
+  css: globSync(path.join(srcPath, '*.css').replace(/\\/g, '/')).map(file => path.basename(file)),
+  html: fs.readdirSync(srcPath)
+    .filter(file => file.toLowerCase().endsWith('.html'))
+    .map(file => path.basename(file)), // Use basename to get clean filenames
+  static: globSync(path.join(srcPath, '*.{ico,png,jpg,jpeg,gif}').replace(/\\/g, '/')).map(file => path.basename(file)),
   sprite: 'sprite.svg',
   img: [
     {
@@ -23,6 +35,10 @@ const srcFiles = {
     },
   ],
 };
+console.log('Glob pattern for html (reference only):', path.join(srcPath, '*.html').replace(/\\/g, '/'));
+console.log('html sources:', srcFiles.html);
+console.log('Raw files in src:', fs.readdirSync(srcPath));
+console.log('Resolved HTML paths:', srcFiles.html.map(file => path.join(srcPath, file)));
 
 export const CONFIG = {
   build: {
@@ -31,14 +47,14 @@ export const CONFIG = {
     minify: isProduction,
     sourcemap: !isProduction,
     js: {
-      bundleAlpine: true, // Include alpine.js in app.js bundle by default
-      output: 'app.js', // Bundled JS output file
+      bundleAlpine: true,
+      output: 'app.js',
     },
     alpine: {
-      output: 'alpine.js', // Separate alpine.js output if not bundled
+      output: 'alpine.js',
       dev: {
         filename: 'alpine.js',
-        modulePath: 'alpinejs/dist/cdn.js', // Use require.resolve in build.js
+        modulePath: 'alpinejs/dist/cdn.js',
       },
       min: {
         filename: 'alpine.min.js',
@@ -48,7 +64,7 @@ export const CONFIG = {
   },
   paths: {
     base: baseDir,
-    src: resolvePath('../src'),
+    src: srcPath,
     dist: resolvePath('../dist'),
     backend: resolvePath('../../backend/app/static'),
   },
