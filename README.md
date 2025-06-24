@@ -78,7 +78,7 @@ ptree() {
 
 ### pydantic - generate models for app
 
-By convention, have a **generate.py** file that creates all pydantic model definitions for the runtime of this web app 
+By convention, have a **generate.py** file that creates all pydantic model definitions for the runtime of this web app
 models/init/ 1st level sub-dirs are to be the org and group business wise isolated in their model structures.
 
 ## frontend
@@ -86,10 +86,11 @@ models/init/ 1st level sub-dirs are to be the org and group business wise isolat
 ## AWS Tags
 
 **UCOP FinApps Group:**
+
 - ucop:group FinApps
 - ucop:application fad
 - ucop:environment dev
-- ucop:createdBy jkirton@ucop.edu
+- ucop:createdBy <jkirton@ucop.edu>
 
 ## FinApps AWS Accounts List
 
