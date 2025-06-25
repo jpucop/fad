@@ -4,7 +4,7 @@
   "long_name": "",
   "description": "",
   "org": "ucop",
-  "group": "",
+  "group": "finapps",
   "app_profile": "",
   "deploy_profile": "",
   "source": {
@@ -19,6 +19,7 @@
     {
       "name": "",
       "server_name": "",
+      "host": "aws",
       "aws": {
         "account_name": "",
         "db_arn": ""
@@ -32,17 +33,12 @@
     "group_web_url": ""
   },
   "jira": {
-    "project_keys": [],
+    "project_keys": [ "" ],
     "group_web_url": ""
   },
   "service_now": {
     "group_web_url": "",
-    "assignment_groups": [
-      {
-        "name": "",
-        "apps": []
-      }
-    ]
+    "assignment_group_names": [ "" ]
   },
   "datadog": {
     "group_web_url": ""

@@ -1,6 +1,6 @@
 {
   "app_name": "",
-  "environment": "",
+  "env": "",
   "deploy_profile": "",
   "created": "",
   "source": {
@@ -11,6 +11,7 @@
   "aws": {
     "account_name": "",
     "account_id": "",
+    "region": "us-west-2",
     "codepipeline": {
       "name": "",
       "arn": ""
@@ -26,8 +27,9 @@
       "dns_name": ""
     },
     "rds": {
-      "instances": [
+      "dbs": [
         {
+          "name": "",
           "arn": "",
           "identifier": ""
         }
