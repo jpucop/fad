@@ -10,7 +10,7 @@ class AwsAccountModel(BaseModel):
     class Config:
         extra = Extra.allow
 
-    name: str
+    account_name: str
     account_id: str
     region: str
     description: str
