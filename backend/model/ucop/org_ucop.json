@@ -4,7 +4,7 @@
   "description": "Office of the President. The central campus of The University of California in Oakland, California.",
   "aws_accounts": [
     {
-      "name": "shs-prod",
+      "account_name": "shs-prod",
       "account_id": "999999999999",
       "region": "us-west-2",
       "description": "UCOP Infra group managed assets over groups in UCOP."

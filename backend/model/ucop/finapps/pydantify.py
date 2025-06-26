@@ -1,156 +1,204 @@
 #!/usr/bin/env python3
 
+"""
+Pydantic Model Generation Script (Refactored)
+
+- Reads raw JSON files from backend/model/schema/ (e.g., app.json, org.json)
+- Excludes specified files (app_snapshot.json, apps.json)
+- Transforms raw JSON to strict JSON Schema with no Optional or Any types
+- Generates one strongly typed Pydantic model file per JSON file in backend/app/models/
+- Creates common base classes for shared fields (e.g., NamedEntity, NameDesc)
+- Ensures:
+  - All arrays have explicitly typed elements
+  - All string fields default to ""
+  - Fails fast on type ambiguity or empty arrays
+  - Uses double quotes in generated model classes
+  - No Optional types; all properties required
+- Uses two-space indentation
+- Requires datamodel-code-generator==0.31.2, pydantic==2.10.6
+"""
+
 import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional
-from pydantic import create_model, BaseModel, Field
 import shutil
-import inflect
-import re
+import subprocess
+from pathlib import Path
+from typing import Dict, List, Set, Tuple, Any
 
-# Configure logging
+# Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Pluralizer for singularization
-inflector = inflect.engine()
+#######################
+# Project Root Logic  #
+#######################
 
-# Paths
-BASE_DIR = Path(__file__).parent.parent.parent.parent
-SCHEMA_DIR = BASE_DIR / "model" / "schema"
-MODEL_DIR = BASE_DIR / "model" / "ucop" / "finapps" / "models"
-OUTPUT_MODELS_DIR = BASE_DIR / "app" / "models"
+def find_project_root() -> Path:
+  current = Path(__file__).resolve().parent
+  while current != current.parent:
+    if (current / "backend").is_dir() and (current / "frontend").is_dir():
+      return current
+    current = current.parent
+  raise RuntimeError("Project root not found")
 
-def load_json(file_path: Path) -> Dict:
-  logger.debug(f"Loading {file_path}")
-  if not file_path.exists():
-    raise FileNotFoundError(f"File {file_path} does not exist.")
-  with open(file_path, "r") as f:
-    return json.load(f)
+PROJECT_ROOT = find_project_root()
+SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
+OUTPUT_DIR = PROJECT_ROOT / "backend" / "app" / "models"
+EXCLUDE_FILES = {"app_snapshot.json", "apps.json"}
+CATEGORY_MAP = {
+  "app": ["app.json", "app_profiles.json", "app_topo.json"],
+  "org": ["org.json"],
+  "group": ["group.json"],
+  "misc": ["aws_account.json", "deploy_profiles.json", "member.json"],
+}
 
-def save_file(content: str, file_path: Path) -> None:
-  logger.debug(f"Saving {file_path}")
-  file_path.parent.mkdir(parents=True, exist_ok=True)
-  with open(file_path, "w") as f:
-    f.write(content)
+####################################
+# Phase 1: Collect + Validate Raw  #
+####################################
 
-def snake_to_pascal(snake_str: str) -> str:
-  return "".join(word.capitalize() for word in snake_str.split("_"))
-
-def pascal_to_snake(name: str) -> str:
-  return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
-
-def singularize(name: str) -> str:
-  singular = inflector.singular_noun(name)
-  return singular if singular else name
-
-def json_schema_to_pydantic(schema: Dict, model_name: str, parent_models: Dict = None) -> type[BaseModel]:
-  if parent_models is None:
-    parent_models = {}
-
-  fields = {}
-
-  for prop_name, prop_value in schema.items():
-    field_type = str
-    default = ""
-
-    if isinstance(prop_value, dict):
-      nested_model_name = snake_to_pascal(f"{model_name}_{prop_name}")
-      nested_model = json_schema_to_pydantic(prop_value, nested_model_name, parent_models)
-      parent_models[nested_model_name] = nested_model
-      field_type = nested_model
-      default = None
-    elif isinstance(prop_value, list):
-      singular = singularize(prop_name)
-      element_model_name = snake_to_pascal(singular)
-
-      if prop_value and isinstance(prop_value[0], dict):
-        sub_model = json_schema_to_pydantic(prop_value[0], element_model_name, parent_models)
-        parent_models[element_model_name] = sub_model
-        field_type = List[sub_model]
-      else:
-        field_type = List[str]
-      default = []
+def collect_raw_json() -> Dict[str, List[Tuple[str, dict]]]:
+  files_by_category = {cat: [] for cat in CATEGORY_MAP}
+  for file in sorted(SCHEMA_DIR.glob("*.json")):
+    if file.name in EXCLUDE_FILES:
+      continue
+    try:
+      data = json.loads(file.read_text("utf-8"))
+      if not data:
+        logger.error(f"Empty JSON file: {file.name}")
+        raise ValueError(f"Empty JSON file: {file.name}")
+    except Exception as e:
+      logger.error(f"Failed to parse {file.name}: {e}")
+      raise
+    for category, names in CATEGORY_MAP.items():
+      if file.name in names:
+        files_by_category[category].append((file.stem, data))
+        break
     else:
-      field_type = str
-      default = ""
+      logger.warning(f"Unmapped file: {file.name}")
+  return files_by_category
 
-    fields[prop_name] = (field_type, Field(default=default))
+###################################
+# Phase 2: Type Inference Helpers #
+###################################
 
-  return create_model(model_name, __base__=BaseModel, **fields)
+def infer_property_type(value: Any, prop_name: str, file_name: str) -> Dict[str, Any]:
+  if isinstance(value, str):
+    return {"type": "string", "default": ""}
+  if isinstance(value, int):
+    return {"type": "integer"}
+  if isinstance(value, float):
+    return {"type": "number"}
+  if isinstance(value, bool):
+    return {"type": "boolean"}
+  if isinstance(value, list):
+    if not value:
+      raise ValueError(f"Empty array for property '{prop_name}' in {file_name}")
+    item_schema = infer_property_type(value[0], f"{prop_name}[]", file_name)
+    return {"type": "array", "items": item_schema, "minItems": 1}
+  if isinstance(value, dict):
+    properties = {}
+    required = []
+    for k, v in value.items():
+      properties[k] = infer_property_type(v, f"{prop_name}.{k}", file_name)
+      required.append(k)
+    return {"type": "object", "properties": properties, "required": required}
+  raise ValueError(f"Ambiguous type for property '{prop_name}' in {file_name}: {value}")
 
-def generate_model_file(model: type[BaseModel], model_name: str, model_path: Path, parent_models: Dict):
-  lines = ["from pydantic import BaseModel, Field\n", "from typing import List, Optional\n"]
+###################################
+# Phase 3: Raw to JSON Schema Step#
+###################################
 
-  for field_info in model.model_fields.values():
-    annotation = field_info.annotation
-    if hasattr(annotation, "__name__") and annotation.__name__ in parent_models:
-      lines.append(f"from .{pascal_to_snake(annotation.__name__)} import {annotation.__name__}\n")
-    if hasattr(annotation, "__origin__") and annotation.__origin__ in (list, List):
-      inner = annotation.__args__[0]
-      if hasattr(inner, "__name__") and inner.__name__ in parent_models:
-        lines.append(f"from .{pascal_to_snake(inner.__name__)} import {inner.__name__}\n")
+def transform_to_json_schema(data: dict, title: str, file_name: str) -> dict:
+  properties = {}
+  required = []
+  for k, v in data.items():
+    properties[k] = infer_property_type(v, k, file_name)
+    required.append(k)
+  return {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": title,
+    "type": "object",
+    "properties": properties,
+    "required": required,
+    "additionalProperties": False
+  }
 
-  lines.append(f"\nclass {model_name}(BaseModel):\n")
+######################################
+# Phase 4: Common Fields + Base Class #
+######################################
 
-  for field_name, field_info in model.model_fields.items():
-    annotation = field_info.annotation
-    field_type = "str"
-    if hasattr(annotation, "__name__"):
-      field_type = annotation.__name__
-    if hasattr(annotation, "__origin__") and annotation.__origin__ in (list, List):
-      inner = annotation.__args__[0]
-      inner_type = inner.__name__ if hasattr(inner, "__name__") else "str"
-      field_type = f"List[{inner_type}]"
+def find_common_fields(all_data: List[dict]) -> Tuple[Set[str], Set[str]]:
+  name_fields = []
+  desc_fields = []
+  for d in all_data:
+    if "name" in d and isinstance(d["name"], str):
+      name_fields.append(set(d.keys()))
+    if "description" in d and isinstance(d.get("description"), str):
+      desc_fields.append(set(d.keys()))
+  named_fields = set.intersection(*name_fields) if name_fields else set()
+  namedesc_fields = set.intersection(*desc_fields) if desc_fields else set()
+  return named_fields, namedesc_fields
 
-    default = field_info.default
-    default_str = f" = {repr(default)}" if default not in (None, ...) else ""
-    lines.append(f"  {field_name}: {field_type}{default_str}\n")
+##############################
+# Phase 5: Base Model Emission#
+##############################
 
-  save_file("".join(lines), model_path)
-  logger.info(f"Generated Pydantic model for {model_name} at {model_path}")
+def generate_base_model(named: Set[str], namedesc: Set[str]):
+  lines = ["from pydantic import BaseModel\n\n", "class NamedEntity(BaseModel, frozen=True):\n"]
+  for f in sorted(named):
+    lines.append(f'  {f}: str = ""\n')
+  lines.append("\nclass NameDesc(NamedEntity, frozen=True):\n")
+  for f in sorted(namedesc - named):
+    lines.append(f'  {f}: str = ""\n')
+  (OUTPUT_DIR / "base_model.py").write_text("".join(lines), encoding="utf-8")
 
-def generate_init_file(model_dir: Path):
-  model_files = [f.stem for f in model_dir.glob("*.py") if f.name != "__init__.py"]
-  init_content = ["from . import (\n"]
-  init_content.extend(f"  {model},\n" for model in sorted(model_files))
-  init_content.append(")\n")
-  save_file("".join(init_content), model_dir / "__init__.py")
-  logger.info(f"Generated {model_dir / '__init__.py'}")
+#################################
+# Phase 6: Final Model Generation#
+#################################
 
-def copy_models_to_app():
-  OUTPUT_MODELS_DIR.mkdir(parents=True, exist_ok=True)
-  for model_file in MODEL_DIR.glob("*.py"):
-    shutil.copy(model_file, OUTPUT_MODELS_DIR / model_file.name)
-    logger.info(f"Copied {model_file} to {OUTPUT_MODELS_DIR / model_file.name}")
-  generate_init_file(OUTPUT_MODELS_DIR)
+def generate_models(all_files: Dict[str, List[Tuple[str, dict]]], named: Set[str], namedesc: Set[str]):
+  for category, entries in all_files.items():
+    for name, data in entries:
+      schema = transform_to_json_schema(data, name.title().replace("_", ""), name)
+      temp_schema_path = OUTPUT_DIR / f"temp_{name}.schema.json"
+      output_path = OUTPUT_DIR / f"{name}_model.py"
+      temp_schema_contents = json.dumps(schema, indent=2)
+      # logger.info(f"temp_schema_contents: \n{temp_schema_contents}\n")
+      temp_schema_path.write_text(temp_schema_contents, encoding="utf-8")
+      cmd = [
+        "datamodel-codegen",
+        "--input", str(temp_schema_path),
+        "--input-file-type", "jsonschema",
+        "--output", str(output_path),
+        "--disable-timestamp",
+        "--strip-default-none",
+        "--extra-fields", "allow",
+        "--disable-appending-item-suffix",
+        "--class-name", f"{name.title().replace('_','')}Model",
+        "--use-double-quotes",
+        "--base-class", "base_model.NamedEntity" if name in CATEGORY_MAP["app"] + CATEGORY_MAP["org"] + CATEGORY_MAP["group"] else "pydantic.BaseModel"
+      ]
+      logger.info(f"Generating {output_path.relative_to(PROJECT_ROOT)}")
+      try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+      except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to generate {output_path}: {e.stderr}")
+        raise
+      temp_schema_path.unlink()
 
-def generate_models():
-  MODEL_DIR.mkdir(parents=True, exist_ok=True)
-  parent_models = {}
+###########################
+# Phase 7: Main Orchestration #
+###########################
 
-  for template_file in sorted(SCHEMA_DIR.glob("*.json")):
-    template_name = template_file.stem
-    template_data = load_json(template_file)
-    model_name = snake_to_pascal(template_name)
-    model = json_schema_to_pydantic(template_data, model_name, parent_models)
-    parent_models[model_name] = model
-    generate_model_file(model, model_name, MODEL_DIR / f"{pascal_to_snake(model_name)}.py", parent_models)
-
-  for sub_model_name, sub_model in parent_models.items():
-    if sub_model_name not in [m for m in parent_models.keys() if m == sub_model_name]:
-      generate_model_file(sub_model, sub_model_name, MODEL_DIR / f"{pascal_to_snake(sub_model_name)}.py", parent_models)
-
-  generate_init_file(MODEL_DIR)
-  copy_models_to_app()
+def main():
+  shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
+  OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+  files = collect_raw_json()
+  all_data = [d for cat in files.values() for _, d in cat]
+  named, namedesc = find_common_fields(all_data)
+  generate_base_model(named, namedesc)
+  generate_models(files, named, namedesc)
+  logger.info("Model generation complete.")
 
 if __name__ == "__main__":
-  try:
-    logger.info(f"BASE_DIR: {BASE_DIR}")
-    logger.info(f"SCHEMA_DIR: {SCHEMA_DIR}")
-    logger.info(f"MODEL_DIR: {MODEL_DIR}")
-    generate_models()
-  except Exception as e:
-    logger.error(f"Error: {e}")
-    raise
+  main()
