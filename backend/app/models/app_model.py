@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class Aws(BaseModel):
@@ -61,7 +61,7 @@ class Jira(BaseModel):
     class Config:
         extra = Extra.allow
 
-    project_keys: List[str] = Field(..., min_items=1)
+    project_keys: List[str]
     group_web_url: str
 
 
@@ -70,7 +70,7 @@ class ServiceNow(BaseModel):
         extra = Extra.allow
 
     group_web_url: str
-    assignment_group_names: List[str] = Field(..., min_items=1)
+    assignment_group_names: List[str]
 
 
 class Datadog(BaseModel):
@@ -114,10 +114,10 @@ class AppModel(BaseModel):
     app_profile: str
     deploy_profile: str
     source: Source
-    dbs: List[Db] = Field(..., min_items=1)
+    dbs: List[Db]
     confluence: Confluence
     box: Box
     jira: Jira
     service_now: ServiceNow
     datadog: Datadog
-    environments: List[Environment] = Field(..., min_items=1)
+    environments: List[Environment]

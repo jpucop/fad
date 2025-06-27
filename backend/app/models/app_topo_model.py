@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class Source(BaseModel):
@@ -56,7 +56,7 @@ class Rds(BaseModel):
     class Config:
         extra = Extra.allow
 
-    dbs: List[Db] = Field(..., min_items=1)
+    dbs: List[Db]
 
 
 class Bucket(BaseModel):
@@ -71,7 +71,7 @@ class S3(BaseModel):
     class Config:
         extra = Extra.allow
 
-    buckets: List[Bucket] = Field(..., min_items=1)
+    buckets: List[Bucket]
 
 
 class Aws(BaseModel):

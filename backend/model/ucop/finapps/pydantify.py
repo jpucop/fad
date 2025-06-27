@@ -94,7 +94,7 @@ def infer_property_type(value: Any, prop_name: str, file_name: str) -> Dict[str,
     if not value:
       raise ValueError(f"Empty array for property '{prop_name}' in {file_name}")
     item_schema = infer_property_type(value[0], f"{prop_name}[]", file_name)
-    return {"type": "array", "items": item_schema, "minItems": 1}
+    return {"type": "array", "items": item_schema}
   if isinstance(value, dict):
     properties = {}
     required = []

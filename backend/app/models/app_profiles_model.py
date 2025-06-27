@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class AppProfile(BaseModel):
@@ -21,4 +21,4 @@ class AppProfilesModel(BaseModel):
     class Config:
         extra = Extra.allow
 
-    app_profiles: List[AppProfile] = Field(..., min_items=1)
+    app_profiles: List[AppProfile]

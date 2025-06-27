@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class AwsAccount(BaseModel):
@@ -70,7 +70,7 @@ class OrgModel(BaseModel):
     name: str
     full_name: str
     description: str
-    aws_accounts: List[AwsAccount] = Field(..., min_items=1)
+    aws_accounts: List[AwsAccount]
     confluence: Confluence
     box: Box
     jira: Jira

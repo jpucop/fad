@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class Member(BaseModel):
@@ -69,7 +69,7 @@ class AssignmentGroup(BaseModel):
         extra = Extra.allow
 
     name: str
-    apps: List[str] = Field(..., min_items=1)
+    apps: List[str]
 
 
 class ServiceNow(BaseModel):
@@ -79,7 +79,7 @@ class ServiceNow(BaseModel):
     name: str
     description: str
     url: str
-    assignment_groups: List[AssignmentGroup] = Field(..., min_items=1)
+    assignment_groups: List[AssignmentGroup]
 
 
 class GroupModel(BaseModel):
@@ -89,8 +89,8 @@ class GroupModel(BaseModel):
     name: str
     full_name: str
     description: str
-    members: List[Member] = Field(..., min_items=1)
-    aws_accounts: List[AwsAccount] = Field(..., min_items=1)
+    members: List[Member]
+    aws_accounts: List[AwsAccount]
     confluence: Confluence
     box: Box
     jira: Jira
