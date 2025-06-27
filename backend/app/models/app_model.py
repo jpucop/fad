@@ -5,17 +5,19 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra
+from pydantic import Extra
+
+from base_model import NamedEntity
 
 
-class Aws(BaseModel):
+class Aws(NamedEntity):
     class Config:
         extra = Extra.allow
 
     account_name: str
 
 
-class Source(BaseModel):
+class Source(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -25,7 +27,7 @@ class Source(BaseModel):
     aws: Aws
 
 
-class Aws1(BaseModel):
+class Aws1(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -33,7 +35,7 @@ class Aws1(BaseModel):
     db_arn: str
 
 
-class Db(BaseModel):
+class Db(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -43,21 +45,21 @@ class Db(BaseModel):
     aws: Aws1
 
 
-class Confluence(BaseModel):
+class Confluence(NamedEntity):
     class Config:
         extra = Extra.allow
 
     group_web_url: str
 
 
-class Box(BaseModel):
+class Box(NamedEntity):
     class Config:
         extra = Extra.allow
 
     group_web_url: str
 
 
-class Jira(BaseModel):
+class Jira(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -65,7 +67,7 @@ class Jira(BaseModel):
     group_web_url: str
 
 
-class ServiceNow(BaseModel):
+class ServiceNow(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -73,21 +75,21 @@ class ServiceNow(BaseModel):
     assignment_group_names: List[str]
 
 
-class Datadog(BaseModel):
+class Datadog(NamedEntity):
     class Config:
         extra = Extra.allow
 
     group_web_url: str
 
 
-class Aws2(BaseModel):
+class Aws2(NamedEntity):
     class Config:
         extra = Extra.allow
 
     account_name: str
 
 
-class Environment(BaseModel):
+class Environment(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -101,14 +103,27 @@ class Environment(BaseModel):
     aws: Aws2
 
 
-class AppModel(BaseModel):
+class NamedEntityModel(NamedEntity):
     class Config:
         extra = Extra.allow
 
     name: str
+
+
+class NameDesc(NamedEntityModel):
+    class Config:
+        extra = Extra.allow
+
+    description: str
+    name: str
+
+
+class AppModel(NameDesc):
+    class Config:
+        extra = Extra.allow
+
     short_name: str
     long_name: str
-    description: str
     org: str
     group: str
     app_profile: str

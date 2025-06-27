@@ -13,4 +13,3 @@ class AwsAccountModel(BaseModel):
     account_name: str
     account_id: str
     region: str
-    description: str

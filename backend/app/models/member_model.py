@@ -10,7 +10,6 @@ class MemberModel(BaseModel):
     class Config:
         extra = Extra.allow
 
-    name: str
     work_email: str
     title: str
     web_url: str

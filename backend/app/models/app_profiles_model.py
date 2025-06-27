@@ -5,10 +5,12 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra
+from pydantic import Extra
+
+from base_model import NamedEntity
 
 
-class AppProfile(BaseModel):
+class AppProfile(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -17,7 +19,7 @@ class AppProfile(BaseModel):
     type: str
 
 
-class AppProfilesModel(BaseModel):
+class AppProfilesModel(NamedEntity):
     class Config:
         extra = Extra.allow
 

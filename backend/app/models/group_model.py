@@ -5,10 +5,12 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra
+from pydantic import Extra
+
+from base_model import NamedEntity
 
 
-class Member(BaseModel):
+class Member(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -18,7 +20,7 @@ class Member(BaseModel):
     web_url: str
 
 
-class AwsAccount(BaseModel):
+class AwsAccount(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -28,7 +30,7 @@ class AwsAccount(BaseModel):
     description: str
 
 
-class Confluence(BaseModel):
+class Confluence(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -37,7 +39,7 @@ class Confluence(BaseModel):
     url: str
 
 
-class Box(BaseModel):
+class Box(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -46,7 +48,7 @@ class Box(BaseModel):
     url: str
 
 
-class Jira(BaseModel):
+class Jira(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -55,7 +57,7 @@ class Jira(BaseModel):
     url: str
 
 
-class DataDog(BaseModel):
+class DataDog(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -64,7 +66,7 @@ class DataDog(BaseModel):
     url: str
 
 
-class AssignmentGroup(BaseModel):
+class AssignmentGroup(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -72,7 +74,7 @@ class AssignmentGroup(BaseModel):
     apps: List[str]
 
 
-class ServiceNow(BaseModel):
+class ServiceNow(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -82,13 +84,26 @@ class ServiceNow(BaseModel):
     assignment_groups: List[AssignmentGroup]
 
 
-class GroupModel(BaseModel):
+class NamedEntityModel(NamedEntity):
     class Config:
         extra = Extra.allow
 
     name: str
-    full_name: str
+
+
+class NameDesc(NamedEntityModel):
+    class Config:
+        extra = Extra.allow
+
     description: str
+    name: str
+
+
+class GroupModel(NameDesc):
+    class Config:
+        extra = Extra.allow
+
+    full_name: str
     members: List[Member]
     aws_accounts: List[AwsAccount]
     confluence: Confluence

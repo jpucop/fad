@@ -5,10 +5,12 @@ from __future__ import annotations
 
 from typing import List
 
-from pydantic import BaseModel, Extra
+from pydantic import Extra
+
+from base_model import NamedEntity
 
 
-class Source(BaseModel):
+class Source(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -17,7 +19,7 @@ class Source(BaseModel):
     project_name: str
 
 
-class Codepipeline(BaseModel):
+class Codepipeline(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -25,7 +27,7 @@ class Codepipeline(BaseModel):
     arn: str
 
 
-class Ecs(BaseModel):
+class Ecs(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -34,7 +36,7 @@ class Ecs(BaseModel):
     task_definition_arn: str
 
 
-class Alb(BaseModel):
+class Alb(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -43,7 +45,7 @@ class Alb(BaseModel):
     dns_name: str
 
 
-class Db(BaseModel):
+class Db(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -52,14 +54,14 @@ class Db(BaseModel):
     identifier: str
 
 
-class Rds(BaseModel):
+class Rds(NamedEntity):
     class Config:
         extra = Extra.allow
 
     dbs: List[Db]
 
 
-class Bucket(BaseModel):
+class Bucket(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -67,14 +69,14 @@ class Bucket(BaseModel):
     arn: str
 
 
-class S3(BaseModel):
+class S3(NamedEntity):
     class Config:
         extra = Extra.allow
 
     buckets: List[Bucket]
 
 
-class Aws(BaseModel):
+class Aws(NamedEntity):
     class Config:
         extra = Extra.allow
 
@@ -88,7 +90,7 @@ class Aws(BaseModel):
     s3: S3
 
 
-class AppTopoModel(BaseModel):
+class AppTopoModel(NamedEntity):
     class Config:
         extra = Extra.allow
 
