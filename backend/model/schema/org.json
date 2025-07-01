@@ -2,14 +2,16 @@
   "name": "",
   "full_name": "",
   "description": "",
-  "aws_accounts": [
-    {
-      "name": "",
-      "account_id": "",
-      "region": "us-west-2",
-      "description": ""
-    }
-  ],
+  "aws": {
+    "accounts": [
+      {
+        "account_name": "",
+        "account_id": "",
+        "region": "us-west-2",
+        "description": ""
+      }
+    ]
+  },
   "confluence": {
     "name": "",
     "description": "",
@@ -25,7 +27,7 @@
     "description": "",
     "url": ""
   },
-  "data_dog": {
+  "datadog": {
     "name": "",
     "description": "",
     "url": ""
