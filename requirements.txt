@@ -28,3 +28,4 @@ websockets==15.0.1
 cachetools==6.1.0
 inflect==7.5.0
 datamodel_code_generator==0.31.2
+genson
