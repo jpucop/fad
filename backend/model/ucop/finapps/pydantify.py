@@ -95,20 +95,6 @@ def transform_to_json_schema(data: dict, title: str) -> dict:
   return schema
 
 
-def adjust_indentation(code: str, from_indent: int = 4, to_indent: int = 2) -> str:
-  lines = code.splitlines()
-  new_lines = []
-  for line in lines:
-    stripped = line.lstrip()
-    if stripped:
-      indent_level = (len(line) - len(stripped)) // from_indent
-      new_indent = " " * (indent_level * to_indent)
-      new_lines.append(new_indent + stripped)
-    else:
-      new_lines.append(line)
-  return "\n".join(new_lines)
-
-
 def generate_models(schemas: List[Tuple[str, dict]]) -> None:
   for name, schema in schemas:
     output_path = OUTPUT_DIR / f"{name}_model.py"
@@ -130,9 +116,8 @@ def generate_models(schemas: List[Tuple[str, dict]]) -> None:
       )
       with open(output_path, "r") as f:
         code = f.read()
-      formatted_code = adjust_indentation(code)
       with open(output_path, "w") as f:
-        f.write(formatted_code)
+        f.write(code)
     except Exception as e:
       logger.error(f"Failed to generate {output_path}: {e}")
       raise
