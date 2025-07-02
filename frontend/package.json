@@ -17,8 +17,8 @@
     "@iconify-json/mdi": "1.2.3",
     "@iconify/tools": "4.1.2",
     "@iconify/utils": "2.3.0",
-    "@tailwindcss/cli": "4.1.10",
-    "@tailwindcss/postcss": "4.1.10",
+    "@tailwindcss/cli": "4.1.11",
+    "@tailwindcss/postcss": "4.1.11",
     "alpinejs": "3.14.9",
     "autoprefixer": "10.4.21",
     "esbuild": "0.25.5",
@@ -27,6 +27,6 @@
     "rimraf": "6.0.1",
     "serve": "14.2.4",
     "svgo": "4.0.0",
-    "tailwindcss": "4.1.10"
+    "tailwindcss": "4.1.11"
   }
 }
