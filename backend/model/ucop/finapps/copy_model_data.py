@@ -7,10 +7,18 @@ import logging
 import shutil
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+def find_project_root() -> Path:
+  current = Path(__file__).resolve().parent
+  while current != current.parent:
+    if (current / "backend").is_dir() and (current / "frontend").is_dir():
+      return current
+    current = current.parent
+  raise RuntimeError("Project root not found")
+
+PROJECT_ROOT = find_project_root()
 SOURCE_DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop" / "finapps"
 SOURCE_SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
 DEST_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"

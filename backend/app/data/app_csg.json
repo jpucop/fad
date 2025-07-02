@@ -1,0 +1,94 @@
+{
+  "name": "csg",
+  "short_name": "csg",
+  "long_name": "csg Application",
+  "description": "Managed FinApps app - csg",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "csgWeb",
+    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/csgWeb",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "dbs": [
+    {
+      "name": "csg_db",
+      "server_name": "csg_server",
+      "host": "aws",
+      "aws": {
+        "account_name": "finapps-dev",
+        "db_arn": "arn:aws:rds:us-west-2:999999999999:db:csg_db"
+      }
+    }
+  ],
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
+    "space_keys": [
+      "FA"
+    ]
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "FA",
+      "csg"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+    "assignment_group_names": [
+      "Corporate Systems Gateway (CSG)",
+      "FINAPPS AWS Tech Support",
+      "BUD Retrofit Team"
+    ]
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "csg-prod-pipeline",
+      "git_branch": "main",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}

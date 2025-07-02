@@ -1,0 +1,40 @@
+{
+  "name": "",
+  "full_name": "",
+  "description": "",
+  "aws": {
+    "accounts": [
+      {
+        "account_name": "",
+        "account_id": "",
+        "region": "us-west-2",
+        "description": ""
+      }
+    ]
+  },
+  "confluence": {
+    "name": "",
+    "description": "",
+    "url": ""
+  },
+  "box": {
+    "name": "",
+    "description": "",
+    "url": ""
+  },
+  "jira": {
+    "name": "",
+    "description": "",
+    "url": ""
+  },
+  "datadog": {
+    "name": "",
+    "description": "",
+    "url": ""
+  },
+  "service_now": {
+    "name": "",
+    "description": "",
+    "url": ""
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "name": "rems",
+  "short_name": "rems",
+  "long_name": "rems Application",
+  "description": "Managed FinApps app - rems",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "remsWeb",
+    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/remsWeb",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "dbs": [
+    {
+      "name": "rems_db",
+      "server_name": "rems_server",
+      "host": "aws",
+      "aws": {
+        "account_name": "finapps-dev",
+        "db_arn": "arn:aws:rds:us-west-2:999999999999:db:rems_db"
+      }
+    }
+  ],
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview",
+    "space_keys": [
+      "FA"
+    ]
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "FA",
+      "rems"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+    "assignment_group_names": [
+      "FINAPPS AWS Tech Support",
+      "Research Enterprise Management System (REMS)"
+    ]
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-dev-pipeline",
+      "git_branch": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-qa-pipeline",
+      "git_branch": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "rems-prod-pipeline",
+      "git_branch": "main",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
