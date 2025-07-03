@@ -42,7 +42,7 @@ class AWSPipelineFetcher:
         deploy_profile=env_data["deploy_profile"],
         created=datetime.now().isoformat(),
         source={
-          "git_branch_name": env_data["git_branch"],
+          "git_branch_name": env_data["git_branch_name"],
           "git_origin_url": app.source.git_origin_url,
           "project_name": app.source.project_name
         },
@@ -64,7 +64,7 @@ class AWSPipelineFetcher:
       logger.error(f"Error fetching topology for {app.name}:{env_data['env']}: {e}")
       return None
 
-  def get_app_snapshot(self, app: "App", env_data: dict, topology: AppTopo) -> Optional[AppSnapshot]:
+  def get_app_snapshot(self, app: App, env_data: dict, topology: AppTopo) -> Optional[AppSnapshot]:
     """Generate app snapshot using topology data."""
     try:
       pipeline_name = topology.aws.codepipeline.name
@@ -81,7 +81,7 @@ class AWSPipelineFetcher:
           "deployment_commit": {
             "commit_id": "",
             "timestamp": "",
-            "branch": env_data["git_branch"],
+            "branch": env_data["git_branch_name"],
             "message": "",
             "commitor": ""
           },

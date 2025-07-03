@@ -59,7 +59,7 @@
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate-rds",
       "deploy_pipeline_name": "wage-dev-pipeline",
-      "git_branch": "dev",
+      "git_branch_name": "dev",
       "aws": {
         "account_name": "finapps-dev"
       }
@@ -71,7 +71,7 @@
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate-rds",
       "deploy_pipeline_name": "wage-qa-pipeline",
-      "git_branch": "qa",
+      "git_branch_name": "qa",
       "aws": {
         "account_name": "finapps-dev"
       }
@@ -83,7 +83,7 @@
       "app_profile": "tomcat-java",
       "deploy_profile": "aws-cicd-fargate-rds",
       "deploy_pipeline_name": "wage-prod-pipeline",
-      "git_branch": "main",
+      "git_branch_name": "main",
       "aws": {
         "account_name": "finapps-prod"
       }

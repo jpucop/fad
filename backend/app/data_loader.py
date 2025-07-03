@@ -59,7 +59,8 @@ def load_web_app_data() -> WebAppData:
   if deploy_profiles_file.exists():
     try:
       with open(deploy_profiles_file, "r") as f:
-        deploy_profiles = json.load(f)
+        raw_profiles = json.load(f)
+      deploy_profiles = [p["name"] for p in raw_profiles.get("deploy_profiles", [])]
       logger.info(f"Loaded deploy profiles: {deploy_profiles}")
     except Exception as e:
       logger.error(f"Failed to load deploy_profiles.json: {e}")
@@ -79,19 +80,22 @@ def load_web_app_data() -> WebAppData:
     logger.error(f"Failed to load app.json: {e}")
     raise
 
-  # Load app_*.json files (topo data)
+  # Load app model definition files (app_*.json)
   apps = {}
   for file in DATA_DIR.glob("app_*.json"):
     try:
       with open(file, "r") as f:
         data = json.load(f)
       app_name = file.stem.replace("app_", "")
+
       if deploy_profiles and data.get("deploy_profile") not in deploy_profiles:
         logger.error(f"Invalid deploy_profile in {file.name}: {data.get('deploy_profile')}")
         raise ValueError(f"Invalid deploy_profile in {file.name}")
-      app_topo_model = AppTopoModel(**data)
-      apps[app_name] = AppData(definition=app_model, topo=app_topo_model)
-      logger.info(f"Loaded app topo: {app_name}")
+
+      app_model_instance = AppModel(**data)
+      apps[app_name] = AppData(definition=app_model_instance, topo=None)
+      logger.info(f"Loaded app definition: {app_name}")
+
     except ValidationError as e:
       logger.error(f"Validation failed for {file.name}: {e}")
       raise

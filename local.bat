@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-cd /d %USERPROFILE%\dev\fad\backend
+cd /d %USERPROFILE%\dev\workspaces\finapps\aws\fad
 
 echo Starting localhost FastAPI server..
-uvicorn app.main:app --reload
+uvicorn backend.app.main:app --reload --reload-dir backend/app
