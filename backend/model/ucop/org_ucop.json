@@ -27,7 +27,7 @@
     "description": "Jira instance for UCOP",
     "url": "https://ucopedu.atlassian.net/jira/"
   },
-  "data_dog": {
+  "datadog": {
     "name": "UCOP DataDog",
     "description": "DataDog monitoring for UCOP",
     "url": "https://dd.com/ucop/index.html"
