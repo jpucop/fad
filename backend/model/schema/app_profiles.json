@@ -1,4 +1,5 @@
 {
+  "_static": true,
   "app_profiles": [
     {
       "name": "jboss-java",

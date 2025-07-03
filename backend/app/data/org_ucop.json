@@ -2,14 +2,16 @@
   "name": "ucop",
   "full_name": "University of California Office of the President",
   "description": "Office of the President. The central campus of The University of California in Oakland, California.",
-  "aws_accounts": [
-    {
-      "account_name": "shs-prod",
-      "account_id": "999999999999",
-      "region": "us-west-2",
-      "description": "UCOP Infra group managed assets over groups in UCOP."
-    }
-  ],
+  "aws": {
+    "accounts": [
+      {
+        "account_name": "shs-prod",
+        "account_id": "999999999999",
+        "region": "us-west-2",
+        "description": "UCOP Infra group managed assets over groups in UCOP."
+      }
+      ]
+  },
   "confluence": {
     "name": "UCOP Confluence",
     "description": "Confluence space for UCOP",

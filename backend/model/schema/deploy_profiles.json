@@ -1,4 +1,5 @@
 {
+  "_static": true,
   "deploy_profiles": [
     {
       "name": "aws-cicd-fargate",

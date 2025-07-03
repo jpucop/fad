@@ -2,10 +2,11 @@
 """
 Data Loader for FAD Web App Models
 
-- Loads JSON data from backend/model/ucop/finapps/ (app_*.json, org_ucop.json, group_finapps.json)
-- Loads static app definitions from backend/model/schema/app.json
+- Copies JSON data from backend/model/ (excluding model/schema/) to backend/app/data/
+- Copies static JSON definitions from backend/model/schema/ to backend/app/data/ if _schema: true present
+- Loads JSON data from backend/app/data/ (app_*.json, org_*.json, group_*.json)
 - Validates against Pydantic models from backend/app/models/ (AppModel, AppTopoModel, OrgModel, GroupModel)
-- Uses static schemas from backend/model/schema/ (e.g., deploy_profiles.json) for constraints
+- Uses static schemas from backend/app/data/ (e.g., deploy_profiles.json) for constraints
 - Caches model instances (org, group, apps with AppModel and AppTopoModel) for app lifecycle
 - Supports on-demand AppTopoModel updates
 - Requires pydantic==2.10.6
@@ -13,6 +14,7 @@ Data Loader for FAD Web App Models
 
 import json
 import logging
+import shutil
 from pathlib import Path
 from typing import Dict
 from pydantic import BaseModel, ValidationError
@@ -26,7 +28,6 @@ from backend.app.models.group_model import GroupModel
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def find_project_root() -> Path:
   current = Path(__file__).resolve().parent
   while current != current.parent:
@@ -35,26 +36,49 @@ def find_project_root() -> Path:
     current = current.parent
   raise RuntimeError("Project root not found")
 
-
 PROJECT_ROOT = find_project_root()
-DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop" / "finapps"
-SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
-
+MODEL_DIR = PROJECT_ROOT / "backend" / "model"
+SCHEMA_DIR = MODEL_DIR / "schema"
+DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
 
 class AppData(BaseModel):
   definition: AppModel
   topo: AppTopoModel | None = None  # Allow None for on-demand topo generation
-
 
 class WebAppData(BaseModel):
   org: OrgModel
   group: GroupModel
   apps: Dict[str, AppData]
 
+def prepare_data_dir() -> None:
+  """Copy eligible JSON files into app/data/ based on _schema rules."""
+  DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+  # Copy all JSON files from model/ recursively excluding schema/
+  for file in MODEL_DIR.rglob("*.json"):
+    if SCHEMA_DIR in file.parents:
+      continue
+    dest = DATA_DIR / file.relative_to(MODEL_DIR)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(file, dest)
+    logger.info(f"Copied {file} to {dest}")
+
+  # Copy static JSON files from schema/ if _schema: true present
+  for file in SCHEMA_DIR.glob("*.json"):
+    try:
+      with open(file, "r") as f:
+        content = json.load(f)
+      if content.get("_schema") is True:
+        dest = DATA_DIR / file.name
+        shutil.copy(file, dest)
+        logger.info(f"Copied static schema {file} to {dest}")
+    except Exception as e:
+      logger.error(f"Failed to process schema file {file}: {e}")
+      raise
 
 def load_web_app_data() -> WebAppData:
-  # Load static schemas for validation
-  deploy_profiles_file = SCHEMA_DIR / "deploy_profiles.json"
+  # Load deploy_profiles.json
+  deploy_profiles_file = DATA_DIR / "deploy_profiles.json"
   deploy_profiles = []
   if deploy_profiles_file.exists():
     try:
@@ -66,23 +90,43 @@ def load_web_app_data() -> WebAppData:
       logger.error(f"Failed to load deploy_profiles.json: {e}")
       raise
 
-  # Load static app definition (app.json)
-  app_file = SCHEMA_DIR / "app.json"
+  # Load org_*.json
+  org_file = next(DATA_DIR.glob("org_*.json"), None)
+  if not org_file:
+    raise FileNotFoundError("No org_*.json file found in data dir")
   try:
-    with open(app_file, "r") as f:
-      app_data = json.load(f)
-    app_model = AppModel(**app_data)
-    logger.info("Loaded app.json")
+    with open(org_file, "r") as f:
+      org_data = json.load(f)
+    org_model = OrgModel(**org_data)
+    logger.info(f"Loaded {org_file.name}")
   except ValidationError as e:
-    logger.error(f"Validation failed for app.json: {e}")
+    logger.error(f"Validation failed for {org_file.name}: {e}")
     raise
   except Exception as e:
-    logger.error(f"Failed to load app.json: {e}")
+    logger.error(f"Failed to load {org_file.name}: {e}")
     raise
 
-  # Load app model definition files (app_*.json)
+  # Load group_*.json
+  group_file = next(DATA_DIR.glob("group_*.json"), None)
+  if not group_file:
+    raise FileNotFoundError("No group_*.json file found in data dir")
+  try:
+    with open(group_file, "r") as f:
+      group_data = json.load(f)
+    group_model = GroupModel(**group_data)
+    logger.info(f"Loaded {group_file.name}")
+  except ValidationError as e:
+    logger.error(f"Validation failed for {group_file.name}: {e}")
+    raise
+  except Exception as e:
+    logger.error(f"Failed to load {group_file.name}: {e}")
+    raise
+
+  # Load app_*.json files, excluding known static files like app_profiles.json
   apps = {}
   for file in DATA_DIR.glob("app_*.json"):
+    if file.name == "app_profiles.json":
+      continue
     try:
       with open(file, "r") as f:
         data = json.load(f)
@@ -103,36 +147,7 @@ def load_web_app_data() -> WebAppData:
       logger.error(f"Failed to load {file.name}: {e}")
       raise
 
-  # Load org_ucop.json
-  org_file = DATA_DIR / "org_ucop.json"
-  try:
-    with open(org_file, "r") as f:
-      org_data = json.load(f)
-    org_model = OrgModel(**org_data)
-    logger.info("Loaded org_ucop.json")
-  except ValidationError as e:
-    logger.error(f"Validation failed for org_ucop.json: {e}")
-    raise
-  except Exception as e:
-    logger.error(f"Failed to load org_ucop.json: {e}")
-    raise
-
-  # Load group_finapps.json
-  group_file = DATA_DIR / "group_finapps.json"
-  try:
-    with open(group_file, "r") as f:
-      group_data = json.load(f)
-    group_model = GroupModel(**group_data)
-    logger.info("Loaded group_finapps.json")
-  except ValidationError as e:
-    logger.error(f"Validation failed for group_finapps.json: {e}")
-    raise
-  except Exception as e:
-    logger.error(f"Failed to load group_finapps.json: {e}")
-    raise
-
   return WebAppData(org=org_model, group=group_model, apps=apps)
-
 
 def update_app_topo(app_name: str, topo_data: dict, data: WebAppData) -> None:
   """Update or add AppTopoModel for an app, used for on-demand generation."""
