@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Pydantic Model Generation Script (Simplified with GenSON)
+Webify Script: Combines Pydantic Model Generation and Data Copying
 
-- Reads raw JSON files from backend/model/schema/ (e.g., app.json, org.json)
-- Excludes specified files (app_snapshot.json, apps.json)
-- Uses GenSON to transform raw JSON to JSON Schema with strict typing
-- Generates one strongly typed Pydantic model file per JSON file in backend/app/models/
-- Ensures:
-  - All arrays have explicitly typed elements
-  - All properties are required; no Optional types
-  - Two-space indentation in generated models
+- Accepts an input argument: "schema", "data", or "all" (default)
+- "schema": Generates Pydantic models from JSON schemas (like pydantify.py)
+- "data": Copies JSON data files recursively from backend/model/ucop/ and specific schema files (like copy_model_data.py)
+- "all": Performs both schema and data operations
+- Uses GenSON for JSON Schema generation with strict typing
+- Ensures all properties are required, arrays have explicit types, and two-space indentation
 - Requires datamodel-code-generator==0.31.2, pydantic==2.10.6, genson
 """
 
+import argparse
 import json
 import logging
 import shutil
@@ -25,7 +24,6 @@ from datamodel_code_generator import generate, InputFileType, PythonVersion
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def find_project_root() -> Path:
   current = Path(__file__).resolve().parent
   while current != current.parent:
@@ -34,12 +32,15 @@ def find_project_root() -> Path:
     current = current.parent
   raise RuntimeError("Project root not found")
 
-
 PROJECT_ROOT = find_project_root()
 SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
 OUTPUT_DIR = PROJECT_ROOT / "backend" / "app" / "models"
 EXCLUDE_FILES = {"app_snapshot.json", "apps.json"}
+INCLUDED_SCHEMA_FILES = {"app_profiles.json", "deploy_profiles.json"}
 
+SOURCE_DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop"
+DEST_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
+DEST_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 def collect_raw_json() -> List[Tuple[str, dict]]:
   schemas = []
@@ -98,13 +99,13 @@ def transform_to_json_schema(data: dict, title: str) -> dict:
 def generate_models(schemas: List[Tuple[str, dict]]) -> None:
   for name, schema in schemas:
     output_path = OUTPUT_DIR / f"{name}_model.py"
-    logger.info(f"Generating {output_path.relative_to(PROJECT_ROOT)}")
+    class_name=f"{name.title().replace('_','')}Model"
     try:
       generate(
         input_=json.dumps(schema),
         input_file_type=InputFileType.JsonSchema,
         output=output_path,
-        class_name=f"{name.title().replace('_','')}Model",
+        class_name=class_name,
         base_class="pydantic.BaseModel",
         use_double_quotes=True,
         use_schema_description=True,
@@ -118,19 +119,69 @@ def generate_models(schemas: List[Tuple[str, dict]]) -> None:
         code = f.read()
       with open(output_path, "w") as f:
         f.write(code)
+      logger.info(f"Generated {output_path.relative_to(PROJECT_ROOT)}")
     except Exception as e:
       logger.error(f"Failed to generate {output_path}: {e}")
       raise
 
 
-def main() -> None:
+def generate_schema():
   shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
   OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
   raw_schemas = collect_raw_json()
   json_schemas = [(name, transform_to_json_schema(data, name.title().replace("_", "")))
-                  for name, data in raw_schemas]
+          for name, data in raw_schemas]
   generate_models(json_schemas)
   logger.info("Model generation complete.")
+
+
+def copy_model_data():
+
+  # Copy all JSON files recursively from backend/model/ucop/
+  for file in SOURCE_DATA_DIR.rglob("*.json"):
+    if file.name in EXCLUDE_FILES:
+      continue
+    try:
+      rel_path = file.relative_to(SOURCE_DATA_DIR)
+      dest_file = DEST_DATA_DIR / rel_path
+      dest_file.parent.mkdir(parents=True, exist_ok=True)
+      shutil.copy2(file, dest_file)
+      logger.info(f"Copied {rel_path} to {dest_file}")
+    except Exception as e:
+      logger.error(f"Failed to copy {file.name}: {e}")
+      raise
+
+  # Copy specific schema files
+  for file_name in INCLUDED_SCHEMA_FILES:
+    source_file = SCHEMA_DIR / file_name
+    if source_file.exists():
+      try:
+        shutil.copy2(source_file, DEST_DATA_DIR / file_name)
+        logger.info(f"Copied {file_name}")
+      except Exception as e:
+        logger.error(f"Failed to copy {file_name}: {e}")
+        raise
+
+
+def main():
+  parser = argparse.ArgumentParser(description="Webify script for schema generation and data copying to app/")
+  parser.add_argument(
+    "--mode",
+    choices=["schema", "data", "all"],
+    default="all",
+    help="Operation mode: 'schema' for model generation, 'data' for copying data, 'all' for both (default)"
+  )
+  args = parser.parse_args()
+
+  if args.mode in ["schema", "all"]:
+    logger.info("Running schema generation")
+    generate_schema()
+
+  if args.mode in ["data", "all"]:
+    logger.info("Running data copying")
+    copy_model_data()
+
+  logger.info("Webify script completed.")
 
 
 if __name__ == "__main__":

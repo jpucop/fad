@@ -15,7 +15,7 @@
       {
         "account_name": "",
         "account_id": "",
-        "region": "us-west-2",
+        "region": "",
         "description": ""
       }
     ]
@@ -47,7 +47,9 @@
     "assignment_groups": [
       {
         "name": "",
-        "apps": [ "" ]
+        "apps": [
+          "{app.name}"
+        ]
       }
     ]
   }
