@@ -1,0 +1,35 @@
+{
+  "paths": {
+    "src": "./src",
+    "dist": "./dist",
+    "backend": "../../backend/app/static",
+    "iconify": "./node_modules/@iconify-json"
+  },
+  "src": {
+    "sprite": "sprite.svg",
+    "imgDir": "img"
+  },
+  "build": {
+    "js": {
+      "bundleAlpine": true,
+      "output": "app.js"
+    },
+    "alpine": {
+      "output": "alpine.js",
+      "dev": {
+        "filename": "alpine.js",
+        "modulePath": "alpinejs/dist/cdn.js"
+      },
+      "min": {
+        "filename": "alpine.min.js",
+        "modulePath": "alpinejs/dist/cdn.min.js"
+      }
+    }
+  },
+  "iconConfig": {
+    "classRegex": "(?:i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)(?=\\b|$)",
+    "validateRegex": "^(i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)$",
+    "spanRegex": "<span\\s+[^>]*class=\"[^\"]*icon[^\"]*\"[^>]*>",
+    "symbolRegex": "<symbol\\s+id=\"([^\"]+)\""
+  }
+}
