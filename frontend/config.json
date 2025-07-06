@@ -2,34 +2,30 @@
   "paths": {
     "src": "./src",
     "dist": "./dist",
-    "backend": "../../backend/app/static",
-    "iconify": "./node_modules/@iconify-json"
+    "deploy": "../app/static",
+    "node_modules": "./node_modules",
+    "index": "index.html"
   },
-  "src": {
-    "sprite": "sprite.svg",
-    "imgDir": "img"
-  },
-  "build": {
-    "js": {
-      "bundleAlpine": true,
-      "output": "app.js"
-    },
-    "alpine": {
-      "output": "alpine.js",
-      "dev": {
-        "filename": "alpine.js",
-        "modulePath": "alpinejs/dist/cdn.js"
-      },
-      "min": {
-        "filename": "alpine.min.js",
-        "modulePath": "alpinejs/dist/cdn.min.js"
-      }
+  "sprite": {
+    "filename": "sprite.svg",
+    "scan": "<span\\s+[^>]*class=\"[^\"]*icon[^\"]*\"[^>]*>",
+    "class": "(?:i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)(?=\\b|$)",
+    "validate": "^(i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)$",
+    "symbol": "<symbol\\s+id=\"([^\"]+)\"",
+    "icon_svg": {
+
     }
   },
-  "iconConfig": {
-    "classRegex": "(?:i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)(?=\\b|$)",
-    "validateRegex": "^(i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)$",
-    "spanRegex": "<span\\s+[^>]*class=\"[^\"]*icon[^\"]*\"[^>]*>",
-    "symbolRegex": "<symbol\\s+id=\"([^\"]+)\""
+  "js": {
+    "bundle": false,
+    "alpine": {
+      "nodeModulePath": "alpinejs/dist/cdn.js",
+      "nodeModulePathMin": "alpinejs/dist/cdn.min.js"
+    }
+  },
+  "css": {
+    "tailwindcss": {
+      
+    } 
   }
 }
