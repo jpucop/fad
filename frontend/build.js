@@ -11,7 +11,7 @@ import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 
-// Global error handling for uncaught errors
+// Global error handling
 process.on('uncaughtException', (err) => {
   console.error(`❌ Uncaught Exception: ${err.message}`);
   console.error(err.stack);
@@ -143,9 +143,9 @@ async function buildJs(config) {
   const nodeModulesPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.node_modules);
   try {
     console.log('📋 Processing JS files...');
-    const jsFiles = globSync(`${srcPath}/**/*.js`).map(f => path.relative(srcPath, f));
+    const jsFiles = globSync(`${srcPath}/**/*.js`).map(f => path.relative(srcPath, f)).filter(f => f !== 'alpine.js');
     const alpineSrc = path.join(nodeModulesPath, config.js.alpine[config.prod ? 'nodeModulePathMin' : 'nodeModulePath']);
-    const alpineDest = path.join(srcPath, 'alpine.js');
+    const alpineDest = path.join(distPath, 'alpine.js');
     if (await fs.stat(alpineSrc).catch(() => false)) await copyFiles(alpineSrc, alpineDest);
     await Promise.all(jsFiles.map(f => copyFiles(path.join(srcPath, f), path.join(distPath, f))));
     console.log('✅ JS processing completed');
@@ -158,7 +158,7 @@ async function buildJs(config) {
 async function processHtml(config) {
   const srcPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.src);
   const distPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.dist);
-  const iconRegex = new RegExp(config.sprite.scan, 'gi');
+  const iconRegex = new RegExp(config.sprite.scan, 'g');
   try {
     console.log('📋 Processing HTML files...');
     const htmlFiles = globSync(`${srcPath}/**/*.html`).map(f => path.relative(srcPath, f));
@@ -181,7 +181,7 @@ async function processHtml(config) {
         if (!classes.includes('icon')) return match;
         const iconClass = classes.find(cls => new RegExp(config.sprite.validate).test(cls));
         if (!iconClass) return match;
-        const attrs = match.replace(/class=(["']).*?\1/, '').trim();
+        const attrs = match.replace(/class=(["']).*?\1/, '').replace(/^<span\s*/, '').replace(/>$/, '').trim();
         replacements++;
         return `<span class="${classMatch[2]}" ${attrs}><svg class="icon-inner" aria-hidden="true"><use href="/${config.sprite.filename}#${iconClass}"></use></svg></span>`;
       });
@@ -201,11 +201,19 @@ async function copyToDeploy(config) {
   const deployPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.deploy);
   try {
     console.log('📋 Deploying to static...');
+    if (!await fs.stat(distPath).catch(() => false)) {
+      console.warn(`⚠️ dist path not found: ${distPath}`);
+      return;
+    }
     if (!await fs.stat(deployPath).catch(() => false)) {
       console.warn(`⚠️ Deploy path not found: ${config.paths.deploy}`);
       return;
     }
-    await copyFiles(distPath, deployPath);
+    const files = globSync(`${distPath}/**/*`, { nodir: true }).map(f => ({
+      src: f,
+      dest: path.join(deployPath, path.relative(distPath, f)),
+    }));
+    await Promise.all(files.map(({ src, dest }) => copyFiles(src, dest)));
     console.log(`✅ Deployed to ${config.paths.deploy}`);
   } catch (err) {
     console.error(`❌ copyToDeploy failed: ${err.message}`);
@@ -347,13 +355,14 @@ async function validateSprite(config) {
     const spriteContent = await fs.readFile(spritePath, 'utf8').catch(() => '');
     const symbolIds = new Set([...spriteContent.matchAll(new RegExp(config.sprite.symbol, 'g'))].map(m => m[1]));
     const missingIcons = iconClasses.filter(id => !symbolIds.has(id));
-    console.log(`✅ Sprite has ${symbolIds.size} symbols: ${[...symbolIds].join(', ') || 'none'}`);
-    if (missingIcons.length || !spriteContent) {
-      console.warn(`⚠️ Sprite issues: ${missingIcons.length} missing`);
+    const unusedIcons = [...symbolIds].filter(id => !iconClasses.includes(id));
+    if (missingIcons.length || unusedIcons.length || !spriteContent) {
+      console.warn(`⚠️ Sprite issues: ${iconClasses.length} refs in HTML, ${symbolIds.size} symbols in sprite.svg`);
       if (missingIcons.length) console.warn(`⚠️ Missing in sprite.svg: ${missingIcons.join(', ')}`);
+      if (unusedIcons.length) console.warn(`⚠️ Unused in sprite.svg: ${unusedIcons.join(', ')}`);
       await generateSprite(config, iconClasses);
     } else {
-      console.log('✅ Sprite validation passed');
+      console.log(`✅ Sprite validation passed: ${iconClasses.length} refs, ${symbolIds.size} symbols`);
     }
   } catch (err) {
     console.error(`❌ validateSprite failed: ${err.message}`);
@@ -371,9 +380,13 @@ async function watch(config) {
         try {
           if (file.endsWith('.css')) await buildCss(config);
           if (file.endsWith('.js')) await buildJs(config);
-          if (file.endsWith('.html')) await processHtml(config);
+          if (file.endsWith('.html')) {
+            await copyStatic(config); // Ensure sprite.svg is copied before HTML processing
+            await processHtml(config);
+          }
           if (globSync(`${srcPath}/**/*.{ico,png,jpg,jpeg,gif}`).map(f => path.relative(srcPath, f)).includes(path.relative(srcPath, file))) await copyStatic(config);
           await validateSprite(config);
+          if (config.deploy) await copyToDeploy(config);
           console.log('✅ Incremental build completed');
         } catch (err) {
           console.error(`❌ Incremental build failed: ${err.message}`);
@@ -387,7 +400,8 @@ async function watch(config) {
 
 export async function cleanLocalSvgs() {
   const config = await resolveConfig();
-  const imgPath = path.join(config.paths.srcPath, 'img');
+  const srcPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.src);
+  const imgPath = path.join(srcPath, 'img');
   try {
     console.log('📋 Cleaning local SVGs...');
     const files = (await fs.readdir(imgPath).catch(() => [])).filter(f => f.endsWith('.svg'));
@@ -413,13 +427,13 @@ export async function build({ prod, watch, deploy } = {}) {
   const config = await resolveConfig({ prod, watch, deploy });
   try {
     console.log(`📋 Starting build... prod: ${config.prod}, watch: ${config.watch}, deploy: ${config.deploy}`);
-    if (config.deploy) return await copyToDeploy(config);
     await cleanDist(config);
     await validateSprite(config);
-    await copyStatic(config);
+    await copyStatic(config); // Moved before processHtml
     await buildCss(config);
     await buildJs(config);
     await processHtml(config);
+    if (config.deploy) await copyToDeploy(config);
     console.log('✅ Build completed');
     if (config.watch) await watch(config);
   } catch (err) {
