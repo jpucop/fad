@@ -4,7 +4,18 @@
     "dist": "./dist",
     "deploy": "../app/static",
     "node_modules": "./node_modules",
-    "index": "index.html"
+    "mainHtml": "index.html",
+    "files": {
+      "css": [
+        "**/*.css"
+      ],
+      "html": [
+        "index.html"
+      ],
+      "js": [
+        "**/*.js"
+      ]
+    }
   },
   "sprite": {
     "filename": "sprite.svg",
@@ -12,20 +23,24 @@
     "class": "(?:i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)(?=\\b|$)",
     "validate": "^(i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)$",
     "symbol": "<symbol\\s+id=\"([^\"]+)\"",
-    "icon_svg": {
-
+    "icon_svg": {}
+  },
+  "css": {
+    "filename": "styles.css",
+    "tailwindcss": {
+      "darkMode": "class",
+      "theme": {
+        "extend": {}
+      },
+      "plugins": []
     }
   },
   "js": {
-    "bundle": false,
+    "filename": "app.js",
     "alpine": {
-      "nodeModulePath": "alpinejs/dist/cdn.js",
-      "nodeModulePathMin": "alpinejs/dist/cdn.min.js"
+      "dev_source": "alpinejs/dist/cdn.js",
+      "minified_source": "alpinejs/dist/cdn.min.js",
+      "output": "alpine.js"
     }
-  },
-  "css": {
-    "tailwindcss": {
-      
-    } 
   }
 }
