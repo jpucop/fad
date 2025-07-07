@@ -336,6 +336,39 @@ async function processHtml(config) {
             console.warn(`⚠️ No content for ${file}`);
             return;
           }
+          // Inject component templates into index.html
+          if (file === mainHtml) {
+            const componentDir = path.join(srcPath, "components");
+            const componentFiles = globSync("**/*.html", {
+              cwd: componentDir,
+              absolute: true,
+            });
+            let templates = "";
+            for (const componentFile of componentFiles) {
+              try {
+                const componentContent = await fs.readFile(
+                  componentFile,
+                  "utf8"
+                );
+                const componentName = path.basename(componentFile, ".html");
+                templates += `<template id="${componentName}-template" style="display: none;">${componentContent}</template>\n`;
+              } catch (err) {
+                console.warn(
+                  `⚠️ Failed to read component ${path.relative(
+                    componentDir,
+                    componentFile
+                  )}: ${err.message}`
+                );
+              }
+            }
+            // Inject templates before </body> or at the end if no </body> found
+            if (html.includes("</body>")) {
+              html = html.replace("</body>", `${templates}</body>`);
+            } else {
+              html += templates;
+            }
+          }
+          // Process icon spans
           let replacements = 0;
           html = html.replace(iconRegex, (match) => {
             const classMatch = match.match(/class=["']([^"']*)["']/);
