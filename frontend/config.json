@@ -2,7 +2,7 @@
   "paths": {
     "src": "./src",
     "dist": "./dist",
-    "deploy": "../app/static",
+    "deploy": "../backend/app/static",
     "node_modules": "./node_modules",
     "mainHtml": "index.html",
     "files": {

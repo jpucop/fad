@@ -1,4 +1,4 @@
-/*! tailwindcss v4.1.10 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.1.11 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
 @layer theme {
@@ -489,9 +489,6 @@
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .filter {
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
-  }
   .transition {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, visibility, content-visibility, overlay, pointer-events;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -655,7 +652,7 @@ body {
 .header-title {
   font-size: 1.3rem;
   font-weight: 300;
-  line-height: 1.0;
+  line-height: 1;
   border-bottom: 4px;
   border-color: var(--color-uc-accent);
 }
@@ -729,7 +726,7 @@ body {
 }
 .header-nav-link::before,
 .app-tile::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 100%;
   left: 50%;
@@ -804,7 +801,7 @@ body {
   color: var(--color-uc-dark);
   opacity: 0.6;
   text-align: center;
-  font-size: 0.60rem;
+  font-size: 0.6rem;
   line-height: 1.5;
 }
 .footer .icon {
@@ -813,10 +810,10 @@ body {
   height: 0.875rem;
 }
 .dev {
-  color: oklch(0.65 0.10 180);
+  color: oklch(0.65 0.1 180);
 }
 .dev .icon {
-  color: oklch(0.65 0.10 180);
+  color: oklch(0.65 0.1 180);
 }
 .qa {
   color: oklch(0.55 0.15 180);
@@ -825,10 +822,10 @@ body {
   color: oklch(0.55 0.15 180);
 }
 .prod {
-  color: oklch(0.50 0.20 180);
+  color: oklch(0.5 0.2 180);
 }
 .prod .icon {
-  color: oklch(0.50 0.20 180);
+  color: oklch(0.5 0.2 180);
 }
 .dev .i-mdi-alert-circle {
   color: #ef4444;
@@ -850,23 +847,16 @@ body {
   color: inherit;
 }
 .app-tile.border-dev {
-  border-color: oklch(0.65 0.10 180);
+  border-color: oklch(0.65 0.1 180);
 }
 .app-tile.border-qa {
   border-color: oklch(0.55 0.15 180);
 }
 .app-tile.border-prod {
-  border-color: oklch(0.50 0.20 180);
+  border-color: oklch(0.5 0.2 180);
 }
 .app-tile .text-gray-600 {
   color: #6b7280;
-}
-@layer components {
-  .btn {
-    padding: 0.5rem 1rem;
-    color: #fff;
-    border-radius: 0.25rem;
-  }
 }
 @property --tw-rotate-x {
   syntax: "*";
@@ -967,59 +957,6 @@ body {
   inherits: false;
   initial-value: 0 0 #0000;
 }
-@property --tw-blur {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-brightness {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-contrast {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-grayscale {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-hue-rotate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-invert {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-opacity {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-saturate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-sepia {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-drop-shadow-size {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-duration {
   syntax: "*";
   inherits: false;
@@ -1049,19 +986,6 @@ body {
       --tw-ring-offset-width: 0px;
       --tw-ring-offset-color: #fff;
       --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-blur: initial;
-      --tw-brightness: initial;
-      --tw-contrast: initial;
-      --tw-grayscale: initial;
-      --tw-hue-rotate: initial;
-      --tw-invert: initial;
-      --tw-opacity: initial;
-      --tw-saturate: initial;
-      --tw-sepia: initial;
-      --tw-drop-shadow: initial;
-      --tw-drop-shadow-color: initial;
-      --tw-drop-shadow-alpha: 100%;
-      --tw-drop-shadow-size: initial;
       --tw-duration: initial;
     }
   }
