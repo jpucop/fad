@@ -4,22 +4,11 @@
     "dist": "./dist",
     "deploy": "../backend/app/static",
     "node_modules": "./node_modules",
-    "mainHtml": "index.html",
-    "files": {
-      "css": [
-        "**/*.css"
-      ],
-      "html": [
-        "index.html"
-      ],
-      "js": [
-        "**/*.js"
-      ]
-    }
+    "mainHtml": "index.html"
   },
   "sprite": {
     "filename": "sprite.svg",
-    "scan": "<span\\s+[^>]*class=\"[^\"]*icon[^\"]*\"[^>]*>",
+    "scan": "<span\\s+[^>]*class=\"[^\"]*\\bicon\\b[^\"]*\"[^>]*>",
     "class": "(?:i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)(?=\\b|$)",
     "validate": "^(i-[a-z0-9]+-[a-z0-9]+(?:-[a-z0-9]+)*|l-[a-z0-9-]+)$",
     "symbol": "<symbol\\s+id=\"([^\"]+)\"",
