@@ -7,7 +7,7 @@ import { optimize } from 'svgo';
 import { fileURLToPath } from 'url';
 import chokidar from 'chokidar';
 import postcss from 'postcss';
-import tailwindcss from 'tailwindcss';
+import tailwindcss from '@tailwindcss/postcss'; // Correct PostCSS plugin per docs
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import esbuild from 'esbuild';
@@ -19,7 +19,6 @@ export async function build({ prod, watch, deploy } = {}) {
     console.log(`📋 Starting build... prod: ${config.prod}, watch: ${config.watch}, deploy: ${config.deploy}`);
     await initAlpineJs(config);
     await cleanDist(config);
-    await cleanLocalSvgs(config); // Added before validateSprite
     await validateSprite(config);
     await copyStatic(config);
     await buildCss(config);
@@ -38,11 +37,23 @@ export async function build({ prod, watch, deploy } = {}) {
 export async function buildProd() { await build({ prod: true }); }
 export async function buildWatch() { await build({ watch: true }); }
 export async function buildDeploy() { await build({ deploy: true }); }
-export async function cleanIcons() { // Exported for independent use
+export async function cleanIcons() {
   const config = await resolveConfig();
   await cleanLocalSvgs(config);
   console.log('✅ Icon cleaning completed');
 }
+
+// Global error handling
+process.on('uncaughtException', (err) => {
+  console.error(`❌ Uncaught Exception: ${err.message}`);
+  console.error(err.stack);
+  process.exit(1);
+});
+process.on('unhandledRejection', (err) => {
+  console.error(`❌ Unhandled Rejection: ${err.message}`);
+  console.error(err.stack);
+  process.exit(1);
+});
 
 async function resolveConfig(args = {}) {
   const baseDir = path.dirname(fileURLToPath(import.meta.url));
@@ -318,17 +329,19 @@ async function buildCss(config) {
       theme: config.css.tailwindcss.theme || { extend: {} },
       plugins: config.css.tailwindcss.plugins || [],
     };
-    const css = await Promise.all(cssFiles.map(f => fs.readFile(f, 'utf8')));
-    const plugins = [
-      tailwindcss(tailwindConfig),
+    const processor = postcss([
+      tailwindcss({ config: tailwindConfig }), // Per TailwindCSS docs
       autoprefixer,
       ...(config.prod ? [cssnano({ preset: 'default' })] : []),
-    ];
-    const result = await postcss(plugins).process(css.join('\n'), { from: undefined, to: dest });
-    await fs.mkdir(path.dirname(dest), { recursive: true });
-    await fs.writeFile(dest, result.css);
-    if (result.map) await fs.writeFile(`${dest}.map`, result.map.toString());
-    console.log(`✅ Compiled CSS to ${config.css.filename}`);
+    ]);
+    for (const file of cssFiles) {
+      const inputCss = await fs.readFile(file, 'utf8');
+      const result = await processor.process(inputCss, { from: file, to: dest });
+      await fs.mkdir(path.dirname(dest), { recursive: true });
+      await fs.writeFile(dest, result.css);
+      if (result.map) await fs.writeFile(`${dest}.map`, result.map.toString());
+      console.log(`✅ Compiled CSS ${path.relative(srcPath, file)} to ${config.css.filename}`);
+    }
     console.log('✅ CSS processing completed');
   } catch (err) {
     console.error(`❌ buildCss failed: ${err.message}`);
@@ -382,8 +395,8 @@ async function buildJs(config) {
         entryPoints: [tempEntryPath],
         bundle: true,
         outfile: path.join(distPath, config.js.filename),
-        minify: config.build.minify,
-        sourcemap: config.build.sourcemap,
+        minify: config.prod,
+        sourcemap: !config.prod,
         format: 'iife',
         target: 'es2018',
       });
@@ -565,7 +578,7 @@ function calculateViewBox(svgContent) {
   }
 }
 
-export async function cleanLocalSvgs(config) { // Exported
+export async function cleanLocalSvgs(config) {
   const srcPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), config.paths.src);
   const imgPath = path.join(srcPath, 'img');
   try {
@@ -589,9 +602,15 @@ export async function cleanLocalSvgs(config) { // Exported
   }
 }
 
-// CLI handler for independent calls
+// CLI handler
 if (process.argv.includes('--clean-icons')) {
   cleanIcons();
+} else if (process.argv.includes('--prod')) {
+  buildProd();
+} else if (process.argv.includes('--watch')) {
+  buildWatch();
+} else if (process.argv.includes('--deploy')) {
+  buildDeploy();
 } else {
   build();
 }

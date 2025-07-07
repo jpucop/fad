@@ -7,9 +7,11 @@
   "scripts": {
     "clean": "rimraf node_modules package-lock.json dist",
     "build": "node ./build.js",
-    "buildwatch": "node ./build.js --watch",
+    "watch": "node ./build.js --watch",
     "dev": "npx serve ./dist",
-    "deploy": "node ./build.js --deploy"
+    "deploy": "node ./build.js --deploy",
+    "deployprod": "node ./build.js --prod",
+    "cleanlocalsvgs": "node ./build.js --clean-icons"
   },
   "devDependencies": {
     "@iconify-json/mdi": "1.2.3",
@@ -21,6 +23,7 @@
     "chokidar": "4.0.1",
     "cssnano": "7.0.7",
     "esbuild": "0.25.5",
+    "glob": "^11.0.0",
     "postcss": "8.5.6",
     "rimraf": "6.0.1",
     "serve": "14.2.4",
