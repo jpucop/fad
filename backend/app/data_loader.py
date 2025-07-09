@@ -2,10 +2,10 @@
 """
 Data Loader for FAD Web App Models
 
-- Loads JSON data from backend/model/ucop/finapps/ (app_*.json, org_ucop.json, group_finapps.json)
-- Loads static app definitions from backend/model/schema/app.json
-- Validates against Pydantic models from backend/app/models/ (AppModel, AppTopoModel, OrgModel, GroupModel)
-- Uses static schemas from backend/model/schema/ (e.g., deploy_profiles.json) for constraints
+- Loads JSON data from app/data/ (app_*.json, org_ucop.json, group_finapps.json)
+- Loads static app definitions from app/data/app.json
+- Validates against Pydantic models from app/models/ (AppModel, AppTopoModel, OrgModel, GroupModel)
+- Uses static schemas from app/data/ (e.g., deploy_profiles.json) for constraints
 - Caches model instances (org, group, apps with AppModel and AppTopoModel) for app lifecycle
 - Supports on-demand AppTopoModel updates
 - Requires pydantic==2.10.6
@@ -18,43 +18,37 @@ from typing import Dict
 from pydantic import BaseModel, ValidationError
 
 # Import generated Pydantic models
-from backend.app.models.app_model import AppModel
-from backend.app.models.app_topo_model import AppTopoModel
-from backend.app.models.org_model import OrgModel
-from backend.app.models.group_model import GroupModel
+from .models.app_model import AppModel
+from .models.app_topo_model import AppTopoModel
+from .models.org_model import OrgModel
+from .models.group_model import GroupModel
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def find_project_root() -> Path:
   current = Path(__file__).resolve().parent
   while current != current.parent:
-    if (current / "backend").is_dir() and (current / "frontend").is_dir():
+    if (current / "app").is_dir() and (current.parent / "frontend").is_dir():  # Adjusted for app/ scope
       return current
     current = current.parent
   raise RuntimeError("Project root not found")
 
-
 PROJECT_ROOT = find_project_root()
-DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop" / "finapps"
-SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
-
+DATA_DIR = PROJECT_ROOT / "data"  # Adjusted to app/data/
 
 class AppData(BaseModel):
   definition: AppModel
   topo: AppTopoModel | None = None  # Allow None for on-demand topo generation
-
 
 class WebAppData(BaseModel):
   org: OrgModel
   group: GroupModel
   apps: Dict[str, AppData]
 
-
 def load_web_app_data() -> WebAppData:
   # Load static schemas for validation
-  deploy_profiles_file = SCHEMA_DIR / "deploy_profiles.json"
+  deploy_profiles_file = DATA_DIR / "deploy_profiles.json"
   deploy_profiles = []
   if deploy_profiles_file.exists():
     try:
@@ -67,7 +61,7 @@ def load_web_app_data() -> WebAppData:
       raise
 
   # Load static app definition (app.json)
-  app_file = SCHEMA_DIR / "app.json"
+  app_file = DATA_DIR / "app.json"
   try:
     with open(app_file, "r") as f:
       app_data = json.load(f)
@@ -95,7 +89,6 @@ def load_web_app_data() -> WebAppData:
       app_model_instance = AppModel(**data)
       apps[app_name] = AppData(definition=app_model_instance, topo=None)
       logger.info(f"Loaded app definition: {app_name}")
-
     except ValidationError as e:
       logger.error(f"Validation failed for {file.name}: {e}")
       raise
@@ -132,7 +125,6 @@ def load_web_app_data() -> WebAppData:
     raise
 
   return WebAppData(org=org_model, group=group_model, apps=apps)
-
 
 def update_app_topo(app_name: str, topo_data: dict, data: WebAppData) -> None:
   """Update or add AppTopoModel for an app, used for on-demand generation."""
