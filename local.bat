@@ -4,4 +4,4 @@ setlocal
 cd /d %USERPROFILE%\dev\workspaces\finapps\aws\fad
 
 echo Starting localhost FastAPI server..
-uvicorn backend.app.main:app --reload --reload-dir backend/app
+uvicorn backend.app.main:app --reload --use-colors --reload-dir backend/app

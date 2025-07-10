@@ -3,10 +3,10 @@
 Webify Script: Combines Pydantic Model Generation and Data Copying
 
 - Accepts an input argument: "schema", "data", or "all" (default)
-- "schema": Generates Pydantic models from JSON schemas (like pydantify.py)
-- "data": Copies JSON data files recursively from backend/model/ucop/ and specific schema files (like copy_model_data.py)
+- "schema": Generates Pydantic models from JSON schemas with normalization
+- "data": Copies JSON data files recursively from backend/model/ucop/ and specific schema files
 - "all": Performs both schema and data operations
-- Uses GenSON for JSON Schema generation with strict typing
+- Uses GenSON for JSON Schema generation with strict typing and consolidation
 - Ensures all properties are required, arrays have explicit types, and two-space indentation
 - Requires datamodel-code-generator==0.31.2, pydantic==2.10.6, genson
 """
@@ -16,12 +16,17 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from genson import SchemaBuilder
 from datamodel_code_generator import generate, InputFileType, PythonVersion
+from datetime import datetime
 
-
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+# Configure logging with timestamp
+logging.basicConfig(
+  level=logging.DEBUG,
+  format="%(asctime)s - %(levelname)s - %(message)s",
+  datefmt="%Y-%m-%d %H:%M:%S %Z"
+)
 logger = logging.getLogger(__name__)
 
 def find_project_root() -> Path:
@@ -42,8 +47,8 @@ SOURCE_DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop"
 DEST_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
 DEST_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-def collect_raw_json() -> List[Tuple[str, dict]]:
-  schemas = []
+def collect_raw_json() -> Dict[str, dict]:
+  schemas = {}
   for file in sorted(SCHEMA_DIR.glob("*.json")):
     if file.name in EXCLUDE_FILES:
       continue
@@ -63,12 +68,65 @@ def collect_raw_json() -> List[Tuple[str, dict]]:
           for k, v in obj.items():
             validate_arrays(v, f"{path}.{k}" if path else k)
       validate_arrays(data)
-      schemas.append((file.stem, data))
+      schemas[file.stem] = data
     except Exception as e:
       logger.error(f"Failed to parse {file.name}: {e}")
       raise
   return schemas
 
+def merge_schemas(raw_schemas: Dict[str, dict]) -> dict:
+  builder = SchemaBuilder()
+  for name, data in raw_schemas.items():
+    builder.add_object(data)
+  schema = builder.to_schema()
+
+  definitions = schema.get("definitions", {})
+  properties = schema.get("properties", {})
+
+  # Define a base Aws schema
+  if "Aws" in definitions or "Aws1" in definitions or "Aws2" in definitions:
+    aws_base = {
+      "type": "object",
+      "properties": {"account_name": {"type": "string"}},
+      "required": ["account_name"],
+      "$id": "#/definitions/AwsBase"
+    }
+    if any("db_arn" in defs.get("properties", {}) for defs in definitions.values()):
+      aws_base["properties"]["db_arn"] = {"type": "string", "nullable": True}
+    definitions["AwsBase"] = aws_base
+    del definitions["Aws"]
+    del definitions["Aws1"]
+    del definitions["Aws2"]
+
+  # Define a collaboration tool base
+  collab_tools = {"Confluence", "Box", "Datadog", "Jira", "ServiceNow"}
+  if any(tool in definitions for tool in collab_tools):
+    collab_base = {
+      "type": "object",
+      "properties": {"group_web_url": {"type": "string"}},
+      "required": ["group_web_url"],
+      "$id": "#/definitions/CollaborationTool"
+    }
+    definitions["CollaborationTool"] = collab_base
+    for tool in collab_tools:
+      if tool in definitions:
+        if tool == "Jira" and "project_keys" in definitions[tool].get("properties", {}):
+          definitions[tool]["allOf"] = [{"$ref": "#/definitions/CollaborationTool"}]
+        elif tool == "ServiceNow" and "assignment_group_names" in definitions[tool].get("properties", {}):
+          definitions[tool]["allOf"] = [{"$ref": "#/definitions/CollaborationTool"}]
+        else:
+          del definitions[tool]
+
+  # Ensure AppModel is the root
+  if "App" in properties or "AppModel" in definitions:
+    schema["title"] = "AppModel"
+    schema["$id"] = "#/definitions/AppModel"
+    schema["additionalProperties"] = False
+    make_all_properties_required(schema)
+
+  schema["definitions"] = definitions
+  logger.debug(f"Merged Schema:\n{json.dumps(schema, indent=2)}")
+  return schema
 
 def make_all_properties_required(schema: dict, parent_prop: str = "") -> None:
   if "properties" in schema:
@@ -82,61 +140,41 @@ def make_all_properties_required(schema: dict, parent_prop: str = "") -> None:
       schema["items"]["$id"] = f"#/definitions/{parent_prop.title()}Item"
     make_all_properties_required(schema["items"], parent_prop)
 
-
-def transform_to_json_schema(data: dict, title: str) -> dict:
-  builder = SchemaBuilder()
-  builder.add_object(data)
-  schema = builder.to_schema()
-  make_all_properties_required(schema)
-  schema["additionalProperties"] = False
-  schema["title"] = title
-  schema["$id"] = f"#/definitions/{title}"
-  logger.debug(f"Generated JSON Schema for {title}:\n{json.dumps(schema, indent=2)}")
-  logger.info(f"Schema for {title} has properties: {list(schema.get('properties', {}).keys())}")
-  return schema
-
-
-def generate_models(schemas: List[Tuple[str, dict]]) -> None:
-  for name, schema in schemas:
-    output_path = OUTPUT_DIR / f"{name}_model.py"
-    class_name=f"{name.title().replace('_','')}Model"
-    try:
-      generate(
-        input_=json.dumps(schema),
-        input_file_type=InputFileType.JsonSchema,
-        output=output_path,
-        class_name=class_name,
-        base_class="pydantic.BaseModel",
-        use_double_quotes=True,
-        use_schema_description=True,
-        use_field_description=True,
-        reuse_model=True,
-        strip_default_none=True,
-        target_python_version=PythonVersion.PY_310,
-        disable_appending_item_suffix=True,
-      )
-      with open(output_path, "r") as f:
-        code = f.read()
-      with open(output_path, "w") as f:
-        f.write(code)
-      logger.info(f"Generated {output_path.relative_to(PROJECT_ROOT)}")
-    except Exception as e:
-      logger.error(f"Failed to generate {output_path}: {e}")
-      raise
-
+def generate_models(schema: dict) -> None:
+  output_path = OUTPUT_DIR / "app_model.py"
+  try:
+    generate(
+      input_=json.dumps(schema),
+      input_file_type=InputFileType.JsonSchema,
+      output=output_path,
+      class_name="AppModel",
+      base_class="pydantic.BaseModel",
+      use_double_quotes=True,
+      use_schema_description=True,
+      use_field_description=True,
+      reuse_model=True,
+      strip_default_none=True,
+      target_python_version=PythonVersion.PY_310,
+      disable_appending_item_suffix=True,
+    )
+    logger.info(f"Generated {output_path.relative_to(PROJECT_ROOT)}")
+  except Exception as e:
+    logger.error(f"Failed to generate {output_path}: {e}")
+    raise
 
 def generate_schema():
   shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
   OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
   raw_schemas = collect_raw_json()
-  json_schemas = [(name, transform_to_json_schema(data, name.title().replace("_", "")))
-          for name, data in raw_schemas]
-  generate_models(json_schemas)
+  logger.info(f"Collected {len(raw_schemas)} raw schemas.")
+  if not raw_schemas:
+    logger.warning("No schemas to process.")
+    return
+  merged_schema = merge_schemas(raw_schemas)
+  generate_models(merged_schema)
   logger.info("Model generation complete.")
 
-
 def copy_model_data():
-
   # Copy all JSON files recursively from backend/model/ucop/
   for file in SOURCE_DATA_DIR.rglob("*.json"):
     if file.name in EXCLUDE_FILES:
@@ -162,7 +200,6 @@ def copy_model_data():
         logger.error(f"Failed to copy {file_name}: {e}")
         raise
 
-
 def main():
   parser = argparse.ArgumentParser(description="Webify script for schema generation and data copying to app/")
   parser.add_argument(
@@ -182,7 +219,6 @@ def main():
     copy_model_data()
 
   logger.info("Webify script completed.")
-
 
 if __name__ == "__main__":
   main()
