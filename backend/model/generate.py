@@ -14,6 +14,7 @@ Webify Script: Combines Pydantic Model Generation and Data Copying
 import argparse
 import json
 import logging
+import re
 import shutil
 from pathlib import Path
 from typing import List, Tuple, Dict
@@ -29,21 +30,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def find_project_root() -> Path:
-  current = Path(__file__).resolve().parent
-  while current != current.parent:
-    if (current / "backend").is_dir() and (current / "frontend").is_dir():
-      return current
-    current = current.parent
-  raise RuntimeError("Project root not found")
-
-PROJECT_ROOT = find_project_root()
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
-OUTPUT_DIR = PROJECT_ROOT / "backend" / "app" / "models"
-EXCLUDE_FILES = {"app_snapshot.json", "apps.json"}
-INCLUDED_SCHEMA_FILES = {"app_profiles.json", "deploy_profiles.json"}
-
-SOURCE_DATA_DIR = PROJECT_ROOT / "backend" / "model" / "ucop"
+APP_MODELS_DIR = PROJECT_ROOT / "backend" / "app" / "models"
+BASE_TYPES_FILE = SCHEMA_DIR / "base.py"
+EXCLUDE_FILES = {"app_snapshot.json", "apps.json", "base.py"}
 DEST_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
 DEST_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -70,7 +61,7 @@ def collect_raw_json() -> Dict[str, dict]:
       validate_arrays(data)
       schemas[file.stem] = data
     except Exception as e:
-      logger.error(f"Failed to parse {file.name}: {e}")
+      logger.error(f"Failed to parse {file}: {e}")
       raise
   return schemas
 
@@ -130,8 +121,10 @@ def merge_schemas(raw_schemas: Dict[str, dict]) -> dict:
 
 def make_all_properties_required(schema: dict, parent_prop: str = "") -> None:
   if "properties" in schema:
-    schema["required"] = list(schema["properties"].keys())
+    schema["required"] = [prop for prop in schema["properties"].keys() if prop not in base_fields]
     for prop, prop_schema in schema["properties"].items():
+      if prop in base_fields:
+        continue
       if prop_schema.get("type") == "object":
         prop_schema["$id"] = f"#/definitions/{prop.title()}"
       make_all_properties_required(prop_schema, prop)
@@ -163,8 +156,11 @@ def generate_models(schema: dict) -> None:
     raise
 
 def generate_schema():
-  shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-  OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+  shutil.rmtree(APP_MODELS_DIR, ignore_errors=True)
+  APP_MODELS_DIR.mkdir(parents=True, exist_ok=True)
+  
+  global base_type_resolver
+  base_type_resolver = BaseTypeResolver(BASE_TYPES_FILE)
   raw_schemas = collect_raw_json()
   logger.info(f"Collected {len(raw_schemas)} raw schemas.")
   if not raw_schemas:
@@ -179,8 +175,9 @@ def copy_model_data():
   for file in SOURCE_DATA_DIR.rglob("*.json"):
     if file.name in EXCLUDE_FILES:
       continue
-    try:
-      rel_path = file.relative_to(SOURCE_DATA_DIR)
+    data = json.loads(file.read_text("utf-8"))
+    if data.get("_schema", False) is True:
+      rel_path = file.relative_to(SCHEMA_DIR.parent)
       dest_file = DEST_DATA_DIR / rel_path
       dest_file.parent.mkdir(parents=True, exist_ok=True)
       shutil.copy2(file, dest_file)
@@ -201,22 +198,20 @@ def copy_model_data():
         raise
 
 def main():
-  parser = argparse.ArgumentParser(description="Webify script for schema generation and data copying to app/")
+  parser = argparse.ArgumentParser(description="Webify script for schema generation and data copying")
   parser.add_argument(
     "--mode",
     choices=["schema", "data", "all"],
     default="all",
-    help="Operation mode: 'schema' for model generation, 'data' for copying data, 'all' for both (default)"
+    help="Operation mode: 'schema' for model generation, 'data' for copying/serializing data, 'all' for both"
   )
   args = parser.parse_args()
 
+  model_names = {}
   if args.mode in ["schema", "all"]:
-    logger.info("Running schema generation")
-    generate_schema()
-
+    model_names = generate_schema()
   if args.mode in ["data", "all"]:
-    logger.info("Running data copying")
-    copy_model_data()
+    copy_model_data(model_names)
 
   logger.info("Webify script completed.")
 
