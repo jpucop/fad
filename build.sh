@@ -12,7 +12,7 @@ source venv/bin/activate || {
 
 # Install backend dependencies
 echo "Installing backend dependencies..."
-pip install -r backend/requirements.txt typer || {
+pip install -r requirements.txt typer || {
   echo "❌ Failed to install backend dependencies"
   exit 1
 }
