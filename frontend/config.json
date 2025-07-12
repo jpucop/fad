@@ -4,13 +4,14 @@
     "dist": "./dist",
     "deploy": "../backend/app/static",
     "node_modules": "./node_modules",
-    "mainHtml": "index.html"
+    "mainHtml": "index.html",
+    "components": "components"
   },
   "patterns": {
     "html": "**/*.html",
     "css": "**/*.css",
     "js": "**/*.js",
-    "static": "**/*.{ico,png,jpg,jpeg,gif,webp,avif,woff,woff2,json}"
+    "static": "**/*.{ico,png,jpg,jpeg,gif}"
   },
   "sprite": {
     "filename": "sprite.svg",

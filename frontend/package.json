@@ -21,6 +21,7 @@
     "alpinejs": "3.14.9",
     "autoprefixer": "10.4.21",
     "chokidar": "4.0.1",
+    "cheerio": "^1.1.0",
     "cssnano": "7.0.7",
     "esbuild": "0.25.5",
     "glob": "^11.0.0",
@@ -29,8 +30,5 @@
     "serve": "14.2.4",
     "svgo": "4.0.0",
     "tailwindcss": "4.1.11"
-  },
-  "dependencies": {
-    "cheerio": "^1.1.0"
   }
 }
