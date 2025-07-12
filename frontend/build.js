@@ -11,55 +11,55 @@ import path from "path";
 import postcss from "postcss";
 import { optimize } from "svgo";
 import { fileURLToPath } from "url";
+import * as cheerio from "cheerio";
+
+// Utility to centralize path resolution
+const resolvePath = (base, ...parts) => path.resolve(base, ...parts);
+
+// Utility to check if a file matches a glob pattern
+const matchesGlob = (file, pattern, cwd) => {
+  const relative = path.relative(cwd, file);
+  return globSync(pattern, { cwd }).includes(relative);
+};
 
 // Entry point
 export async function build({ prod, watch, deploy } = {}) {
   const config = await resolveConfig({ prod, watch, deploy });
   try {
-    console.log(
-      `📋 Starting build... prod: ${config.prod}, watch: ${config.watch}, deploy: ${config.deploy}`
-    );
+    console.log(`📋 Starting build... [prod: ${config.prod}] [watch: ${config.watch}] [deploy: ${config.deploy}]`);
     await initAlpineJs(config);
     await cleanDist(config);
     await validateSprite(config);
     await copyStatic(config);
-    await processHtml(config); // After copyStatic
+    await processHtml(config);
     await buildCss(config);
     await buildJs(config);
     if (config.deploy) await copyToDeploy(config);
     console.log("✅ Build completed");
     if (config.watch) await watch(config);
   } catch (err) {
-    console.error(`❌ build failed: ${err.message}`);
-    console.error(err.stack);
+    console.error(`❌ Build failed: ${err.message}\n${err.stack}`);
     process.exit(1);
   }
 }
 
-export async function buildProd() {
-  await build({ prod: true });
-}
-export async function buildWatch() {
-  await build({ watch: true });
-}
-export async function buildDeploy() {
-  await build({ deploy: true });
-}
+// Other entry points
+export async function buildProd() { await build({ prod: true }); }
+export async function buildWatch() { await build({ watch: true }); }
+export async function buildDeploy() { await build({ deploy: true }); }
 export async function cleanIcons() {
   const config = await resolveConfig();
   await cleanLocalSvgs(config);
   console.log("✅ Icon cleaning completed");
 }
 
-// Global error handling
+// Global error handlers
 process.on("uncaughtException", (err) => {
-  console.error(`❌ Uncaught Exception: ${err.message}`);
-  console.error(err.stack);
+  console.error(`❌ Uncaught Exception: ${err.message}\n${err.stack}`);
   process.exit(1);
 });
 process.on("unhandledRejection", (err) => {
-  console.error(`❌ Unhandled Rejection: ${err.message}`);
-  console.error(err.stack);
+  console.error(`❌ Unhandled Rejection: ${err.message}\n${err.stack}`);
   process.exit(1);
 });
 
@@ -67,496 +67,270 @@ async function resolveConfig(args = {}) {
   const baseDir = path.dirname(fileURLToPath(import.meta.url));
   try {
     console.log("📋 Loading config.json...");
-    const rawConfig = await fs
-      .readFile(path.join(baseDir, "config.json"), "utf8")
-      .then(JSON.parse)
-      .catch((err) => {
-        throw new Error(`Failed to load config.json: ${err.message}`);
-      });
-    const packageJson = await fs
-      .readFile(path.join(baseDir, "package.json"), "utf8")
-      .then(JSON.parse)
-      .catch(() => ({}));
-    console.log("✅ config.json loaded");
-    const srcPath = path.resolve(baseDir, rawConfig.paths.src);
+    const rawConfig = await fs.readFile(resolvePath(baseDir, "config.json"), "utf8").then(JSON.parse);
+    const packageJson = await fs.readFile(resolvePath(baseDir, "package.json"), "utf8").then(JSON.parse).catch(() => ({}));
+    const srcPath = resolvePath(baseDir, rawConfig.paths.src);
+
+    // Scan for paths using config patterns
     const inputs = {
-      html: {},
-      css: {},
-      js: {},
-      static: {},
+      html: globSync(rawConfig.patterns.html, { cwd: srcPath, nodir: true }).map(f => f),
+      css: globSync(rawConfig.patterns.css, { cwd: srcPath, nodir: true }).map(f => f),
+      js: globSync(rawConfig.patterns.js, { cwd: srcPath, nodir: true }).map(f => f),
+      static: globSync(rawConfig.patterns.static, { cwd: srcPath, nodir: true }).map(f => f),
     };
-    // Scan files and load contents
-    for (const file of globSync("**/*.html", {
-      cwd: srcPath,
-      absolute: true,
-    })) {
-      try {
-        inputs.html[path.relative(srcPath, file)] = await fs.readFile(
-          file,
-          "utf8"
-        );
-      } catch (err) {
-        console.warn(
-          `⚠️ Failed to read HTML ${path.relative(srcPath, file)}: ${
-            err.message
-          }`
-        );
-      }
-    }
-    for (const file of globSync("**/*.css", { cwd: srcPath, absolute: true })) {
-      try {
-        inputs.css[path.relative(srcPath, file)] = await fs.readFile(
-          file,
-          "utf8"
-        );
-      } catch (err) {
-        console.warn(
-          `⚠️ Failed to read CSS ${path.relative(srcPath, file)}: ${
-            err.message
-          }`
-        );
-      }
-    }
-    for (const file of globSync("**/*.js", { cwd: srcPath, absolute: true })) {
-      try {
-        inputs.js[path.relative(srcPath, file)] = await fs.readFile(
-          file,
-          "utf8"
-        );
-      } catch (err) {
-        console.warn(
-          `⚠️ Failed to read JS ${path.relative(srcPath, file)}: ${err.message}`
-        );
-      }
-    }
-    for (const file of globSync(
-      "**/*.{ico,png,jpg,jpeg,gif,webp,avif,woff,woff2,json}",
-      { cwd: srcPath, absolute: true }
-    )) {
-      try {
-        inputs.static[path.relative(srcPath, file)] = await fs.readFile(file);
-      } catch (err) {
-        console.warn(
-          `⚠️ Failed to read static ${path.relative(srcPath, file)}: ${
-            err.message
-          }`
-        );
-      }
-    }
+
     const config = {
       ...rawConfig,
       prod: args.prod || process.env.env === "prod",
       watch: args.watch || process.argv.includes("--watch"),
       deploy: args.deploy || process.argv.includes("--deploy"),
-      svgo: {
-        sprite: {
-          plugins: [
-            { name: "removeDimensions" },
-            { name: "removeAttrs", params: { attrs: ["fill"] } },
-            { name: "convertTransform" },
-            { name: "cleanupNumericValues", params: { floatPrecision: 0 } },
-            { name: "removeUselessStrokeAndFill" },
-            { name: "mergePaths" },
-            { name: "removeXMLNS" },
-          ],
-        },
-        clean: {
-          plugins: [
-            "preset-default",
-            { name: "removeViewBox", active: false },
-            { name: "cleanupNumericValues", params: { floatPrecision: 3 } },
-          ],
-        },
-      },
-      sprite: {
-        ...rawConfig.sprite,
-        filename: rawConfig.sprite.filename,
-      },
-      css: {
-        ...rawConfig.css,
-        filename: rawConfig.css.filename,
-      },
+      inputs,
       js: {
         ...rawConfig.js,
-        filename: rawConfig.js.filename,
+        alpineVersion: packageJson.dependencies?.alpinejs || packageJson.devDependencies?.alpinejs || "unknown",
       },
-      build: {
-        minify: rawConfig.prod || false,
-        sourcemap: !rawConfig.prod,
+      getSrcPath: () => srcPath,
+      getDistPath: () => resolvePath(baseDir, rawConfig.paths.dist),
+      getCssConfig: () => ({
+        files: inputs.css.map(f => resolvePath(srcPath, f)),
+        output: resolvePath(config.getDistPath(), rawConfig.css.filename),
+        tailwindcss: rawConfig.css.tailwindcss,
+      }),
+      getJsConfig: () => ({
+        files: inputs.js.filter(f => !f.includes("alpine-") && !f.includes("alpine.min-")).map(f => resolvePath(srcPath, f)),
+        output: resolvePath(config.getDistPath(), rawConfig.js.filename),
+      }),
+      getHtmlConfig: () => ({
+        files: inputs.html.map(f => resolvePath(srcPath, f)),
+      }),
+      getSpriteConfig: () => ({
+        filename: rawConfig.sprite.filename,
+        output: resolvePath(srcPath, rawConfig.sprite.filename),
+        containerElement: rawConfig.sprite.containerElement,
+        containerClass: rawConfig.sprite.containerClass,
+        svgTemplate: rawConfig.sprite.svgTemplate,
+        symbol: rawConfig.sprite.symbol,
+      }),
+      svgo: {
+        sprite: { plugins: [
+          { name: "removeDimensions" },
+          { name: "removeAttrs", params: { attrs: ["fill"] } },
+          { name: "convertTransform" },
+          { name: "cleanupNumericValues", params: { floatPrecision: 0 } },
+          { name: "removeUselessStrokeAndFill" },
+          { name: "mergePaths" },
+          { name: "removeXMLNS" },
+        ] },
+        clean: { plugins: [
+          "preset-default",
+          { name: "removeViewBox", active: false },
+          { name: "cleanupNumericValues", params: { floatPrecision: 3 } },
+        ] },
       },
-      package: {
-        alpineVersion:
-          packageJson.dependencies?.alpinejs ||
-          packageJson.devDependencies?.alpinejs,
-      },
-      inputs,
-      getSrcPath: () => path.resolve(baseDir, rawConfig.paths.src),
-      getDistPath: () => path.resolve(baseDir, rawConfig.paths.dist),
-      getMainHtmlPath: () =>
-        path.resolve(baseDir, rawConfig.paths.src, rawConfig.paths.mainHtml),
     };
-    console.log(
-      `✅ Found inputs: ${Object.keys(inputs.html).length} HTML, ${
-        Object.keys(inputs.css).length
-      } CSS, ${Object.keys(inputs.js).length} JS, ${
-        Object.keys(inputs.static).length
-      } static`
-    );
+    console.log(`✅ Config loaded: ${inputs.html.length} HTML, ${inputs.css.length} CSS, ${inputs.js.length} JS, ${inputs.static.length} static`);
     return config;
   } catch (err) {
-    console.error(`❌ resolveConfig failed: ${err.message}`);
-    throw err;
+    throw new Error(`Failed to load config: ${err.message}`);
   }
 }
 
 async function extractIconRefs(config) {
-  const srcPath = config.getSrcPath();
+  const htmlConfig = config.getHtmlConfig();
+  const spriteConfig = config.getSpriteConfig();
   try {
-    console.log("📋 Extracting icon references...");
-    const htmlFiles = Object.keys(config.inputs.html);
-    console.log(
-      `Found HTML files: ${
-        htmlFiles.length > 0 ? htmlFiles.join(", ") : "None"
-      }`
-    );
+    console.log("📋 Extracting icon refs...");
     const matches = new Set();
-    for (const file of htmlFiles) {
-      const html = config.inputs.html[file];
-      if (!html) {
-        console.warn(`⚠️ No content for ${file}`);
-        continue;
-      }
-      for (const span of html.match(new RegExp(config.sprite.scan, "g")) ||
-        []) {
-        const classMatch = span.match(/class=["']([^"']*)["']/);
-        if (classMatch) {
-          const classes = classMatch[1].split(/\s+/);
-          const iconClass = classes.find((cls) =>
-            new RegExp(config.sprite.validate).test(cls)
-          );
-          if (iconClass && classes.includes("icon")) {
+    for (const file of htmlConfig.files) {
+      const html = await fs.readFile(file, "utf8");
+      const $ = cheerio.load(html);
+      const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
+      $(selector).each(function () {
+        const classes = $(this).attr('class')?.split(/\s+/) || [];
+        const iconIndex = classes.indexOf(spriteConfig.containerClass);
+        if (iconIndex !== -1 && iconIndex + 1 < classes.length) {
+          const iconClass = classes[iconIndex + 1];
+          if (iconClass.startsWith('i-') || iconClass.startsWith('l-')) {
             matches.add(iconClass);
           }
         }
-      }
-      console.log(`✅ Processed ${file}: ${matches.size} icon refs found`);
+      });
     }
-    console.log(
-      `✅ Found ${matches.size} icon refs in ${htmlFiles.length} HTML files`
-    );
+    console.log(`✅ Found ${matches.size} icon refs`);
     return Array.from(matches);
   } catch (err) {
-    console.error(`❌ extractIconRefs failed: ${err.message}`);
-    throw err;
+    throw new Error(`Extract icon refs failed: ${err.message}`);
   }
 }
 
 async function validateSprite(config) {
-  const srcPath = config.getSrcPath();
-  const spritePath = path.join(srcPath, config.sprite.filename);
-  const mainHtmlPath = config.getMainHtmlPath();
+  const spriteConfig = config.getSpriteConfig();
   try {
     console.log("📋 Validating sprite...");
-    const mainHtmlExists = await fs.stat(mainHtmlPath).catch(() => false);
-    if (!mainHtmlExists) {
-      console.warn(`⚠️ Main HTML file not found at ${mainHtmlPath}`);
-    }
     const iconClasses = await extractIconRefs(config);
-    const spriteContent = await fs.readFile(spritePath, "utf8").catch(() => "");
-    const symbolIds = new Set(
-      [...spriteContent.matchAll(new RegExp(config.sprite.symbol, "g"))].map(
-        (m) => m[1]
-      )
-    );
-    const missingIcons = iconClasses.filter((id) => !symbolIds.has(id));
-    const unusedIcons = [...symbolIds].filter(
-      (id) => !iconClasses.includes(id)
-    );
-    if (missingIcons.length || unusedIcons.length || !spriteContent) {
-      console.warn(
-        `⚠️ Sprite issues: ${iconClasses.length} refs in HTML, ${symbolIds.size} symbols in sprite.svg`
-      );
-      if (missingIcons.length)
-        console.warn(`⚠️ Missing in sprite.svg: ${missingIcons.join(", ")}`);
-      if (unusedIcons.length)
-        console.warn(`⚠️ Unused in sprite.svg: ${unusedIcons.join(", ")}`);
+    const spriteContent = await fs.readFile(spriteConfig.output, "utf8").catch(() => "");
+    const symbolIds = new Set([...spriteContent.matchAll(new RegExp(spriteConfig.symbol, "g"))].map(m => m[1]));
+    const missing = iconClasses.filter(id => !symbolIds.has(id));
+    if (missing.length || !spriteContent) {
+      console.warn(`⚠️ Sprite outdated: ${missing.length} missing icons`);
       await generateSprite(config, iconClasses);
     } else {
-      console.log(
-        `✅ Sprite validation passed: ${iconClasses.length} refs, ${symbolIds.size} symbols`
-      );
+      console.log(`✅ Sprite valid: ${symbolIds.size} symbols`);
     }
   } catch (err) {
-    console.error(`❌ validateSprite failed: ${err.message}`);
-    throw err;
+    throw new Error(`Sprite validation failed: ${err.message}`);
   }
 }
 
 async function copyStatic(config) {
-  const srcPath = config.getSrcPath();
   const distPath = config.getDistPath();
-  const spritePath = path.join(srcPath, config.sprite.filename);
-  const spriteDistPath = path.join(distPath, config.sprite.filename);
+  const spriteConfig = config.getSpriteConfig();
   try {
     console.log("📋 Copying static files...");
-    const staticFiles = Object.keys(config.inputs.static);
+    const staticFiles = config.inputs.static.map(f => ({
+      src: resolvePath(config.getSrcPath(), f),
+      dest: resolvePath(distPath, f),
+    }));
     await Promise.all([
-      ...staticFiles.map((f) =>
-        copyFiles(path.join(srcPath, f), path.join(distPath, f))
-      ),
-      copyFiles(spritePath, spriteDistPath),
+      ...staticFiles.map(({ src, dest }) => copyFiles(src, dest)),
+      copyFiles(spriteConfig.output, resolvePath(distPath, spriteConfig.filename)),
     ]);
     console.log("✅ Static files copied");
   } catch (err) {
-    console.error(`❌ copyStatic failed: ${err.message}`);
-    throw err;
+    throw new Error(`Copy static failed: ${err.message}`);
   }
 }
 
 async function processHtml(config) {
-  const srcPath = config.getSrcPath();
+  const htmlConfig = config.getHtmlConfig();
   const distPath = config.getDistPath();
-  const iconRegex = new RegExp(config.sprite.scan, "g");
+  const spriteConfig = config.getSpriteConfig();
   try {
-    console.log("📋 Processing HTML files...");
-    const htmlFiles = Object.keys(config.inputs.html);
-    const mainHtml = config.paths.mainHtml;
-    if (mainHtml && !htmlFiles.includes(mainHtml)) {
-      console.warn(
-        `⚠️ Main HTML file not found in processed files: ${mainHtml}`
-      );
-    }
-    await Promise.all(
-      htmlFiles.map(async (file) => {
-        const src = path.join(srcPath, file);
-        const dest = path.join(distPath, file);
-        try {
-          let html = config.inputs.html[file];
-          if (!html) {
-            console.warn(`⚠️ No content for ${file}`);
-            return;
-          }
-          // Inject component templates into index.html
-          if (file === mainHtml) {
-            const componentDir = path.join(srcPath, "components");
-            const componentFiles = globSync("**/*.html", {
-              cwd: componentDir,
-              absolute: true,
-            });
-            let templates = "";
-            for (const componentFile of componentFiles) {
-              try {
-                const componentContent = await fs.readFile(
-                  componentFile,
-                  "utf8"
-                );
-                const componentName = path.basename(componentFile, ".html");
-                templates += `<template id="${componentName}-template" style="display: none;">${componentContent}</template>\n`;
-              } catch (err) {
-                console.warn(
-                  `⚠️ Failed to read component ${path.relative(
-                    componentDir,
-                    componentFile
-                  )}: ${err.message}`
-                );
-              }
-            }
-            // Inject templates before </body> or at the end if no </body> found
-            if (html.includes("</body>")) {
-              html = html.replace("</body>", `${templates}</body>`);
-            } else {
-              html += templates;
-            }
-          }
-          // Process icon spans
-          let replacements = 0;
-          html = html.replace(iconRegex, (match) => {
-            const classMatch = match.match(/class=["']([^"']*)["']/);
-            if (!classMatch) return match;
-            const classes = classMatch[1].trim().split(/\s+/);
-            if (!classes.includes("icon")) return match;
-            const iconClass = classes.find((cls) =>
-              new RegExp(config.sprite.validate).test(cls)
-            );
-            if (!iconClass) return match;
-            const attrs = match
-              .replace(/class=["'].*?["']/, "")
-              .replace(/^<span\s*/, "")
-              .replace(/>$/, "")
-              .trim();
+    console.log("📋 Processing HTML...");
+    await Promise.all(htmlConfig.files.map(async src => {
+      const dest = resolvePath(distPath, path.relative(config.getSrcPath(), src));
+      let html = await fs.readFile(src, "utf8");
+      const $ = cheerio.load(html);
+      let replacements = 0;
+
+      const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
+      $(selector).each(function () {
+        const $el = $(this);
+        const classes = $el.attr('class')?.split(/\s+/) || [];
+        const iconIndex = classes.indexOf(spriteConfig.containerClass);
+        if (iconIndex !== -1 && iconIndex + 1 < classes.length) {
+          const iconClass = classes[iconIndex + 1];
+          if (iconClass.startsWith('i-') || iconClass.startsWith('l-')) {
+            const svg = spriteConfig.svgTemplate
+              .replace('{filename}', spriteConfig.filename)
+              .replace('{iconClass}', iconClass);
+            $el.append(svg);
             replacements++;
-            return `<span class="${classMatch[1]}" ${attrs}><svg class="icon-inner" aria-hidden="true"><use href="/${config.sprite.filename}#${iconClass}"></use></svg></span>`;
-          });
-          await fs.mkdir(path.dirname(dest), { recursive: true });
-          await fs.writeFile(dest, html);
-          console.log(`✅ Processed ${file} (${replacements} icons)`);
-        } catch (err) {
-          console.warn(`⚠️ Failed to process ${file}: ${err.message}`);
+          }
         }
-      })
-    );
-    console.log("✅ HTML processing completed");
+      });
+
+      html = $.html();
+      await fs.mkdir(path.dirname(dest), { recursive: true });
+      await fs.writeFile(dest, html);
+      console.log(`✅ Processed ${path.basename(src)} (${replacements} icons)`);
+    }));
+    console.log("✅ HTML done");
   } catch (err) {
-    console.error(`❌ processHtml failed: ${err.message}`);
-    throw err;
+    throw new Error(`Process HTML failed: ${err.message}`);
   }
 }
 
 async function buildCss(config) {
-  const srcPath = config.getSrcPath();
-  const distPath = config.getDistPath();
-  const dest = path.join(distPath, config.css.filename);
+  const cssConfig = config.getCssConfig();
   try {
-    console.log("📋 Processing CSS files...");
-    const cssFiles = Object.keys(config.inputs.css);
-    console.log(
-      `Found CSS files: ${cssFiles.length > 0 ? cssFiles.join(", ") : "None"}`
-    );
-    if (!cssFiles.length) {
-      console.warn(`⚠️ No CSS files found`);
+    console.log("📋 Processing CSS...");
+    if (!cssConfig.files.length) {
+      console.warn("⚠️ No CSS files found");
       return;
     }
-    const nodeAlpinePkg = await fs
-      .readFile(
-        path.join(
-          path.resolve(
-            path.dirname(fileURLToPath(import.meta.url)),
-            config.paths.node_modules
-          ),
-          "alpinejs/package.json"
-        ),
-        "utf8"
-      )
-      .then(JSON.parse)
-      .catch(() => ({ version: null }));
-    const version = nodeAlpinePkg.version || "unknown";
-    const tailwindConfig = {
-      content: [
-        ...Object.keys(config.inputs.html).map((p) => path.join(srcPath, p)),
-        ...Object.keys(config.inputs.js)
-          .filter(
-            (f) =>
-              !f.includes(`alpine-${version}.js`) &&
-              !f.includes(`alpine.min-${version}.js`)
-          )
-          .map((f) => path.join(srcPath, f)),
-      ],
-      darkMode: config.css.tailwindcss.darkMode,
-      theme: config.css.tailwindcss.theme,
-      plugins: config.css.tailwindcss.plugins,
-    };
     const processor = postcss([
-      tailwindcss(tailwindConfig),
+      tailwindcss(cssConfig.tailwindcss),
       autoprefixer,
       ...(config.prod ? [cssnano({ preset: "default" })] : []),
     ]);
-    for (const file of cssFiles) {
-      const inputCss = config.inputs.css[file];
-      const result = await processor.process(inputCss, {
-        from: path.join(srcPath, file),
-        to: dest,
-      });
-      await fs.mkdir(path.dirname(dest), { recursive: true });
-      await fs.writeFile(dest, result.css);
-      if (result.map) await fs.writeFile(`${dest}.map`, result.map.toString());
-      console.log(`✅ Compiled CSS ${file} to ${config.css.filename}`);
-    }
-    console.log("✅ CSS processing completed");
+    const cssContent = await Promise.all(cssConfig.files.map(f => fs.readFile(f, "utf8")));
+    const result = await processor.process(cssContent.join("\n"), {
+      from: cssConfig.files[0],
+      to: cssConfig.output,
+    });
+    await fs.mkdir(path.dirname(cssConfig.output), { recursive: true });
+    await fs.writeFile(cssConfig.output, result.css);
+    if (result.map) await fs.writeFile(`${cssConfig.output}.map`, result.map.toString());
+    console.log(`✅ CSS compiled to ${path.basename(cssConfig.output)}`);
   } catch (err) {
-    console.error(`❌ buildCss failed: ${err.message}`);
-    throw err;
+    throw new Error(`Build CSS failed: ${err.message}`);
   }
 }
 
 async function buildJs(config) {
-  const srcPath = config.getSrcPath();
-  const distPath = config.getDistPath();
+  const jsConfig = config.getJsConfig();
   try {
-    console.log("📋 Processing JS files...");
-    const jsFiles = Object.keys(config.inputs.js).filter(
-      (f) => !f.includes("alpine-") && !f.includes("alpine.min-")
-    );
-    console.log(
-      `Found JS files: ${jsFiles.length > 0 ? jsFiles.join(", ") : "None"}`
-    );
-    if (!jsFiles.length) {
-      console.warn(`⚠️ No JS files found for bundling; skipping JS build`);
+    console.log("📋 Processing JS...");
+    if (!jsConfig.files.length) {
+      console.warn("⚠️ No JS files found");
       return;
     }
-    const entryPoints = [];
-    for (const f of jsFiles) {
-      const filePath = path.join(srcPath, f);
-      try {
-        const stats = await fs.stat(filePath);
-        if (stats.isFile()) {
-          entryPoints.push(filePath);
-        }
-      } catch (err) {
-        console.warn(`⚠️ Failed to stat JS file ${f}: ${err.message}`);
-      }
-    }
-    if (!entryPoints.length) {
-      console.warn(
-        `⚠️ No valid JS files found for bundling; skipping JS build`
-      );
-      return;
-    }
-    const tempEntryPath = path.join(distPath, "temp-entry.js");
-    const imports = entryPoints
-      .map(
-        (file) =>
-          `import "${path.relative(distPath, file).replace(/\\/g, "/")}";`
-      )
-      .join("\n");
-    await fs.writeFile(tempEntryPath, imports);
-    try {
-      await esbuild.build({
-        entryPoints: [tempEntryPath],
-        bundle: true,
-        outfile: path.join(distPath, config.js.filename),
-        minify: config.prod,
-        sourcemap: !config.prod,
-        format: "iife",
-        target: "es2018",
-      });
-      console.log(`✅ Bundled JS into ${config.js.filename}`);
-    } finally {
-      if (await fs.stat(tempEntryPath).catch(() => false)) {
-        await fs.unlink(tempEntryPath);
-      }
-    }
-    console.log("✅ JS processing completed");
+    await esbuild.build({
+      entryPoints: jsConfig.files,
+      bundle: true,
+      outfile: jsConfig.output,
+      minify: config.prod,
+      sourcemap: !config.prod,
+      format: "iife",
+      target: "es2018",
+    });
+    console.log(`✅ JS bundled to ${path.basename(jsConfig.output)}`);
   } catch (err) {
-    console.error(`❌ buildJs failed: ${err.message}`);
-    throw err;
+    throw new Error(`Build JS failed: ${err.message}`);
   }
 }
 
 async function copyToDeploy(config) {
   const distPath = config.getDistPath();
-  const deployPath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    config.paths.deploy
-  );
+  const deployPath = resolvePath(path.dirname(fileURLToPath(import.meta.url)), config.paths.deploy);
   try {
-    console.log("📋 Deploying to static...");
-    if (!(await fs.stat(distPath).catch(() => false))) {
-      console.warn(`⚠️ dist path not found: ${distPath}`);
-      return;
-    }
-    if (!(await fs.stat(deployPath).catch(() => false))) {
-      console.warn(`⚠️ Deploy path not found: ${deployPath}`);
-      return;
-    }
-    const files = globSync(`${distPath}/**/*`, { nodir: true }).map((f) => ({
-      src: f,
-      dest: path.join(deployPath, path.relative(distPath, f)),
+    console.log("📋 Deploying...");
+    const files = globSync("**/*", { cwd: distPath, nodir: true }).map(f => ({
+      src: resolvePath(distPath, f),
+      dest: resolvePath(deployPath, f),
     }));
     await Promise.all(files.map(({ src, dest }) => copyFiles(src, dest)));
     console.log(`✅ Deployed to ${config.paths.deploy}`);
   } catch (err) {
-    console.error(`❌ copyToDeploy failed: ${err.message}`);
-    throw err;
+    throw new Error(`Deploy failed: ${err.message}`);
+  }
+}
+
+async function buildByFileTypeUpdate(config, file) {
+  const srcPath = config.getSrcPath();
+  try {
+    const fileTypes = [
+      { type: "html", pattern: config.patterns.html, tasks: [validateSprite, copyStatic, processHtml] },
+      { type: "css", pattern: config.patterns.css, tasks: [buildCss] },
+      { type: "js", pattern: config.patterns.js, tasks: [file => file.includes("alpine-") ? null : buildJs] },
+      { type: "static", pattern: config.patterns.static, tasks: [copyStatic] },
+    ];
+
+    const matchedType = fileTypes.find(({ pattern }) => matchesGlob(file, pattern, srcPath));
+    if (!matchedType) {
+      console.log(`⚠️ No build tasks for ${path.relative(srcPath, file)}`);
+      return;
+    }
+
+    console.log(`🔄 Building ${matchedType.type} for ${path.relative(srcPath, file)}`);
+    for (const task of matchedType.tasks) {
+      if (task) await task(config);
+    }
+    if (config.deploy) await copyToDeploy(config);
+    console.log("✅ Incremental build done");
+  } catch (err) {
+    console.error(`❌ Build failed for ${file}: ${err.message}`);
   }
 }
 
@@ -564,123 +338,40 @@ async function watch(config) {
   const srcPath = config.getSrcPath();
   try {
     console.log("👀 Watching for changes...");
-    const patterns = [
-      "**/*.html",
-      "**/*.css",
-      "**/*.js",
-      "**/*.{ico,png,jpg,jpeg,gif,webp,avif,woff,woff2,json}",
-    ].map((p) => path.join(srcPath, p));
-    const watcher = chokidar.watch(patterns, { ignoreInitial: true });
+    const watcher = chokidar.watch(srcPath, { ignoreInitial: true });
     watcher.on("all", async (event, file) => {
-      console.log(`🔄 Detected ${event}: ${path.relative(srcPath, file)}`);
-      try {
-        const relFile = path.relative(srcPath, file);
-        if (file.endsWith(".html")) {
-          try {
-            config.inputs.html[relFile] = await fs.readFile(file, "utf8");
-            await validateSprite(config);
-            await copyStatic(config);
-            await processHtml(config);
-          } catch (err) {
-            console.warn(`⚠️ Failed to update HTML ${relFile}: ${err.message}`);
-          }
-        } else if (file.endsWith(".css")) {
-          try {
-            config.inputs.css[relFile] = await fs.readFile(file, "utf8");
-            await buildCss(config);
-          } catch (err) {
-            console.warn(`⚠️ Failed to update CSS ${relFile}: ${err.message}`);
-          }
-        } else if (file.endsWith(".js")) {
-          try {
-            config.inputs.js[relFile] = await fs.readFile(file, "utf8");
-            await buildJs(config);
-          } catch (err) {
-            console.warn(`⚠️ Failed to update JS ${relFile}: ${err.message}`);
-          }
-        } else if (
-          /\.(ico|png|jpg|jpeg|gif|webp|avif|woff|woff2|json)$/.test(file)
-        ) {
-          try {
-            config.inputs.static[relFile] = await fs.readFile(file);
-            await copyStatic(config);
-          } catch (err) {
-            console.warn(
-              `⚠️ Failed to update static ${relFile}: ${err.message}`
-            );
-          }
-        }
-        if (config.deploy) await copyToDeploy(config);
-        console.log("✅ Incremental build completed");
-      } catch (err) {
-        console.error(`❌ Incremental build failed: ${err.message}`);
-      }
+      console.log(`🔄 [${event}] ${path.relative(srcPath, file)}`);
+      await buildByFileTypeUpdate(config, file);
     });
   } catch (err) {
-    console.error(`❌ watch failed: ${err.message}`);
-    throw err;
+    throw new Error(`Watch failed: ${err.message}`);
   }
 }
 
 async function copyFiles(src, dest) {
   try {
-    if (!(await fs.stat(src).catch(() => false))) {
-      console.warn(`⚠️ Source file not found: ${src}`);
-      return;
-    }
     await fs.mkdir(path.dirname(dest), { recursive: true });
     await fs.copyFile(src, dest);
     console.log(`✅ Copied ${path.basename(dest)}`);
   } catch (err) {
-    console.error(`❌ copyFiles failed for ${src}: ${err.message}`);
+    console.warn(`⚠️ Copy failed for ${src}: ${err.message}`);
   }
 }
 
 async function initAlpineJs(config) {
-  const srcPath = config.getSrcPath();
-  const nodeModulesPath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    config.paths.node_modules
-  );
-  const alpineSrc = path.join(nodeModulesPath, config.js.alpine.dev_source);
-  const alpineMinSrc = path.join(
-    nodeModulesPath,
-    config.js.alpine.minified_source
-  );
+  const nodeModulesPath = resolvePath(path.dirname(fileURLToPath(import.meta.url)), config.paths.node_modules);
+  const alpineSrc = resolvePath(nodeModulesPath, config.js.alpine.dev_source);
+  const alpineMinSrc = resolvePath(nodeModulesPath, config.js.alpine.minified_source);
+  const version = config.js.alpineVersion;
+  const alpineDest = resolvePath(config.getSrcPath(), `alpine-${version}.js`);
+  const alpineMinDest = resolvePath(config.getSrcPath(), `alpine.min-${version}.js`);
   try {
     console.log("📋 Initializing Alpine.js...");
-    const nodeAlpinePkg = await fs
-      .readFile(path.join(nodeModulesPath, "alpinejs/package.json"), "utf8")
-      .then(JSON.parse)
-      .catch(() => ({ version: null }));
-    const version = nodeAlpinePkg.version || "unknown";
-    const alpineDest = path.join(srcPath, `alpine-${version}.js`);
-    const alpineMinDest = path.join(srcPath, `alpine.min-${version}.js`);
-    const expectedVersion = config.package.alpineVersion;
-
-    const copyIfNeeded = async (src, dest, type) => {
-      const srcExists = await fs.stat(src).catch(() => false);
-      const destExists = await fs.stat(dest).catch(() => false);
-      if (!srcExists) {
-        console.warn(`⚠️ ${type} Alpine.js source not found: ${src}`);
-        return;
-      }
-      if (
-        !destExists ||
-        (expectedVersion && nodeAlpinePkg.version !== expectedVersion)
-      ) {
-        await fs.mkdir(path.dirname(dest), { recursive: true });
-        await fs.copyFile(src, dest);
-        console.log(`✅ Copied ${type} Alpine.js to ${path.basename(dest)}`);
-      }
-    };
-
-    await copyIfNeeded(alpineSrc, alpineDest, "dev");
-    await copyIfNeeded(alpineMinSrc, alpineMinDest, "minified");
-    console.log("✅ Alpine.js initialization completed");
+    await copyFiles(alpineSrc, alpineDest);
+    await copyFiles(alpineMinSrc, alpineMinDest);
+    console.log("✅ Alpine.js initialized");
   } catch (err) {
-    console.error(`❌ initAlpineJs failed: ${err.message}`);
-    throw err;
+    throw new Error(`Init Alpine failed: ${err.message}`);
   }
 }
 
@@ -690,186 +381,91 @@ async function cleanDist(config) {
     console.log(`📋 Cleaning ${config.paths.dist}...`);
     await fs.rm(distPath, { recursive: true, force: true });
     await fs.mkdir(distPath, { recursive: true });
-    console.log(`✅ Cleaned ${config.paths.dist}`);
+    console.log("✅ Dist cleaned");
   } catch (err) {
-    console.error(`❌ cleanDist failed: ${err.message}`);
-    throw err;
+    throw new Error(`Clean dist failed: ${err.message}`);
   }
 }
 
 async function generateSprite(config, iconClasses) {
-  const srcPath = config.getSrcPath();
-  const spritePath = path.join(srcPath, config.sprite.filename);
+  const spriteConfig = config.getSpriteConfig();
   try {
     console.log("📋 Generating sprite...");
     const symbols = [];
     for (const ref of iconClasses) {
       try {
-        if (ref.startsWith("i-")) {
-          const [, pkg, name] = ref.match(
-            /^i-([a-z0-9]+)-([a-z0-9]+(?:-[a-z0-9]+)*)$/
-          );
+        const parts = ref.split("-");
+        if (parts[0] === "i" && parts.length >= 3) {
+          const pkg = parts[1];
+          const name = parts.slice(2).join("-");
           const iconSet = await loadIconSet(config, pkg);
           const iconData = getIconData(iconSet, name);
-          if (!iconData) throw new Error(`Icon not found: ${name}`);
+          if (!iconData) continue;
           const svgObj = iconToSVG(iconData, { height: "1em", width: "auto" });
-          const svg = new SVG(
-            `<svg viewBox="${
-              svgObj.attributes.viewBox || "0 0 24 24"
-            }" xmlns="http://www.w3.org/2000/svg">${svgObj.body}</svg>`
-          );
+          const svg = new SVG(`<svg viewBox="${svgObj.attributes.viewBox || "0 0 24 24"}">${svgObj.body}</svg>`);
           cleanupSVG(svg);
-          parseColors(svg, {
-            defaultColor: "currentColor",
-            callback: (_, colorStr) =>
-              colorStr === "none" ? colorStr : "currentColor",
-          });
+          parseColors(svg, { defaultColor: "currentColor" });
           runSVGO(svg);
-          symbols.push(
-            `<symbol id="${ref}" viewBox="${
-              svgObj.attributes.viewBox || "0 0 24 24"
-            }">${svg.getBody()}</symbol>`
-          );
-        } else if (ref.startsWith("l-")) {
-          const name = ref.slice(2);
-          const svgPath = path.join(srcPath, "img", `${name}.svg`);
-          let svg = await fs.readFile(svgPath, "utf8").catch(() => {
-            throw new Error(`Local icon not found: ${svgPath}`);
-          });
+          symbols.push(`<symbol id="${ref}" viewBox="${svgObj.attributes.viewBox || "0 0 24 24"}">${svg.getBody()}</symbol>`);
+        } else if (parts[0] === "l" && parts.length >= 2) {
+          const name = parts.slice(1).join("-");
+          const svgPath = resolvePath(config.getSrcPath(), "img", `${name}.svg`);
+          let svg = await fs.readFile(svgPath, "utf8").catch(() => "");
+          if (!svg) continue;
           svg = svg.replace(/<\?xml[^?]*\?>\s*/, "");
           const optimizedSvg = optimize(svg, config.svgo.sprite).data;
-          const viewBox =
-            optimizedSvg.match(/viewBox="([^"]+)"/)?.[1] ||
-            calculateViewBox(optimizedSvg);
-          const content = optimizedSvg
-            .replace(/^<svg[^>]*>/, "")
-            .replace(/<\/svg>\s*$/, "")
-            .trim();
-          if (!content) throw new Error(`No valid SVG content in ${svgPath}`);
-          symbols.push(
-            `<symbol id="${ref}" viewBox="${viewBox}">${content}</symbol>`
-          );
+          const viewBox = optimizedSvg.match(/viewBox="([^"]+)"/)?.[1] || "0 0 24 24";
+          const content = optimizedSvg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").trim();
+          symbols.push(`<symbol id="${ref}" viewBox="${viewBox}">${content}</symbol>`);
         }
       } catch (err) {
-        console.error(`❌ Processing ${ref} failed: ${err.message}`);
+        console.warn(`⚠️ Failed to process icon ${ref}: ${err.message}`);
       }
     }
-    const spriteContent = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">${symbols.join(
-      ""
-    )}</svg>`;
-    await fs.mkdir(path.dirname(spritePath), { recursive: true });
-    await fs.writeFile(spritePath, spriteContent);
-    console.log(
-      `✅ Sprite generated: ${config.sprite.filename} (${symbols.length} symbols)`
-    );
+    const spriteContent = `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">${symbols.join("")}</svg>`;
+    await fs.mkdir(path.dirname(spriteConfig.output), { recursive: true });
+    await fs.writeFile(spriteConfig.output, spriteContent);
+    console.log(`✅ Sprite generated: ${symbols.length} symbols`);
   } catch (err) {
-    console.error(`❌ generateSprite failed: ${err.message}`);
-    throw err;
+    throw new Error(`Generate sprite failed: ${err.message}`);
   }
 }
 
 async function loadIconSet(config, pkg) {
-  const iconifyPath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    config.paths.node_modules,
-    "@iconify-json"
-  );
+  const iconifyPath = resolvePath(path.dirname(fileURLToPath(import.meta.url)), config.paths.node_modules, "@iconify-json");
+  const iconSetPath = resolvePath(iconifyPath, `${pkg}/icons.json`);
   try {
-    const iconSetPath = path.join(iconifyPath, `${pkg}/icons.json`);
-    const raw = await fs.readFile(iconSetPath, "utf8").catch(() => {
-      throw new Error(`Iconify package not found: ${iconSetPath}`);
-    });
-    const json = JSON.parse(raw);
-    if (!json.icons) throw new Error(`Invalid icon set: ${pkg}`);
-    return json;
+    const raw = await fs.readFile(iconSetPath, "utf8");
+    return JSON.parse(raw);
   } catch (err) {
-    console.error(`❌ loadIconSet failed for ${pkg}: ${err.message}`);
-    throw err;
-  }
-}
-
-function calculateViewBox(svgContent) {
-  try {
-    const pathRegex = /d="([^"]+)"/g;
-    let minX = Infinity,
-      minY = Infinity,
-      maxX = -Infinity,
-      maxY = -Infinity;
-    let match;
-    while ((match = pathRegex.exec(svgContent)) !== null) {
-      const coords = match[1].match(/[\d.-]+/g)?.map(Number) || [];
-      for (let i = 0; i < coords.length; i += 2) {
-        const x = coords[i];
-        const y = coords[i + 1];
-        if (!isNaN(x) && !isNaN(y)) {
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-      }
-    }
-    if (
-      minX === Infinity ||
-      minY === Infinity ||
-      maxX === -Infinity ||
-      maxY === -Infinity
-    )
-      return "0 0 24 24";
-    const padding = 10;
-    const width = maxX - minX;
-    const height = maxY - minY;
-    return `${minX - padding} ${minY - padding} ${width + 2 * padding} ${
-      height + 2 * padding
-    }`;
-  } catch (err) {
-    console.error(`❌ calculateViewBox failed: ${err.message}`);
-    return "0 0 24 24";
+    throw new Error(`Load icon set failed for ${pkg}: ${err.message}`);
   }
 }
 
 async function cleanLocalSvgs(config) {
-  const srcPath = config.getSrcPath();
-  const imgPath = path.join(srcPath, "img");
+  const imgPath = resolvePath(config.getSrcPath(), "img");
   try {
-    console.log("📋 Cleaning local SVGs...");
-    const files = (await fs.readdir(imgPath).catch(() => [])).filter((f) =>
-      f.endsWith(".svg")
-    );
-    if (!files.length) return console.log("ℹ️ No SVGs found in src/img/");
+    console.log("📋 Cleaning SVGs...");
+    const files = (await fs.readdir(imgPath)).filter(f => f.endsWith(".svg"));
     for (const file of files) {
-      const filePath = path.join(imgPath, file);
-      let svg = await fs
-        .readFile(filePath, "utf8")
-        .replace(/<\?xml[^?]*\?>\s*/, "")
-        .replace(/<!DOCTYPE[^>]*>\s*/, "");
+      const filePath = resolvePath(imgPath, file);
+      let svg = await fs.readFile(filePath, "utf8").replace(/<\?xml[^?]*\?>\s*/, "");
       const icon = new SVG(svg);
       cleanupSVG(icon);
-      parseColors(icon, {
-        defaultColor: "currentColor",
-        callback: (_, colorStr) =>
-          colorStr === "none" ? colorStr : "currentColor",
-      });
+      parseColors(icon, { defaultColor: "currentColor" });
       const optimized = optimize(icon.toMinifiedString(), config.svgo.clean);
       await fs.writeFile(filePath, optimized.data);
       console.log(`✅ Cleaned ${file}`);
     }
-    console.log("✅ SVG cleaning completed");
+    console.log("✅ SVG cleaning done");
   } catch (err) {
-    console.error(`❌ cleanLocalSvgs failed: ${err.message}`);
-    throw err;
+    throw new Error(`Clean SVGs failed: ${err.message}`);
   }
 }
 
 // CLI handler
-if (process.argv.includes("--clean-icons")) {
-  cleanIcons();
-} else if (process.argv.includes("--prod")) {
-  buildProd();
-} else if (process.argv.includes("--watch")) {
-  buildWatch();
-} else if (process.argv.includes("--deploy")) {
-  buildDeploy();
-} else {
-  build();
-}
+if (process.argv.includes("--clean-icons")) cleanIcons();
+else if (process.argv.includes("--prod")) buildProd();
+else if (process.argv.includes("--watch")) buildWatch();
+else if (process.argv.includes("--deploy")) buildDeploy();
+else build();

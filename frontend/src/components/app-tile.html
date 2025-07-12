@@ -1,5 +1,6 @@
-<!-- App Tile (CSG) -->
+<!-- App Tile -->
 <div
+  id="app-tile-{app_name}"
   class="p-3 border rounded-md shadow-sm bg-white cursor-pointer app-tile"
   x-data="{ selectedEnv: 'prod' }"
   x-bind:class="{ 'env-dev': selectedEnv === 'dev', 'env-qa': selectedEnv === 'qa', 'env-prod': selectedEnv === 'prod' }">
@@ -33,7 +34,7 @@
     </div>
   </div>
 
-  <!-- app tile main section -->  
+  <!-- app tile main section -->
   <div class="text-sm space-y-1 mb-2">
     <div class="flex justify-between items-center">
       <div class="flex gap-2 items-center">
@@ -210,5 +211,9 @@
       </div>
     </div>
   </div>
+  <!-- END App Tile Footer -->
+
 </div>
-<!-- END App Tile (CSG)-->
+<!-- END App Tile -->
+
+
