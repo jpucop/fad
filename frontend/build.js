@@ -47,10 +47,9 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 
-
 async function extractIconRefs(config) {
-  const htmlConfig = config.getHtmlConfig();
-  const spriteConfig = config.getSpriteConfig();
+  const htmlConfig = config.newHtmlConfig();
+  const spriteConfig = config.newSpriteConfig();
   try {
     console.log("📋 Extracting icon refs...");
     const matches = new Set();
@@ -77,11 +76,13 @@ async function extractIconRefs(config) {
 }
 
 async function validateSprite(config) {
-  const spriteConfig = config.getSpriteConfig();
+  const spriteConfig = config.newSpriteConfig();
   try {
     console.log("📋 Validating sprite...");
     const iconClasses = await extractIconRefs(config);
-    const spriteContent = await fs.readFile(spriteConfig.output, "utf8").catch(() => "");
+    const spriteContent = await fs
+      .readFile(spriteConfig.output, "utf8")
+      .catch(() => "");
     const symbolIds = new Set(
       [...spriteContent.matchAll(new RegExp(spriteConfig.symbol, "g"))].map(
         (m) => m[1]
@@ -100,11 +101,11 @@ async function validateSprite(config) {
 }
 
 async function copyStatic(config) {
-  const distPath = config.getDistPath();
-  const spriteConfig = config.getSpriteConfig();
+  const distPath = config.distp();
+  const spriteConfig = config.newSpriteConfig();
   try {
     const staticFiles = config.inputs.static.map((f) => ({
-      src: resolvePath(config.getSrcPath(), f),
+      src: resolvePath(config.srcp(), f),
       dest: resolvePath(distPath, f),
     }));
     await Promise.all([
@@ -121,18 +122,15 @@ async function copyStatic(config) {
 }
 
 async function processHtml(config) {
-  const htmlConfig = config.getHtmlConfig();
-  const distPath = config.getDistPath();
-  const spriteConfig = config.getSpriteConfig();
-  const componentsPath = config.getComponentsPath();
+  const htmlConfig = config.newHtmlConfig();
+  const distPath = config.distp();
+  const spriteConfig = config.newSpriteConfig();
+  const componentsPath = config.componentsp();
   try {
     console.log("📋 Processing HTML...");
     await Promise.all(
       htmlConfig.files.map(async (src) => {
-        const dest = resolvePath(
-          distPath,
-          path.relative(config.getSrcPath(), src)
-        );
+        const dest = resolvePath(distPath, path.relative(config.srcp(), src));
         let html = await fs.readFile(src, "utf8");
         const $ = cheerio.load(html, { decodeEntities: false });
 
@@ -264,7 +262,7 @@ async function buildJs(config) {
 }
 
 async function copyToDeploy(config) {
-  const distPath = config.getDistPath();
+  const distPath = config.distp();
   const deployPath = resolvePath(
     path.dirname(fileURLToPath(import.meta.url)),
     config.paths.deploy
@@ -282,7 +280,7 @@ async function copyToDeploy(config) {
 }
 
 async function buildByFileType(config, file) {
-  const srcPath = config.getSrcPath();
+  const srcPath = config.srcp();
   try {
     const fileTypes = [
       {
@@ -321,7 +319,7 @@ async function buildByFileType(config, file) {
 }
 
 export async function watch(config) {
-  const srcPath = config.getSrcPath();
+  const srcPath = config.srcp();
   try {
     console.log("👀 Watching for changes...");
     const watcher = chokidar.watch(srcPath, { ignoreInitial: true });
@@ -363,11 +361,8 @@ async function initAlpineJs(config) {
     config.js.alpine.minified_source
   );
   const version = config.js.alpineVersion;
-  const alpineDest = resolvePath(config.getSrcPath(), `alpine-${version}.js`);
-  const alpineMinDest = resolvePath(
-    config.getSrcPath(),
-    `alpine.min-${version}.js`
-  );
+  const alpineDest = resolvePath(config.srcp(), `alpine-${version}.js`);
+  const alpineMinDest = resolvePath(config.srcp(), `alpine.min-${version}.js`);
   try {
     await copyFiles(alpineSrc, alpineDest);
     await copyFiles(alpineMinSrc, alpineMinDest);
@@ -378,7 +373,7 @@ async function initAlpineJs(config) {
 }
 
 async function cleanDist(config) {
-  const distPath = config.getDistPath();
+  const distPath = config.distp();
   try {
     await fs.rm(distPath, { recursive: true, force: true });
     await fs.mkdir(distPath, { recursive: true });
@@ -389,7 +384,7 @@ async function cleanDist(config) {
 }
 
 async function generateSprite(config, iconClasses) {
-  const spriteConfig = config.getSpriteConfig();
+  const spriteConfig = config.newSpriteConfig();
   try {
     const symbols = [];
     for (const ref of iconClasses) {
@@ -417,11 +412,7 @@ async function generateSprite(config, iconClasses) {
           );
         } else if (parts[0] === "l" && parts.length >= 2) {
           const name = parts.slice(1).join("-");
-          const svgPath = resolvePath(
-            config.getSrcPath(),
-            "img",
-            `${name}.svg`
-          );
+          const svgPath = resolvePath(config.srcp(), "img", `${name}.svg`);
           let svg = await fs.readFile(svgPath, "utf8").catch(() => "");
           if (!svg) continue;
           svg = svg.replace(/<\?xml[^?]*\?>\s*/, "");
@@ -470,12 +461,14 @@ async function loadIconSet(config, pkg) {
 }
 
 export async function cleanLocalSvgs(config) {
-  const imgPath = resolvePath(config.getSrcPath(), "img");
+  const imgPath = resolvePath(config.srcp(), "img");
   try {
     const files = (await fs.readdir(imgPath)).filter((f) => f.endsWith(".svg"));
     for (const file of files) {
       const filePath = resolvePath(imgPath, file);
-      let svg = await fs.readFile(filePath, "utf8").replace(/<\?xml[^?]*\?>\s*/, "");
+      let svg = await fs
+        .readFile(filePath, "utf8")
+        .replace(/<\?xml[^?]*\?>\s*/, "");
       const icon = new SVG(svg);
       cleanupSVG(icon);
       parseColors(icon, { defaultColor: "currentColor" });
@@ -502,8 +495,3 @@ export async function cleanLocalSvgs(config) {
   }
 })();
 */
-
-if (typeof module !== "undefined" && !module.parent) {
-  throw new Error("This module should be imported and called with a config object by the root build.js");
-}
-module.exports = { build, watch, cleanLocalSvgs };

@@ -11,31 +11,18 @@ env/
 .venv/
 ENV/
 
-# Dependency directories
-node_modules/          # Root node_modules from package.json
-.pip_cache/
-pip-wheel-metadata/
-dist/                 # General build output
-build/                # General build output
-*.egg-info/
-*.egg
+node_modules/
+
+dist/
 
 # Frontend build artifacts
-frontend/dist/         # Frontend build output
-frontend/node_modules/ # Optional, if frontend has its own node_modules (unlikely now)
-frontend/src/alpine*.js # Keep if generated, but consider broader coverage
+frontend/src/alpine*.js
 
 # FastAPI/Pydantic specific
 *.cache
 
 # Testing
 .pytest_cache/
-htmlcov/
-.coverage
-coverage.xml
-*.cover
-nosetests.xml
-junit-reports/
 
 # IDE/Editor files
 .idea/
@@ -52,15 +39,4 @@ junit-reports/
 .DS_Store
 Thumbs.db
 
-# Docker-related
-Dockerfile.*          # Ignore generated Dockerfiles
-*.dockerignore        # Ignore if used
-__pycache__/Dockerfile  # Avoid confusion with cached Dockerfiles
-
 package-lock.json
-
-# Obsolete scripts (remove after transition)
-build.sh
-run.sh
-venv.bat
-venv.sh
