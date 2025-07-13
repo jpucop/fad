@@ -16,18 +16,18 @@ pip install -r requirements.txt typer || {
   exit 1
 }
 
-cd frontend
-
 # Install frontend dependencies
 echo "Installing frontend dependencies..."
+cd frontend
 npm install || {
   echo "❌ Failed to install frontend dependencies"
   exit 1
 }
 cd ..
 
-# frontend build
+# build frontend
 echo "Building frontend..."
+cd frontend
 npm run build || {
   echo "❌ Frontend build failed"
   exit 1

@@ -2,6 +2,7 @@ import { cleanupSVG, parseColors, runSVGO, SVG } from "@iconify/tools";
 import { getIconData, iconToSVG } from "@iconify/utils";
 import tailwindcss from "@tailwindcss/postcss";
 import autoprefixer from "autoprefixer";
+import * as cheerio from "cheerio";
 import chokidar from "chokidar";
 import cssnano from "cssnano";
 import esbuild from "esbuild";
@@ -11,7 +12,6 @@ import path from "path";
 import postcss from "postcss";
 import { optimize } from "svgo";
 import { fileURLToPath } from "url";
-import * as cheerio from "cheerio";
 
 // Utility to centralize path resolution
 const resolvePath = (base, ...parts) => path.resolve(base, ...parts);
@@ -22,13 +22,13 @@ const matchesGlob = (file, pattern, cwd) => {
   return globSync(pattern, { cwd }).includes(relative);
 };
 
+// Strip BOM from content if present
+const stripBOM = (content) => content.replace(/^\uFEFF/, "");
+
 // Entry point
-export async function build({ prod, watch, deploy } = {}) {
-  const config = await resolveConfig({ prod, watch, deploy });
+export async function build(config) {
   try {
-    console.log(
-      `📋 Starting build... [prod: ${config.prod}] [watch: ${config.watch}] [deploy: ${config.deploy}]`
-    );
+    console.log(`📋 Building ... [prod: ${config.prod}]`);
     await initAlpineJs(config);
     await cleanDist(config);
     await validateSprite(config);
@@ -36,29 +36,9 @@ export async function build({ prod, watch, deploy } = {}) {
     await processHtml(config);
     await buildCss(config);
     await buildJs(config);
-    if (config.deploy) await copyToDeploy(config);
-    console.log("✅ Build completed");
-    if (config.watch) await watch(config);
   } catch (err) {
     console.error(`❌ Build failed: ${err.message}\n${err.stack}`);
-    process.exit(1);
   }
-}
-
-// Other entry points
-export async function buildProd() {
-  await build({ prod: true });
-}
-export async function buildWatch() {
-  await build({ watch: true });
-}
-export async function buildDeploy() {
-  await build({ deploy: true });
-}
-export async function cleanIcons() {
-  const config = await resolveConfig();
-  await cleanLocalSvgs(config);
-  console.log("✅ Icon cleaning completed");
 }
 
 // Global error handlers
@@ -71,7 +51,7 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 
-async function resolveConfig(args = {}) {
+async function resolveConfig() {
   const baseDir = path.dirname(fileURLToPath(import.meta.url));
   try {
     console.log("📋 Loading config.json...");
@@ -84,7 +64,6 @@ async function resolveConfig(args = {}) {
       .catch(() => ({}));
     const srcPath = resolvePath(baseDir, rawConfig.paths.src);
 
-    // Scan for paths using config patterns, excluding components from static
     const inputs = {
       html: globSync(rawConfig.patterns.html, {
         cwd: srcPath,
@@ -105,9 +84,9 @@ async function resolveConfig(args = {}) {
 
     const config = {
       ...rawConfig,
-      prod: args.prod || process.env.env === "prod",
-      watch: args.watch || process.argv.includes("--watch"),
-      deploy: args.deploy || process.argv.includes("--deploy"),
+      prod: process.argv.includes("--prod"),
+      watch: process.argv.includes("--watch"),
+      deploy: process.argv.includes("--deploy"),
       inputs,
       js: {
         ...rawConfig.js,
@@ -124,12 +103,23 @@ async function resolveConfig(args = {}) {
         output: resolvePath(config.getDistPath(), rawConfig.css.filename),
         tailwindcss: rawConfig.css.tailwindcss,
       }),
-      getJsConfig: () => ({
-        files: inputs.js
-          .filter((f) => !f.includes("alpine-") && !f.includes("alpine.min-"))
-          .map((f) => resolvePath(srcPath, f)),
-        output: resolvePath(config.getDistPath(), rawConfig.js.filename),
-      }),
+      getJsConfig: async () => {
+        const packageJsonRaw = stripBOM(
+          await fs.readFile(resolvePath(baseDir, "package.json"), "utf8")
+        );
+        console.log("Raw package.json content (BOM stripped):", packageJsonRaw);
+        const packageJson = JSON.parse(packageJsonRaw);
+        return {
+          alpineVersion:
+            packageJson.dependencies?.alpinejs ||
+            packageJson.devDependencies?.alpinejs ||
+            "unknown",
+          files: inputs.js
+            .filter((f) => !f.includes("alpine-") && !f.includes("alpine.min-"))
+            .map((f) => resolvePath(srcPath, f)),
+          output: resolvePath(config.getDistPath(), rawConfig.js.filename),
+        };
+      },
       getHtmlConfig: () => ({
         files: inputs.html.map((f) => resolvePath(srcPath, f)),
       }),
@@ -162,6 +152,7 @@ async function resolveConfig(args = {}) {
         },
       },
     };
+
     console.log(
       `✅ Config loaded: ${inputs.html.length} HTML, ${inputs.css.length} CSS, ${inputs.js.length} JS, ${inputs.static.length} static`
     );
@@ -178,8 +169,8 @@ async function extractIconRefs(config) {
     console.log("📋 Extracting icon refs...");
     const matches = new Set();
     for (const file of htmlConfig.files) {
-      const html = await fs.readFile(file, "utf8");
-      const $ = cheerio.load(html);
+      const html = stripBOM(await fs.readFile(file, "utf8"));
+      const $ = cheerio.load(html, { decodeEntities: false });
       const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
       $(selector).each(function () {
         const classes = $(this).attr("class")?.split(/\s+/) || [];
@@ -204,9 +195,9 @@ async function validateSprite(config) {
   try {
     console.log("📋 Validating sprite...");
     const iconClasses = await extractIconRefs(config);
-    const spriteContent = await fs
-      .readFile(spriteConfig.output, "utf8")
-      .catch(() => "");
+    const spriteContent = stripBOM(
+      await fs.readFile(spriteConfig.output, "utf8").catch(() => "")
+    );
     const symbolIds = new Set(
       [...spriteContent.matchAll(new RegExp(spriteConfig.symbol, "g"))].map(
         (m) => m[1]
@@ -228,7 +219,6 @@ async function copyStatic(config) {
   const distPath = config.getDistPath();
   const spriteConfig = config.getSpriteConfig();
   try {
-    console.log("📋 Copying static files...");
     const staticFiles = config.inputs.static.map((f) => ({
       src: resolvePath(config.getSrcPath(), f),
       dest: resolvePath(distPath, f),
@@ -253,63 +243,81 @@ async function processHtml(config) {
   const componentsPath = config.getComponentsPath();
   try {
     console.log("📋 Processing HTML...");
-    await Promise.all(htmlConfig.files.map(async src => {
-      const dest = resolvePath(distPath, path.relative(config.getSrcPath(), src));
-      let html = await fs.readFile(src, "utf8");
-      const $ = cheerio.load(html, { decodeEntities: false });
+    await Promise.all(
+      htmlConfig.files.map(async (src) => {
+        const dest = resolvePath(
+          distPath,
+          path.relative(config.getSrcPath(), src)
+        );
+        let html = stripBOM(await fs.readFile(src, "utf8"));
+        const $ = cheerio.load(html, { decodeEntities: false });
 
-      // Process HTML imports (<!-- inject[components/file.html] -->)
-      let imports = 0;
-      const importPromises = [];
-      $('*').contents().filter(function () { return this.type === 'comment'; }).each(function () {
-        const comment = this.data.trim();
-        const match = comment.match(/^\s*inject\[(components\/[^[\]]+\.html)\]\s*$/);
-        if (match) {
-          const componentFile = match[1].replace('components/', ''); // Strip 'components/' prefix
-          const componentPath = resolvePath(componentsPath, componentFile);
-          importPromises.push(
-            fs.readFile(componentPath, "utf8")
-              .then(componentHtml => {
-                if (!componentHtml.trim()) {
-                  console.warn(`⚠️ Component ${match[1]} is empty`);
-                  return;
-                }
-                console.log(`🔍 Injecting ${match[1]}: ${componentHtml.length} bytes`);
-                $(this).replaceWith(componentHtml); // Replace comment with HTML
-                imports++;
-              })
-              .catch(err => {
-                console.warn(`⚠️ Failed to inject ${match[1]}: ${err.message}`);
-              })
-          );
-        }
-      });
-      await Promise.all(importPromises);
+        let imports = 0;
+        const importPromises = [];
+        $("*")
+          .contents()
+          .filter(function () {
+            return this.type === "comment";
+          })
+          .each(function () {
+            const comment = this.data.trim();
+            const match = comment.match(
+              /^\s*inject\[(components\/[^[\]]+\.html)\]\s*$/
+            );
+            if (match) {
+              const componentFile = match[1].replace("components/", "");
+              const componentPath = resolvePath(componentsPath, componentFile);
+              importPromises.push(
+                fs
+                  .readFile(componentPath, "utf8")
+                  .then((componentHtml) => {
+                    if (!componentHtml.trim()) {
+                      console.warn(`⚠️ Component ${match[1]} is empty`);
+                      return;
+                    }
+                    console.log(
+                      `🔍 Injecting ${match[1]}: ${componentHtml.length} bytes`
+                    );
+                    $(this).replaceWith(componentHtml);
+                    imports++;
+                  })
+                  .catch((err) => {
+                    console.warn(
+                      `⚠️ Failed to inject ${match[1]}: ${err.message}`
+                    );
+                  })
+              );
+            }
+          });
+        await Promise.all(importPromises);
 
-      // Process icon classes
-      let replacements = 0;
-      const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
-      $(selector).each(function () {
-        const $el = $(this);
-        const classes = $el.attr('class')?.split(/\s+/) || [];
-        const iconIndex = classes.indexOf(spriteConfig.containerClass);
-        if (iconIndex !== -1 && iconIndex + 1 < classes.length) {
-          const iconClass = classes[iconIndex + 1];
-          if (iconClass.startsWith('i-') || iconClass.startsWith('l-')) {
-            const svg = spriteConfig.svgTemplate
-              .replace('{filename}', spriteConfig.filename)
-              .replace('{iconClass}', iconClass);
-            $el.append(svg);
-            replacements++;
+        let replacements = 0;
+        const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
+        $(selector).each(function () {
+          const $el = $(this);
+          const classes = $el.attr("class")?.split(/\s+/) || [];
+          const iconIndex = classes.indexOf(spriteConfig.containerClass);
+          if (iconIndex !== -1 && iconIndex + 1 < classes.length) {
+            const iconClass = classes[iconIndex + 1];
+            if (iconClass.startsWith("i-") || iconClass.startsWith("l-")) {
+              const svg = spriteConfig.svgTemplate
+                .replace("{filename}", spriteConfig.filename)
+                .replace("{iconClass}", iconClass);
+              $el.append(svg);
+              replacements++;
+            }
           }
-        }
-      });
+        });
 
-      html = $.html();
-      await fs.mkdir(path.dirname(dest), { recursive: true });
-      await fs.writeFile(dest, html);
-      console.log(`✅ Processed ${path.basename(src)} (${replacements} icons, ${imports} imports)`);
-    }));
+        html = $.html();
+        await fs.mkdir(path.dirname(dest), { recursive: true });
+        await fs.writeFile(dest, html, "utf8");
+        console.log(
+          `✅ Processed ${path.basename(src)} ` + // Explicit space
+            `(${replacements} icons, ${imports} imports)` // Explicit space before opening parenthesis
+        );
+      })
+    );
     console.log("✅ HTML done");
   } catch (err) {
     throw new Error(`Process HTML failed: ${err.message}`);
@@ -319,7 +327,6 @@ async function processHtml(config) {
 async function buildCss(config) {
   const cssConfig = config.getCssConfig();
   try {
-    console.log("📋 Processing CSS...");
     if (!cssConfig.files.length) {
       console.warn("⚠️ No CSS files found");
       return;
@@ -337,9 +344,13 @@ async function buildCss(config) {
       to: cssConfig.output,
     });
     await fs.mkdir(path.dirname(cssConfig.output), { recursive: true });
-    await fs.writeFile(cssConfig.output, result.css);
+    await fs.writeFile(cssConfig.output, result.css, "utf8");
     if (result.map)
-      await fs.writeFile(`${cssConfig.output}.map`, result.map.toString());
+      await fs.writeFile(
+        `${cssConfig.output}.map`,
+        result.map.toString(),
+        "utf8"
+      );
     console.log(`✅ CSS compiled to ${path.basename(cssConfig.output)}`);
   } catch (err) {
     throw new Error(`Build CSS failed: ${err.message}`);
@@ -347,9 +358,8 @@ async function buildCss(config) {
 }
 
 async function buildJs(config) {
-  const jsConfig = config.getJsConfig();
+  const jsConfig = await config.getJsConfig();
   try {
-    console.log("📋 Processing JS...");
     if (!jsConfig.files.length) {
       console.warn("⚠️ No JS files found");
       return;
@@ -376,7 +386,6 @@ async function copyToDeploy(config) {
     config.paths.deploy
   );
   try {
-    console.log("📋 Deploying...");
     const files = globSync("**/*", { cwd: distPath, nodir: true }).map((f) => ({
       src: resolvePath(distPath, f),
       dest: resolvePath(deployPath, f),
@@ -388,7 +397,7 @@ async function copyToDeploy(config) {
   }
 }
 
-async function buildByFileTypeUpdate(config, file) {
+async function buildByFileType(config, file) {
   const srcPath = config.getSrcPath();
   try {
     const fileTypes = [
@@ -452,6 +461,14 @@ async function copyFiles(src, dest) {
 }
 
 async function initAlpineJs(config) {
+  if (!config.paths?.node_modules) {
+    throw new Error("config.paths.node_modules is not defined in config.json");
+  }
+  if (!config.js?.alpine?.dev_source || !config.js?.alpine?.minified_source) {
+    throw new Error(
+      "config.js.alpine.dev_source or config.js.alpine.minified_source is not defined in config.json"
+    );
+  }
   const nodeModulesPath = resolvePath(
     path.dirname(fileURLToPath(import.meta.url)),
     config.paths.node_modules
@@ -468,7 +485,6 @@ async function initAlpineJs(config) {
     `alpine.min-${version}.js`
   );
   try {
-    console.log("📋 Initializing Alpine.js...");
     await copyFiles(alpineSrc, alpineDest);
     await copyFiles(alpineMinSrc, alpineMinDest);
     console.log("✅ Alpine.js initialized");
@@ -480,10 +496,9 @@ async function initAlpineJs(config) {
 async function cleanDist(config) {
   const distPath = config.getDistPath();
   try {
-    console.log(`📋 Cleaning ${config.paths.dist}...`);
     await fs.rm(distPath, { recursive: true, force: true });
     await fs.mkdir(distPath, { recursive: true });
-    console.log("✅ Dist cleaned");
+    console.log("✅ dist contents deleted");
   } catch (err) {
     throw new Error(`Clean dist failed: ${err.message}`);
   }
@@ -492,7 +507,6 @@ async function cleanDist(config) {
 async function generateSprite(config, iconClasses) {
   const spriteConfig = config.getSpriteConfig();
   try {
-    console.log("📋 Generating sprite...");
     const symbols = [];
     for (const ref of iconClasses) {
       try {
@@ -524,7 +538,9 @@ async function generateSprite(config, iconClasses) {
             "img",
             `${name}.svg`
           );
-          let svg = await fs.readFile(svgPath, "utf8").catch(() => "");
+          let svg = stripBOM(
+            await fs.readFile(svgPath, "utf8").catch(() => "")
+          );
           if (!svg) continue;
           svg = svg.replace(/<\?xml[^?]*\?>\s*/, "");
           const optimizedSvg = optimize(svg, config.svgo.sprite).data;
@@ -546,7 +562,7 @@ async function generateSprite(config, iconClasses) {
       ""
     )}</svg>`;
     await fs.mkdir(path.dirname(spriteConfig.output), { recursive: true });
-    await fs.writeFile(spriteConfig.output, spriteContent);
+    await fs.writeFile(spriteConfig.output, spriteContent, "utf8");
     console.log(`✅ Sprite generated: ${symbols.length} symbols`);
   } catch (err) {
     throw new Error(`Generate sprite failed: ${err.message}`);
@@ -554,6 +570,9 @@ async function generateSprite(config, iconClasses) {
 }
 
 async function loadIconSet(config, pkg) {
+  if (!config.paths?.node_modules) {
+    throw new Error("config.paths.node_modules is not defined in config.json");
+  }
   const iconifyPath = resolvePath(
     path.dirname(fileURLToPath(import.meta.url)),
     config.paths.node_modules,
@@ -561,7 +580,7 @@ async function loadIconSet(config, pkg) {
   );
   const iconSetPath = resolvePath(iconifyPath, `${pkg}/icons.json`);
   try {
-    const raw = await fs.readFile(iconSetPath, "utf8");
+    const raw = stripBOM(await fs.readFile(iconSetPath, "utf8"));
     return JSON.parse(raw);
   } catch (err) {
     throw new Error(`Load icon set failed for ${pkg}: ${err.message}`);
@@ -571,18 +590,17 @@ async function loadIconSet(config, pkg) {
 async function cleanLocalSvgs(config) {
   const imgPath = resolvePath(config.getSrcPath(), "img");
   try {
-    console.log("📋 Cleaning SVGs...");
     const files = (await fs.readdir(imgPath)).filter((f) => f.endsWith(".svg"));
     for (const file of files) {
       const filePath = resolvePath(imgPath, file);
-      let svg = await fs
-        .readFile(filePath, "utf8")
-        .replace(/<\?xml[^?]*\?>\s*/, "");
+      let svg = stripBOM(
+        await fs.readFile(filePath, "utf8").replace(/<\?xml[^?]*\?>\s*/, "")
+      );
       const icon = new SVG(svg);
       cleanupSVG(icon);
       parseColors(icon, { defaultColor: "currentColor" });
       const optimized = optimize(icon.toMinifiedString(), config.svgo.clean);
-      await fs.writeFile(filePath, optimized.data);
+      await fs.writeFile(filePath, optimized.data, "utf8");
       console.log(`✅ Cleaned ${file}`);
     }
     console.log("✅ SVG cleaning done");
@@ -591,9 +609,14 @@ async function cleanLocalSvgs(config) {
   }
 }
 
-// CLI handler
-if (process.argv.includes("--clean-icons")) cleanIcons();
-else if (process.argv.includes("--prod")) buildProd();
-else if (process.argv.includes("--watch")) buildWatch();
-else if (process.argv.includes("--deploy")) buildDeploy();
-else build();
+// Entry point
+(async () => {
+  const config = await resolveConfig();
+  if (process.argv.includes("--clean-icons")) {
+    await cleanLocalSvgs(config);
+  } else if (process.argv.includes("--watch")) {
+    await watch(config);
+  } else {
+    await build(config);
+  }
+})();

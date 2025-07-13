@@ -5,12 +5,13 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "clean": "rimraf node_modules package-lock.json dist",
+    "nodeclean": "rimraf node_modules package-lock.json",
+    "clean": "rimraf dist",
     "build": "node ./build.js",
     "watch": "node ./build.js --watch",
     "dev": "npx serve ./dist",
     "deploy": "node ./build.js --deploy",
-    "deployprod": "node ./build.js --prod",
+    "deployprod": "node ./build.js --prod --deploy",
     "cleanlocalsvgs": "node ./build.js --clean-icons"
   },
   "devDependencies": {

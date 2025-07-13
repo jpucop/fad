@@ -9,28 +9,14 @@ source venv/bin/activate || {
   exit 1
 }
 
-# Install backend dependencies
-echo "Installing backend dependencies..."
-pip install -r requirements.txt typer || {
-  echo "❌ Failed to install backend dependencies"
-  exit 1
-}
-
-# Install watchfiles for model directory watch
-echo "Installing watchfiles for model watch..."
-pip install watchfiles || {
-  echo "❌ Failed to install watchfiles"
-  exit 1
-}
-
-# verify app static assets present
+# verify app static assets
 echo "Validating app static web files..."
 if [ ! -d backend/app/static ] || [ -z "$(ls -A backend/app/static)" ]; then
   echo "❌ No app static assets found."
   exit 1
 fi
 
-# verify app models present 
+# verify app models
 echo "Validating app models..."
 if [ ! -d backend/app/models ] || [ -z "$(ls -A backend/app/models)" ]; then
   echo "❌ No app models found."
@@ -40,14 +26,14 @@ fi
 # Start frontend watch in background
 echo "Starting frontend watch..."
 cd frontend
-npm run buildwatch &
+npm run watch &
 FRONTEND_PID=$!
 cd ..
 
 # Start model watch in background
 echo "Starting model watch..."
 cd backend/model
-watchfiles --filter "*.{json,py}" "python generate.py --mode all" . &
+watchfiles --filter "*.{json,py}" "python gen_app_models.py --mode all" . &
 MODEL_PID=$!
 cd ../..
 
@@ -59,7 +45,7 @@ python -c "import uvicorn" || {
 }
 
 # Start FastAPI with Uvicorn
-echo "Starting FastAPI app server..."
+echo "Starting app server..."
 cd backend/app
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload &
 BACKEND_PID=$!
