@@ -6,27 +6,20 @@ __pycache__/
 *.so
 
 # Virtual environment
-venv/
-env/
-.venv/
-ENV/
-
-node_modules/
-
-dist/
-
-# Frontend build artifacts
-frontend/src/alpine*.js
+venv
+env
+.venv
+ENV
 
 # FastAPI/Pydantic specific
 *.cache
 
 # Testing
-.pytest_cache/
+.pytest_cache
 
 # IDE/Editor files
-.idea/
-.vscode/
+.idea
+.vscode
 *.sublime-workspace
 *.sublime-project
 
@@ -40,3 +33,8 @@ frontend/src/alpine*.js
 Thumbs.db
 
 package-lock.json
+node_modules
+dist
+# Frontend build artifacts
+frontend/src/alpine*.js
+

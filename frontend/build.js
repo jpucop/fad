@@ -207,7 +207,7 @@ async function processHtml(config) {
 }
 
 async function buildCss(config) {
-  const cssConfig = config.getCssConfig();
+  const cssConfig = config.newCssConfig();
   try {
     if (!cssConfig.files.length) {
       console.warn("⚠️ No CSS files found");
@@ -240,7 +240,7 @@ async function buildCss(config) {
 }
 
 async function buildJs(config) {
-  const jsConfig = await config.getJsConfig();
+  const jsConfig = await config.newJsConfig();
   try {
     if (!jsConfig.files.length) {
       console.warn("⚠️ No JS files found");

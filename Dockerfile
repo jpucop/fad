@@ -2,10 +2,9 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY backend/ .
-COPY frontend/dist/ app/static/
+COPY backend/app/ .
 
 EXPOSE 8000
 
