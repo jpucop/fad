@@ -12,15 +12,20 @@ env/
 ENV/
 
 # Dependency directories
+node_modules/          # Root node_modules from package.json
 .pip_cache/
 pip-wheel-metadata/
-dist/
-build/
+dist/                 # General build output
+build/                # General build output
 *.egg-info/
 *.egg
 
+# Frontend build artifacts
+frontend/dist/         # Frontend build output
+frontend/node_modules/ # Optional, if frontend has its own node_modules (unlikely now)
+frontend/src/alpine*.js # Keep if generated, but consider broader coverage
+
 # FastAPI/Pydantic specific
-*.log
 *.cache
 
 # Testing
@@ -40,26 +45,22 @@ junit-reports/
 
 # Environment variables
 .env
-.env.local
-.env.development
-.env.test
-.env.production
+.env.dev
+.env.prod
 
 # System files
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-*.sqlite3
-
-# Miscellaneous
-*.bak
-*.swp
-*~
-
-node_modules
+# Docker-related
+Dockerfile.*          # Ignore generated Dockerfiles
+*.dockerignore        # Ignore if used
+__pycache__/Dockerfile  # Avoid confusion with cached Dockerfiles
 
 package-lock.json
 
-frontend/src/alpine*.js
+# Obsolete scripts (remove after transition)
+build.sh
+run.sh
+venv.bat
+venv.sh

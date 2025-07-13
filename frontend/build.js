@@ -22,10 +22,6 @@ const matchesGlob = (file, pattern, cwd) => {
   return globSync(pattern, { cwd }).includes(relative);
 };
 
-// Strip BOM from content if present
-const stripBOM = (content) => content.replace(/^\uFEFF/, "");
-
-// Entry point
 export async function build(config) {
   try {
     console.log(`📋 Building ... [prod: ${config.prod}]`);
@@ -51,116 +47,6 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 
-async function resolveConfig() {
-  const baseDir = path.dirname(fileURLToPath(import.meta.url));
-  try {
-    console.log("📋 Loading config.json...");
-    const rawConfig = await fs
-      .readFile(resolvePath(baseDir, "config.json"), "utf8")
-      .then(JSON.parse);
-    const packageJson = await fs
-      .readFile(resolvePath(baseDir, "package.json"), "utf8")
-      .then(JSON.parse)
-      .catch(() => ({}));
-    const srcPath = resolvePath(baseDir, rawConfig.paths.src);
-
-    const inputs = {
-      html: globSync(rawConfig.patterns.html, {
-        cwd: srcPath,
-        nodir: true,
-      }).map((f) => f),
-      css: globSync(rawConfig.patterns.css, { cwd: srcPath, nodir: true }).map(
-        (f) => f
-      ),
-      js: globSync(rawConfig.patterns.js, { cwd: srcPath, nodir: true }).map(
-        (f) => f
-      ),
-      static: globSync(rawConfig.patterns.static, {
-        cwd: srcPath,
-        nodir: true,
-        ignore: "components/**",
-      }).map((f) => f),
-    };
-
-    const config = {
-      ...rawConfig,
-      prod: process.argv.includes("--prod"),
-      watch: process.argv.includes("--watch"),
-      deploy: process.argv.includes("--deploy"),
-      inputs,
-      js: {
-        ...rawConfig.js,
-        alpineVersion:
-          packageJson.dependencies?.alpinejs ||
-          packageJson.devDependencies?.alpinejs ||
-          "unknown",
-      },
-      getSrcPath: () => srcPath,
-      getDistPath: () => resolvePath(baseDir, rawConfig.paths.dist),
-      getComponentsPath: () => resolvePath(srcPath, rawConfig.paths.components),
-      getCssConfig: () => ({
-        files: inputs.css.map((f) => resolvePath(srcPath, f)),
-        output: resolvePath(config.getDistPath(), rawConfig.css.filename),
-        tailwindcss: rawConfig.css.tailwindcss,
-      }),
-      getJsConfig: async () => {
-        const packageJsonRaw = stripBOM(
-          await fs.readFile(resolvePath(baseDir, "package.json"), "utf8")
-        );
-        console.log("Raw package.json content (BOM stripped):", packageJsonRaw);
-        const packageJson = JSON.parse(packageJsonRaw);
-        return {
-          alpineVersion:
-            packageJson.dependencies?.alpinejs ||
-            packageJson.devDependencies?.alpinejs ||
-            "unknown",
-          files: inputs.js
-            .filter((f) => !f.includes("alpine-") && !f.includes("alpine.min-"))
-            .map((f) => resolvePath(srcPath, f)),
-          output: resolvePath(config.getDistPath(), rawConfig.js.filename),
-        };
-      },
-      getHtmlConfig: () => ({
-        files: inputs.html.map((f) => resolvePath(srcPath, f)),
-      }),
-      getSpriteConfig: () => ({
-        filename: rawConfig.sprite.filename,
-        output: resolvePath(srcPath, rawConfig.sprite.filename),
-        containerElement: rawConfig.sprite.containerElement,
-        containerClass: rawConfig.sprite.containerClass,
-        svgTemplate: rawConfig.sprite.svgTemplate,
-        symbol: rawConfig.sprite.symbol,
-      }),
-      svgo: {
-        sprite: {
-          plugins: [
-            { name: "removeDimensions" },
-            { name: "removeAttrs", params: { attrs: ["fill"] } },
-            { name: "convertTransform" },
-            { name: "cleanupNumericValues", params: { floatPrecision: 0 } },
-            { name: "removeUselessStrokeAndFill" },
-            { name: "mergePaths" },
-            { name: "removeXMLNS" },
-          ],
-        },
-        clean: {
-          plugins: [
-            "preset-default",
-            { name: "removeViewBox", active: false },
-            { name: "cleanupNumericValues", params: { floatPrecision: 3 } },
-          ],
-        },
-      },
-    };
-
-    console.log(
-      `✅ Config loaded: ${inputs.html.length} HTML, ${inputs.css.length} CSS, ${inputs.js.length} JS, ${inputs.static.length} static`
-    );
-    return config;
-  } catch (err) {
-    throw new Error(`Failed to load config: ${err.message}`);
-  }
-}
 
 async function extractIconRefs(config) {
   const htmlConfig = config.getHtmlConfig();
@@ -169,7 +55,7 @@ async function extractIconRefs(config) {
     console.log("📋 Extracting icon refs...");
     const matches = new Set();
     for (const file of htmlConfig.files) {
-      const html = stripBOM(await fs.readFile(file, "utf8"));
+      const html = await fs.readFile(file, "utf8");
       const $ = cheerio.load(html, { decodeEntities: false });
       const selector = `${spriteConfig.containerElement}.${spriteConfig.containerClass}`;
       $(selector).each(function () {
@@ -195,9 +81,7 @@ async function validateSprite(config) {
   try {
     console.log("📋 Validating sprite...");
     const iconClasses = await extractIconRefs(config);
-    const spriteContent = stripBOM(
-      await fs.readFile(spriteConfig.output, "utf8").catch(() => "")
-    );
+    const spriteContent = await fs.readFile(spriteConfig.output, "utf8").catch(() => "");
     const symbolIds = new Set(
       [...spriteContent.matchAll(new RegExp(spriteConfig.symbol, "g"))].map(
         (m) => m[1]
@@ -249,7 +133,7 @@ async function processHtml(config) {
           distPath,
           path.relative(config.getSrcPath(), src)
         );
-        let html = stripBOM(await fs.readFile(src, "utf8"));
+        let html = await fs.readFile(src, "utf8");
         const $ = cheerio.load(html, { decodeEntities: false });
 
         let imports = 0;
@@ -436,14 +320,14 @@ async function buildByFileType(config, file) {
   }
 }
 
-async function watch(config) {
+export async function watch(config) {
   const srcPath = config.getSrcPath();
   try {
     console.log("👀 Watching for changes...");
     const watcher = chokidar.watch(srcPath, { ignoreInitial: true });
     watcher.on("all", async (event, file) => {
       console.log(`🔄 [${event}] ${path.relative(srcPath, file)}`);
-      await buildByFileTypeUpdate(config, file);
+      await buildByFileType(config, file);
     });
   } catch (err) {
     throw new Error(`Watch failed: ${err.message}`);
@@ -538,9 +422,7 @@ async function generateSprite(config, iconClasses) {
             "img",
             `${name}.svg`
           );
-          let svg = stripBOM(
-            await fs.readFile(svgPath, "utf8").catch(() => "")
-          );
+          let svg = await fs.readFile(svgPath, "utf8").catch(() => "");
           if (!svg) continue;
           svg = svg.replace(/<\?xml[^?]*\?>\s*/, "");
           const optimizedSvg = optimize(svg, config.svgo.sprite).data;
@@ -580,22 +462,20 @@ async function loadIconSet(config, pkg) {
   );
   const iconSetPath = resolvePath(iconifyPath, `${pkg}/icons.json`);
   try {
-    const raw = stripBOM(await fs.readFile(iconSetPath, "utf8"));
+    const raw = await fs.readFile(iconSetPath, "utf8");
     return JSON.parse(raw);
   } catch (err) {
     throw new Error(`Load icon set failed for ${pkg}: ${err.message}`);
   }
 }
 
-async function cleanLocalSvgs(config) {
+export async function cleanLocalSvgs(config) {
   const imgPath = resolvePath(config.getSrcPath(), "img");
   try {
     const files = (await fs.readdir(imgPath)).filter((f) => f.endsWith(".svg"));
     for (const file of files) {
       const filePath = resolvePath(imgPath, file);
-      let svg = stripBOM(
-        await fs.readFile(filePath, "utf8").replace(/<\?xml[^?]*\?>\s*/, "")
-      );
+      let svg = await fs.readFile(filePath, "utf8").replace(/<\?xml[^?]*\?>\s*/, "");
       const icon = new SVG(svg);
       cleanupSVG(icon);
       parseColors(icon, { defaultColor: "currentColor" });
@@ -610,6 +490,7 @@ async function cleanLocalSvgs(config) {
 }
 
 // Entry point
+/*
 (async () => {
   const config = await resolveConfig();
   if (process.argv.includes("--clean-icons")) {
@@ -620,3 +501,9 @@ async function cleanLocalSvgs(config) {
     await build(config);
   }
 })();
+*/
+
+if (typeof module !== "undefined" && !module.parent) {
+  throw new Error("This module should be imported and called with a config object by the root build.js");
+}
+module.exports = { build, watch, cleanLocalSvgs };

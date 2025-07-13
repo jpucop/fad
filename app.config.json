@@ -1,11 +1,11 @@
 {
   "paths": {
-    "src": "./src",
-    "dist": "./dist",
-    "deploy": "../backend/app/static",
-    "node_modules": "./node_modules",
+    "src": "frontend/src",
+    "dist": "frontend/dist",
+    "deploy": "backend/app/static",
+    "node_modules": "node_modules",
     "mainHtml": "index.html",
-    "components": "components"
+    "components": "frontend/components"
   },
   "patterns": {
     "html": "**/*.html",
@@ -24,7 +24,9 @@
     "filename": "styles.css",
     "tailwindcss": {
       "darkMode": "class",
-      "theme": { "extend": {} },
+      "theme": {
+        "extend": {}
+      },
       "plugins": []
     }
   },

@@ -1,0 +1,38 @@
+{
+  "name": "fad",
+  "version": "1.0.0",
+  "author": "jkirton@ucop.edu",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "nodeclean": "rimraf node_modules package-lock.json",
+    "clean": "rimraf frontend/dist",
+    "build": "node build.js build",
+    "build:prod": "node build.js build --prod",
+    "watch": "node build.js run --watch", // Adjusted to use run mode with watch flag
+    "dev": "npx serve frontend/dist",
+    "deploy": "node build.js build --deploy",
+    "deployprod": "node build.js build --prod --deploy",
+    "cleanlocalsvgs": "node build.js build --clean-icons",
+    "start": "npm run build && npm run watch" // Combined build and watch for dev
+  },
+  "devDependencies": {
+    "@iconify-json/mdi": "1.2.3",
+    "@iconify/tools": "4.1.2",
+    "@iconify/utils": "2.3.0",
+    "@tailwindcss/postcss": "4.1.11",
+    "alpinejs": "3.14.9",
+    "autoprefixer": "10.4.21",
+    "chokidar": "4.0.1",
+    "cheerio": "^1.1.0",
+    "cssnano": "7.0.7",
+    "esbuild": "0.25.5",
+    "glob": "^11.0.0",
+    "postcss": "8.5.6",
+    "rimraf": "6.0.1",
+    "serve": "14.2.4",
+    "svgo": "4.0.0",
+    "tailwindcss": "4.1.11",
+    "dotenv": "^16.0.0" // Added for environment variable support in root build.js
+  }
+}
