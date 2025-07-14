@@ -545,7 +545,7 @@ async function runDevServer(config) {
 
   const modelWatcher = spawn(
     "watchfiles",
-    ["--filter", "*.{json,py}", "python", "gen_app_models.py", "--mode", "all", "."],
+    ["--filter", "*.{json,py}", "--mode", "all", "."],
     { cwd: modelDir, stdio: "inherit", detached: true }
   );
 
@@ -585,17 +585,16 @@ yargs(hideBin(process.argv))
     await frontendBuild(config);
   })
   .command("watch", "Watch for frontend changes", {}, async (argv) => {
-    await setupBackend();
     const config = await resolveConfig(argv);
+    await setupBackend();
     await frontendWatch(config);
   })
   .command("run", "Run the development server", {}, async (argv) => {
-    await setupBackend();
     const config = await resolveConfig(argv);
+    await setupBackend();
     await runDevServer(config);
   })
   .command("clean-icons", "Clean local SVG files", {}, async (argv) => {
-    await setupBackend();
     const config = await resolveConfig(argv);
     await cleanLocalSvgs(config);
   })

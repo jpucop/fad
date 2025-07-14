@@ -3282,7 +3282,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
   var src_default = alpine_default;
   var module_default = src_default;
 
-  // src/app.js
+  // frontend/src/app.js
   window.Alpine = module_default;
   module_default.start();
   console.log("App initialized");
