@@ -5,7 +5,7 @@
     "deploy": "backend/app/static",
     "node_modules": "node_modules",
     "mainHtml": "index.html",
-    "components": "frontend/components"
+    "components": "frontend/src/components"
   },
   "patterns": {
     "html": "**/*.html",
