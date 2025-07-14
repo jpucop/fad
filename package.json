@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "nodeclean": "rimraf node_modules package-lock.json",
-    "clean": "rimraf frontend/dist",
+    "clean": "rimraf dist",
     "build": "node build.js build",
     "build:prod": "node build.js build --prod",
     "watch": "node build.js run --watch",
-    "dev": "npx serve frontend/dist",
+    "dev": "npx serve dist",
     "deploy": "node build.js build --deploy",
     "deployprod": "node build.js build --prod --deploy",
     "cleanlocalsvgs": "node build.js build --clean-icons",
