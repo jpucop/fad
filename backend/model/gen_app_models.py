@@ -30,13 +30,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 SCHEMA_DIR = PROJECT_ROOT / "backend" / "model" / "schema"
 APP_MODELS_DIR = PROJECT_ROOT / "backend" / "app" / "models"
 BASE_TYPES_FILE = SCHEMA_DIR / "base.py"
 EXCLUDE_FILES = {"app_snapshot.json", "apps.json", "base.py"}
-DEST_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
-DEST_DATA_DIR.mkdir(parents=True, exist_ok=True)
+APP_DATA_DIR = PROJECT_ROOT / "backend" / "app" / "data"
+
+APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 def collect_raw_json() -> Dict[str, dict]:
   schemas = {}
@@ -134,7 +135,7 @@ def make_all_properties_required(schema: dict, parent_prop: str = "") -> None:
     make_all_properties_required(schema["items"], parent_prop)
 
 def generate_models(schema: dict) -> None:
-  output_path = OUTPUT_DIR / "app_model.py"
+  output_path = APP_DATA_DIR / "app_model.py"
   try:
     generate(
       input_=json.dumps(schema),
@@ -159,8 +160,8 @@ def generate_schema():
   shutil.rmtree(APP_MODELS_DIR, ignore_errors=True)
   APP_MODELS_DIR.mkdir(parents=True, exist_ok=True)
   
-  global base_type_resolver
-  base_type_resolver = BaseTypeResolver(BASE_TYPES_FILE)
+  # global base_type_resolver
+  # base_type_resolver = BaseTypeResolver(BASE_TYPES_FILE)
   raw_schemas = collect_raw_json()
   logger.info(f"Collected {len(raw_schemas)} raw schemas.")
   if not raw_schemas:
@@ -170,18 +171,20 @@ def generate_schema():
   generate_models(merged_schema)
   logger.info("Model generation complete.")
 
-def copy_model_data():
+def copy_model_data(model_names):
   # Copy all JSON files recursively from backend/model/ucop/
   for file in SOURCE_DATA_DIR.rglob("*.json"):
     if file.name in EXCLUDE_FILES:
+      logger.info(f"Skipping {rel_path}")
       continue
-    data = json.loads(file.read_text("utf-8"))
-    if data.get("_schema", False) is True:
-      rel_path = file.relative_to(SCHEMA_DIR.parent)
-      dest_file = DEST_DATA_DIR / rel_path
-      dest_file.parent.mkdir(parents=True, exist_ok=True)
-      shutil.copy2(file, dest_file)
-      logger.info(f"Copied {rel_path} to {dest_file}")
+    try:
+      data = json.loads(file.read_text("utf-8"))
+      if data.get("_schema", False) is True:
+        rel_path = file.relative_to(SCHEMA_DIR.parent)
+        dest_file = APP_DATA_DIR / rel_path
+        dest_file.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(file, dest_file)
+        logger.info(f"Copied {rel_path} to {dest_file}")
     except Exception as e:
       logger.error(f"Failed to copy {file.name}: {e}")
       raise
@@ -191,7 +194,7 @@ def copy_model_data():
     source_file = SCHEMA_DIR / file_name
     if source_file.exists():
       try:
-        shutil.copy2(source_file, DEST_DATA_DIR / file_name)
+        shutil.copy2(source_file, APP_DATA_DIR / file_name)
         logger.info(f"Copied {file_name}")
       except Exception as e:
         logger.error(f"Failed to copy {file_name}: {e}")
