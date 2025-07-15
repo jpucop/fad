@@ -1,0 +1,89 @@
+{
+  "name": "wage",
+  "short_name": "wage",
+  "long_name": "wage Application",
+  "description": "Managed FinApps app - wage",
+  "org": "ucop",
+  "group": "finapps",
+  "app_profile": "tomcat-java",
+  "deploy_profile": "aws-cicd-fargate-rds",
+  "source": {
+    "project_name": "wageWeb",
+    "git_origin_url": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/wageWeb",
+    "production_branch_name": "main",
+    "aws": {
+      "account_name": "finapps-dev"
+    }
+  },
+  "dbs": [
+    {
+      "name": "wage_db",
+      "server_name": "wage_server",
+      "host": "aws",
+      "aws": {
+        "account_name": "finapps-dev",
+        "db_arn": "arn:aws:rds:us-west-2:999999999999:db:wage_db"
+      }
+    }
+  ],
+  "confluence": {
+    "group_web_url": "https://ucopedu.atlassian.net/wiki/spaces/FA/overview"
+  },
+  "box": {
+    "group_web_url": "https://ucop.app.box.com/FA/"
+  },
+  "jira": {
+    "project_keys": [
+      "FA",
+      "wage"
+    ],
+    "group_web_url": "https://ucopedu.atlassian.net/jira/FA/"
+  },
+  "service_now": {
+    "group_web_url": "https://ucop.service-now.com/now/nav/ui/classic/params/target/%24pa_dashboard.do",
+    "assignment_group_names": [
+      "FINAPPS AWS Tech Support"
+    ]
+  },
+  "datadog": {
+    "group_web_url": "https://dd.com/ucop/finapps/index.html"
+  },
+  "environments": [
+    {
+      "env": "dev",
+      "name": "development",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-dev-pipeline",
+      "git_branch_name": "dev",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "qa",
+      "name": "staging",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-qa-pipeline",
+      "git_branch_name": "qa",
+      "aws": {
+        "account_name": "finapps-dev"
+      }
+    },
+    {
+      "env": "prod",
+      "name": "production",
+      "host": "aws",
+      "app_profile": "tomcat-java",
+      "deploy_profile": "aws-cicd-fargate-rds",
+      "deploy_pipeline_name": "wage-prod-pipeline",
+      "git_branch_name": "main",
+      "aws": {
+        "account_name": "finapps-prod"
+      }
+    }
+  ]
+}
