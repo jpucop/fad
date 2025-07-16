@@ -1,78 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Financial Applications Group</title>
-  <meta name="description" content="Financial Applications Group Office of the President">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="preload" href="/styles.css" as="style">
-  <link href="/styles.css" rel="stylesheet">
-  <link rel="preload" href="/app.js" as="script">
-  <script src="/app.js" defer></script>
-</head>
-<body class="font-sans relative min-h-screen bg-uc-light">
-  <!-- Watermark -->
-  <div class="watermark">
-    <span class="icon l-uc-seal w-full h-auto" aria-hidden="true"></span>
-  </div>
-  <div class="max-w-screen-xl mx-auto px-6 relative z-10">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-content">
-        <!-- Group Title + UCOP Logo -->
-        <div class="header-left">
-          <div class="header-title-group">
-            <h1 class="header-title text-uc-primary">Financial Applications Group</h1>
-            <span class="icon l-ucop-logo header-ucop-logo" aria-hidden="true"></span>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Financial Applications Group</title>
+    <meta
+      name="description"
+      content="Financial Applications Group Office of the President"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="preload" href="/styles.css" as="style" />
+    <link href="/styles.css" rel="stylesheet" />
+    <link rel="preload" href="/app.js" as="script" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body class="font-sans relative min-h-screen bg-uc-light">
+    <!-- Watermark -->
+    <div class="watermark">
+      <span class="icon l-uc-seal w-full h-auto" aria-hidden="true"></span>
+    </div>
+    <div class="max-w-screen-xl mx-auto px-6 relative z-10">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <!-- Group Title + UCOP Logo -->
+          <div class="header-left">
+            <div class="header-title-group">
+              <h1 class="header-title text-uc-primary">
+                Financial Applications Group
+              </h1>
+              <span
+                class="icon l-ucop-logo header-ucop-logo"
+                aria-hidden="true"
+              ></span>
+            </div>
           </div>
+
+          <!-- Org Group Icon Links -->
+          <nav class="header-nav" aria-label="Resource Links">
+            <div class="header-nav-grid">
+              <a
+                href="/members"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="View Team Members"
+              >
+                <span
+                  class="icon i-mdi-account-multiple-outline"
+                  aria-hidden="true"
+                ></span>
+                Members
+              </a>
+              <a
+                href="/servicenow"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="Access ServiceNow"
+              >
+                <span
+                  class="icon i-mdi-ticket-outline"
+                  aria-hidden="true"
+                ></span>
+                ServiceNow
+              </a>
+              <a
+                href="/confluence"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="Visit Confluence"
+              >
+                <span
+                  class="icon i-mdi-book-open-page-variant-outline"
+                  aria-hidden="true"
+                ></span>
+                Confluence
+              </a>
+              <a
+                href="/box"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="Access Box Folder"
+              >
+                <span
+                  class="icon i-mdi-cloud-outline"
+                  aria-hidden="true"
+                ></span>
+                Box
+              </a>
+              <a
+                href="/datadog"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="Monitor with Datadog"
+              >
+                <span
+                  class="icon i-mdi-chart-box-outline"
+                  aria-hidden="true"
+                ></span>
+                DataDog
+              </a>
+              <a
+                href="/github"
+                class="header-nav-link text-black hover:text-blue-500"
+                aria-label="View Source Code"
+              >
+                <span class="icon i-mdi-github" aria-hidden="true"></span>
+                Sources
+              </a>
+            </div>
+          </nav>
         </div>
-        <!-- Org Group Icon Links -->
-        <nav class="header-nav" aria-label="Resource Links">
-          <div class="header-nav-grid">
-            <a href="/members" class="header-nav-link" aria-label="View Team Members">
-              <span class="icon i-mdi-account-multiple-outline" aria-hidden="true"></span> Members
-            </a>
-            <a href="/servicenow" class="header-nav-link" aria-label="Access ServiceNow">
-              <span class="icon i-mdi-ticket-outline" aria-hidden="true"></span> ServiceNow
-            </a>
-            <a href="/confluence" class="header-nav-link" aria-label="Visit Confluence">
-              <span class="icon i-mdi-book-open-page-variant-outline" aria-hidden="true"></span> Confluence
-            </a>
-            <a href="/box" class="header-nav-link" aria-label="Access Box Folder">
-              <span class="icon i-mdi-cloud-outline" aria-hidden="true"></span> Box
-            </a>
-            <a href="/datadog" class="header-nav-link" aria-label="Monitor with Datadog">
-              <span class="icon i-mdi-chart-box-outline" aria-hidden="true"></span> DataDog
-            </a>
-            <a href="/github" class="header-nav-link" aria-label="View Source Code">
-              <span class="icon i-mdi-github" aria-hidden="true"></span> Sources
-            </a>
+      </header>
+      <main class="main-content">
+        <!-- App Grid -->
+        <section class="app-section">
+          <h2 class="section-title">Applications</h2>
+          <div class="app-grid">
+            <!-- inject[components/app-tile.html]  -->
           </div>
-        </nav>
-      </div>
-    </header>
-    <main class="main-content">
-      
-      <!-- App Grid -->
-      <section class="app-section">
-        <h2 class="section-title">Applications</h2>
-        <div class="app-grid">
+        </section>
+      </main>
 
-          <!-- inject[components/app-tile.html]  -->
-
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-content">
+          <div>© 2025 University of California, Office of the President</div>
+          <div>FAD v1.0.0-SNAPSHOT @ 2025-05-01 13:05 UTC</div>
         </div>
-      </section>
-
-    </main>
-    
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-content">
-        <div>© 2025 University of California, Office of the President</div>
-        <div>FAD v1.0.0-SNAPSHOT @ 2025-05-01 13:05 UTC</div>
-      </div>
-    </footer>
-  </div>
-</body>
+      </footer>
+    </div>
+  </body>
 </html>

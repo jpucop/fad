@@ -246,12 +246,25 @@ body {
   vertical-align: middle;
 }
 
-/* Tooltip for Links and App Tiles */
-.header-nav-link,
-.app-tile {
-  position: relative;
+/* Popup Card Styling */
+.popup-card {
+  display: none;
+  position: absolute;
+  background: var(--color-uc-light);
+  border: 1px solid var(--color-uc-mid);
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  width: 200px;
+  z-index: 10;
+  font-size: 0.875rem;
+  color: var(--color-uc-dark);
+}
+.popup-card.active {
+  display: block;
 }
 
+/* Tooltip for Links and App Tiles */
 .header-nav-link::after,
 .app-tile::after {
   content: attr(aria-label);
