@@ -14,7 +14,8 @@
     <link rel="preload" href="/app.js" as="script" />
     <script src="/app.js" defer></script>
   </head>
-  <body class="font-sans relative min-h-screen bg-uc-light">
+
+  <body class="font-sans relative min-h-screen bg-uc-light" x-data="app">
     <!-- Watermark -->
     <div class="watermark">
       <span class="icon l-uc-seal w-full h-auto" aria-hidden="true"></span>
@@ -39,69 +40,171 @@
           <!-- Org Group Icon Links -->
           <nav class="header-nav" aria-label="Resource Links">
             <div class="header-nav-grid">
-              <a
-                href="/members"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="View Team Members"
-              >
-                <span
-                  class="icon i-mdi-account-multiple-outline"
-                  aria-hidden="true"
-                ></span>
-                Members
-              </a>
-              <a
-                href="/servicenow"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="Access ServiceNow"
-              >
-                <span
-                  class="icon i-mdi-ticket-outline"
-                  aria-hidden="true"
-                ></span>
-                ServiceNow
-              </a>
-              <a
-                href="/confluence"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="Visit Confluence"
-              >
-                <span
-                  class="icon i-mdi-book-open-page-variant-outline"
-                  aria-hidden="true"
-                ></span>
-                Confluence
-              </a>
-              <a
-                href="/box"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="Access Box Folder"
-              >
-                <span
-                  class="icon i-mdi-cloud-outline"
-                  aria-hidden="true"
-                ></span>
-                Box
-              </a>
-              <a
-                href="/datadog"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="Monitor with Datadog"
-              >
-                <span
-                  class="icon i-mdi-chart-box-outline"
-                  aria-hidden="true"
-                ></span>
-                DataDog
-              </a>
-              <a
-                href="/github"
-                class="header-nav-link text-black hover:text-blue-500"
-                aria-label="View Source Code"
-              >
-                <span class="icon i-mdi-github" aria-hidden="true"></span>
-                Sources
-              </a>
+              <!-- Members -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/members"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="View Team Members"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span
+                    class="icon i-mdi-account-multiple-outline"
+                    aria-hidden="true"
+                  ></span>
+                  Members
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">Members</p>
+                  <p>Group: Financial Applications</p>
+                  <p x-text="'Name: ' + groupData.members[0].name"></p>
+                  <p x-text="'Title: ' + groupData.members[0].title"></p>
+                  <p x-text="'Email: ' + groupData.members[0].work_email"></p>
+                </div>
+              </div>
+
+              <!-- ServiceNow -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/servicenow"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="Access ServiceNow"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span
+                    class="icon i-mdi-ticket-outline"
+                    aria-hidden="true"
+                  ></span>
+                  ServiceNow
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">ServiceNow</p>
+                  <p x-text="groupData.service_now.description"></p>
+                  <p x-text="'URL: ' + groupData.service_now.url"></p>
+                  <p>
+                    Assignment Groups:
+                    <span
+                      x-text="groupData.service_now.assignment_groups.length"
+                    ></span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Confluence -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/confluence"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="Visit Confluence"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span
+                    class="icon i-mdi-book-open-page-variant-outline"
+                    aria-hidden="true"
+                  ></span>
+                  Confluence
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">Confluence</p>
+                  <p x-text="groupData.confluence.description"></p>
+                  <p x-text="'URL: ' + groupData.confluence.url"></p>
+                </div>
+              </div>
+
+              <!-- Box -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/box"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="Access Box Folder"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span
+                    class="icon i-mdi-cloud-outline"
+                    aria-hidden="true"
+                  ></span>
+                  Box
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">Box</p>
+                  <p x-text="groupData.box.description"></p>
+                  <p x-text="'URL: ' + groupData.box.url"></p>
+                </div>
+              </div>
+
+              <!-- DataDog -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/datadog"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="Monitor with Datadog"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span
+                    class="icon i-mdi-chart-box-outline"
+                    aria-hidden="true"
+                  ></span>
+                  DataDog
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">DataDog</p>
+                  <p x-text="groupData.datadog.description"></p>
+                  <p x-text="'URL: ' + groupData.datadog.url"></p>
+                </div>
+              </div>
+
+              <!-- Sources -->
+              <div class="relative inline-block" x-data="{ showPopup: false }">
+                <a
+                  href="/github"
+                  class="header-nav-link text-uc-dark hover:text-uc-primary"
+                  aria-label="View Source Code"
+                  @mouseenter="showPopup = true"
+                  @mouseleave="showPopup = false"
+                >
+                  <span class="icon i-mdi-github" aria-hidden="true"></span>
+                  Sources
+                </a>
+                <div
+                  class="popup-card absolute top-full left-0 mt-2"
+                  x-show="showPopup"
+                  x-cloak
+                >
+                  <p class="font-semibold">Sources</p>
+                  <p>AWS Accounts for Source Repositories:</p>
+                  <p
+                    x-text="'- ' + groupData.aws.accounts[0].account_name + ': ' + groupData.aws.accounts[0].description"
+                  ></p>
+                  <p
+                    x-text="'- ' + groupData.aws.accounts[1].account_name + ': ' + groupData.aws.accounts[1].description"
+                  ></p>
+                </div>
+              </div>
             </div>
           </nav>
         </div>
