@@ -1,18 +1,22 @@
 {
-  "named_entity": {
+  "entity": {},
+
+  "named_entity[entity]": {
     "name": ""
   },
+
   "web_entity[named_entity]": {
     "url": "",
     "description": ""
   },
 
-  "aws_account[web_entity]": {
+  "aws_account[entity]": {
     "account_name": "",
     "region": "",
     "account_id": ""
   },
-  "aws_account_ref": {
-    "aws.account_name": ""
+
+  "aws_account_ref[entity]": {
+    "account_name": ""
   }
 }

@@ -3,14 +3,7 @@
   "full_name": "",
   "description": "",
   "aws": {
-    "accounts": [
-      {
-        "account_name": "",
-        "account_id": "",
-        "region": "us-west-2",
-        "description": ""
-      }
-    ]
+    "accounts": []
   },
   "confluence": {
     "name": "",

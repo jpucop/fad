@@ -2,23 +2,9 @@
   "name": "",
   "full_name": "",
   "description": "",
-  "members": [
-    {
-      "name": "",
-      "work_email": "",
-      "title": "",
-      "web_url": ""
-    }
-  ],
+  "members": [],
   "aws": {
-    "accounts": [
-      {
-        "account_name": "",
-        "account_id": "",
-        "region": "",
-        "description": ""
-      }
-    ]
+    "accounts": []
   },
   "confluence": {
     "name": "",
@@ -40,16 +26,14 @@
     "description": "",
     "url": ""
   },
-  "service_now": {
+  "service_now::bizwebsysref": {
     "name": "",
     "description": "",
     "url": "",
     "assignment_groups": [
       {
         "name": "",
-        "apps": [
-          "{app.name}"
-        ]
+        "apps": ["{app.name}"]
       }
     ]
   }

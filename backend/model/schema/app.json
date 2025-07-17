@@ -33,28 +33,15 @@
     "group_web_url": ""
   },
   "jira": {
-    "project_keys": [ "" ],
+    "project_keys": [""],
     "group_web_url": ""
   },
   "service_now": {
     "group_web_url": "",
-    "assignment_group_names": [ "" ]
+    "assignment_group_names": [""]
   },
   "datadog": {
     "group_web_url": ""
   },
-  "environments": [
-    {
-      "env": "",
-      "name": "",
-      "host": "aws",
-      "app_profile": "",
-      "deploy_profile": "",
-      "deploy_pipeline_name": "",
-      "git_branch_name": "",
-      "aws": {
-        "account_name": ""
-      }
-    }
-  ]
+  "environments": []
 }

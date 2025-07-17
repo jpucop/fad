@@ -1,0 +1,12 @@
+{
+  "env": "",
+  "name": "",
+  "host": "aws",
+  "app_profile": "",
+  "deploy_profile": "",
+  "deploy_pipeline_name": "",
+  "git_branch_name": "",
+  "aws": {
+    "account_name": ""
+  }
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "jboss-java",
+    "description": "JBoss EAP app server with Java EE war file app bundle.",
+    "type": "java"
+  },
+  {
+    "name": "jboss-java-sso",
+    "description": "JBoss EAP app server with Java EE war file app bundle with SSO login",
+    "type": "java"
+  },
+  {
+    "name": "tomcat-java",
+    "description": "Tomcat app server with Java 17 web app",
+    "type": "java"
+  },
+  {
+    "name": "tomcat-java-sso",
+    "description": "Tomcat app server with Java 17 web app with SSO Login",
+    "type": "java"
+  },
+  {
+    "name": "flask-sso",
+    "description": "Flask app server with Python web app and SSO login",
+    "type": "python"
+  }
+]
